@@ -1,0 +1,11 @@
+spring:
+  application:
+    name: SuperCodingTeam1
+
+  datasource:
+    url: "jdbc:mariadb://database-1.cn6ioosku2ij.ap-northeast-2.rds.amazonaws.com"
+    username: "root"
+    password: "20240917"
+
+logging:
+  config: classpath:logback-spring-local.xml
