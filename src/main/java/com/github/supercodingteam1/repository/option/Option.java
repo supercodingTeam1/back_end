@@ -14,16 +14,16 @@ import lombok.*;
 public class Option {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    @Column(name = "option_id", nullable = false)
+    @Column(name = "option_id", nullable = false, length = 11)
     private Integer optionId;
 
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name="item_id",nullable = false)
     private Item item;
 
-    @Column(name="stock",nullable = false)
-    private Integer stock;
+    @Column(name="option_stock",nullable = false, length = 11)
+    private Integer optionStock;
 
-    @Column(name="size", nullable = false)
-    private String size; //int여도 되지 않을까?
+    @Column(name="size", nullable = false, length = 11)
+    private Integer size;
 }
