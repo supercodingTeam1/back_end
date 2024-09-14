@@ -17,16 +17,16 @@ import java.util.List;
 public class Item {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    @Column(name = "item_id", nullable = false)
+    @Column(name = "item_id", nullable = false, length = 11)
     private Integer itemId;
 
-    @Column(name = "item_name", nullable = false)
+    @Column(name = "item_name", nullable = false, length = 50)
     private String itemName;
 
-    @Column(name = "price", nullable = false)
-    private String price;
+    @Column(name = "price", nullable = false, length = 11)
+    private Integer itemPrice;
 
-    @Column(name = "total_sales", nullable = false)
+    @Column(name = "total_sales", nullable = false, length = 11)
     private Integer totalSales;
 
     @Column(name = "description", nullable = false)
