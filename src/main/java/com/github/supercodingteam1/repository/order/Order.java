@@ -17,8 +17,8 @@ import java.time.LocalDateTime;
 @Entity
 public class Order {
     @Id
-    @GeneratedValue(strategy = GenerationType.SEQUENCE)
-    @Column(name = "order_id", nullable = false)
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
+    @Column(name = "order_id", nullable = false, length = 11)
     private Integer order_id;
 
     @Column(name="order_num",nullable = false)
@@ -31,6 +31,6 @@ public class Order {
     @Column(name = "order_at", nullable = false)
     private LocalDateTime orderAt;
 
-    @Column(name = "order_address",nullable = false)
+    @Column(name = "order_address",nullable = false, length = 200)
     private String orderAddress;
 }
