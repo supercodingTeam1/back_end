@@ -14,14 +14,14 @@ import lombok.*;
 public class Image {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    @Column(name = "image_id", nullable = false)
+    @Column(name = "image_id", nullable = false, length = 11)
     private Integer imageId;
 
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "item_id", nullable = false)
     private Item item;
 
-    @Column(name = "image_link",nullable = false)
+    @Column(name = "image_link",nullable = false, length = 255)
     private String imageLink;
 
     @Column(name="image_first", nullable = false)
