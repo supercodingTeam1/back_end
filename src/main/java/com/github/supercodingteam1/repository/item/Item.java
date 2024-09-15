@@ -23,7 +23,7 @@ public class Item {
     @Column(name = "item_name", nullable = false, length = 50)
     private String itemName;
 
-    @Column(name = "price", nullable = false, length = 11)
+    @Column(name = "item_price", nullable = false, length = 11)
     private Integer itemPrice;
 
     @Column(name = "total_sales", nullable = false, length = 11)
