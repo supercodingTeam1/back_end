@@ -15,14 +15,14 @@ public class Option {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column(name = "option_id", nullable = false, length = 11)
-    private Integer optionId;
+    private Integer option_id;
 
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name="item_id",nullable = false)
     private Item item;
 
     @Column(name="option_stock",nullable = false, length = 11)
-    private Integer optionStock;
+    private Integer stock;
 
     @Column(name="size", nullable = false, length = 11)
     private Integer size;
