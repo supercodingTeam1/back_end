@@ -29,7 +29,7 @@ public class ItemController {
         Map<String, Object> responseBody = new HashMap<>();
         log.info("getAllItems 요청");
         List<GetAllItemDTO> getAllItemDTOList = itemService.getAllItems();
-//        responseBody.put("items", getAllItemDTOList);
+        responseBody.put("items",getAllItemDTOList);
 //        log.info("getAllItemDTOList: {}", getAllItemDTOList);
         return ResponseEntity.ok(responseBody);
     }

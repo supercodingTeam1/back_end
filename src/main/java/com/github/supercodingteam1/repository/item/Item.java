@@ -32,10 +32,11 @@ public class Item {
     @Column(name = "description", nullable = false)
     private String description;
 
-    @ManyToOne(fetch = FetchType.LAZY)
+    @ManyToOne(fetch = FetchType.EAGER)
     @JoinColumn(name = "category_id", nullable = false)
     private Category category;
 
     @OneToMany(mappedBy="item",cascade = CascadeType.ALL,fetch = FetchType.LAZY)
     private List<Image> imageList;
+
 }

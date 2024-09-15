@@ -9,7 +9,7 @@ import lombok.*;
 @NoArgsConstructor
 @AllArgsConstructor
 @Builder
-@Table(name = "Images")
+@Table(name = "images")
 @Entity
 public class Image {
     @Id
@@ -26,6 +26,7 @@ public class Image {
 
     @Column(name="image_first", nullable = false)
     private Boolean imageFirst;
+
 }
 
 /*
