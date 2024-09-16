@@ -12,7 +12,7 @@ import java.util.List;
 public interface OptionToGetAllItemDTOMapper {
     OptionToGetAllItemDTOMapper INSTANCE = Mappers.getMapper(OptionToGetAllItemDTOMapper.class);
 
-    @Mapping(target = "option_id", source = "optionId")
-    @Mapping(target = "stock", source = "optionStock")
-    List<GetAllItemOptionDTO> OptionToGetAllItemOptionDTO(List<Option> optionList);
+    @Mapping(source = "optionStock", target = "stock")
+    @Mapping(source = "optionId", target = "option_id")
+    GetAllItemOptionDTO OptionToGetAllItemOptionDTO(Option option);
 }

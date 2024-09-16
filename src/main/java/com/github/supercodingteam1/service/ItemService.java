@@ -64,9 +64,4 @@ public class ItemService {
             }
         }
     }
-
-    public List<GetAllItemDTO> getAllItemsOrderBySales(String sort, String order) {
-        log.info(sort, order);
-        return Arrays.asList(new GetAllItemDTO());
-    }
 }
