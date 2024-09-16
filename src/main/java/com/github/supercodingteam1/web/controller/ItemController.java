@@ -12,6 +12,7 @@ import org.slf4j.LoggerFactory;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
 import java.util.*;
@@ -24,11 +25,11 @@ public class ItemController {
     private final ItemService itemService;
     private final OptionService optionService;
 
-    @GetMapping("/")
-    public ResponseEntity<?> getAllItems(HttpServletRequest httpServletRequest){
+    @GetMapping //물품전체조회
+    public ResponseEntity<?> getAllItems(HttpServletRequest httpServletRequest,@RequestParam(required = false) String sort, @RequestParam(required = false) String order){
         Map<String, Object> responseBody = new HashMap<>();
         log.info("getAllItems 요청");
-        List<GetAllItemDTO> getAllItemDTOList = itemService.getAllItems();
+        List<GetAllItemDTO> getAllItemDTOList = itemService.getAllItems(sort, order);
         responseBody.put("items",getAllItemDTOList);
 //        log.info("getAllItemDTOList: {}", getAllItemDTOList);
         return ResponseEntity.ok(responseBody);
