@@ -31,7 +31,6 @@ public class ItemController {
         log.info("getAllItems 요청");
         List<GetAllItemDTO> getAllItemDTOList = itemService.getAllItems(sort, order);
         responseBody.put("items",getAllItemDTOList);
-//        log.info("getAllItemDTOList: {}", getAllItemDTOList);
         return ResponseEntity.ok(responseBody);
     }
 }
