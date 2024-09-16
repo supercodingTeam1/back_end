@@ -29,7 +29,7 @@ public class ItemService {
                             .item_name(item.getItemName())
                             .item_image(item.getImageList().get(0).getImageLink())
                             .category(item.getCategory())
-                            .option(OptionToGetAllItemDTOMapper.INSTANCE.OptionToGetAllItemOptionDTO(optionRepository.findAllByItem(item)))
+                            .option(optionRepository.findAllByItem(item).stream().map(OptionToGetAllItemDTOMapper.INSTANCE::OptionToGetAllItemOptionDTO).toList())
                             .price(item.getItemPrice())
                             .build();
                 }).toList();
