@@ -34,10 +34,11 @@ public class ItemController {
         log.info("getAllItems 요청");
         List<GetAllItemDTO> getAllItemDTOList = itemService.getAllItems(sort, order, size);
 
-        if(sort.equalsIgnoreCase("sales"))
+        if(sort != null && sort.equalsIgnoreCase("sales"))
             responseBody.put("items", getAllItemDTOList.stream().limit(8));
         else
-            responseBody.put("items",getAllItemDTOList);
+            responseBody.put("items", getAllItemDTOList);
+
 
         return ResponseEntity.ok(responseBody);
     }
