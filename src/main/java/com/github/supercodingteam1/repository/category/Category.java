@@ -21,4 +21,12 @@ public class Category {
 
     @Column(name = "category_gender", nullable = false, length = 20)
     private String categoryGender;
+
+    @Override
+    public String toString() {
+        return "Category{" +
+                "categoryType='" + categoryType + '\'' +
+                ",\n categoryGender='" + categoryGender + '\'' +
+                '}';
+    }
 }
