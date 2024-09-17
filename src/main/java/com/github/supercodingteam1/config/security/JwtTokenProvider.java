@@ -5,8 +5,6 @@ import io.jsonwebtoken.Jwts;
 import io.jsonwebtoken.SignatureAlgorithm;
 import io.jsonwebtoken.security.Keys;
 import jakarta.servlet.http.HttpServletRequest;
-import lombok.AllArgsConstructor;
-import lombok.NoArgsConstructor;
 import lombok.RequiredArgsConstructor;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.Authentication;
@@ -23,7 +21,7 @@ import java.util.List;
 @RequiredArgsConstructor
 public class JwtTokenProvider {
     private final String secretKey= Base64.getEncoder()
-            .encodeToString("secret-key".getBytes());
+            .encodeToString("5f8d5e3c7f1d292fb94d7dbccf9e8c8a97e5e4f902c3836724e97a163e77cdbc".getBytes());
     SecretKey key = Keys.hmacShaKeyFor(secretKey.getBytes());
 
     private long tokenValidMillisecond=1000L*60*60;
