@@ -57,5 +57,4 @@ public class ItemService {
                 .option(OptionToGetAllItemDTOMapper.INSTANCE.OptionToGetAllItemOptionDTO(optionRepository.findAllByItem(item)))
                 .price(item.getItemPrice())
                 .build();
-    }
 }
