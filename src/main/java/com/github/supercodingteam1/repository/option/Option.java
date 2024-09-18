@@ -22,7 +22,7 @@ public class Option {
     private Item item;
 
     @Column(name="option_stock",nullable = false, length = 11)
-    private Integer optionStock;
+    private Integer stock;
 
     @Column(name="size", nullable = false, length = 11)
     private Integer size;
