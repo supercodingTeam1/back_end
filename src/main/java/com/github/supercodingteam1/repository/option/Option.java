@@ -30,7 +30,8 @@ public class Option {
     @Override
     public String toString() {
         return "Option{" +
-                "item=" + item.getItemName() +
+                "optionId=" + optionId +
+                "item=" + item.getItemId() +
                 ", stock=" + stock +
                 ", size=" + size +
                 '}';
