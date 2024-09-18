@@ -64,11 +64,10 @@ public class SellService {
         images.get(0).setImageFirst(true);
         newItem.setImageList(images); //만들어진 List를 Item에 추가
 
-        List<Integer> option_size = addSellItemDTO.getOption_size();
-        List<Integer> option_stock = addSellItemDTO.getOption_stock();
+        List<Integer> option_size = addSellItemDTO.getOptions().stream().map(Option::getSize).toList();
+        List<Integer> option_stock = addSellItemDTO.getOptions().stream().map(Option::getStock).toList();
 
         List<Option> options = new ArrayList<>(); //Option List 생성
-
         for(int i =0; i < option_size.size(); i++){ //입력한 옵션 size와 stock으로 Option 생성하여 optionList에 추가
             Option option = Option.builder()
                     .item(newItem)
@@ -76,10 +75,9 @@ public class SellService {
                     .stock(option_stock.get(i))
                     .build();
             options.add(option);
-            optionRepository.save(option);
         }
+        optionRepository.saveAll(options);
 
-        System.out.println("item : " + newItem);
-        System.out.println("options : " + options);
+
     }
 }
