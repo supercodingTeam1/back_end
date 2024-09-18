@@ -59,8 +59,8 @@ public class SellService {
                     .imageLink(imageString)
                     .build();
             images.add(newImage);
-            imageRepository.save(newImage);
         }
+        imageRepository.saveAll(images);
         images.get(0).setImageFirst(true);
         newItem.setImageList(images); //만들어진 List를 Item에 추가
 
