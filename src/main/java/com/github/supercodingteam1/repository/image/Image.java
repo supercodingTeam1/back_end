@@ -24,9 +24,18 @@ public class Image {
     @Column(name = "image_link",nullable = false, length = 255)
     private String imageLink;
 
+    @Builder.Default
     @Column(name="image_first", nullable = false)
-    private Boolean imageFirst;
+    private Boolean imageFirst = false;
 
+    @Override
+    public String toString() {
+        return "Image{" +
+                ", item=" + item.getItemName() +
+                ",\n imageLink='" + imageLink + '\'' +
+                ",\n imageFirst=" + imageFirst +
+                "}\n";
+    }
 }
 
 /*
