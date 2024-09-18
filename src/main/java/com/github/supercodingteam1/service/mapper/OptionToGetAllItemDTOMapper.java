@@ -14,4 +14,6 @@ public interface OptionToGetAllItemDTOMapper {
 
     @Mapping(source = "optionId", target = "option_id")
     GetAllItemOptionDTO OptionToGetAllItemOptionDTO(Option option);
+
+    List<GetAllItemOptionDTO> OptionToGetAllItemOptionDTO(List<Option> options);
 }
