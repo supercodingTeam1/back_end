@@ -79,9 +79,6 @@ public class SellService {
             optionRepository.save(option);
         }
 
-        itemRepository.save(newItem);
-
-
         System.out.println("item : " + newItem);
         System.out.println("options : " + options);
     }
