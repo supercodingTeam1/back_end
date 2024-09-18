@@ -4594,3 +4594,4 @@ java.lang.NullPointerException: Cannot invoke "String.equalsIgnoreCase(String)" 
 2024-09-15 17:23:17.563 [http-nio-8080-exec-6] [34mINFO [0;39m [36mc.g.s.service.ItemService[0;39m - [com.github.supercodingteam1.repository.item.Item@9ddcbe2, com.github.supercodingteam1.repository.item.Item@ca507af]
 2024-09-15 17:23:17.715 [http-nio-8080-exec-6] [34mINFO [0;39m [36mc.g.s.service.ItemService[0;39m - [com.github.supercodingteam1.repository.option.Option@56f426b3, com.github.supercodingteam1.repository.option.Option@a06efb3]
 2024-09-15 17:24:55.825 [SpringApplicationShutdownHook] [34mINFO [0;39m [36mo.s.o.j.LocalContainerEntityManagerFactoryBean[0;39m - Closing JPA EntityManagerFactory for persistence unit 'default'
+
