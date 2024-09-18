@@ -10,6 +10,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Service;
 
+import java.util.Arrays;
 import java.util.Comparator;
 import java.util.List;
 import java.util.Objects;
@@ -57,5 +58,4 @@ public class ItemService {
                 .option(OptionToGetAllItemDTOMapper.INSTANCE.OptionToGetAllItemOptionDTO(optionRepository.findAllByItem(item)))
                 .price(item.getItemPrice())
                 .build();
-    }
 }
