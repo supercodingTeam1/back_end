@@ -26,11 +26,19 @@ public class ItemController {
     private final OptionService optionService;
 
     @GetMapping //물품전체조회
-    public ResponseEntity<?> getAllItems(HttpServletRequest httpServletRequest,@RequestParam(required = false) String sort, @RequestParam(required = false) String order){
+    public ResponseEntity<?> getAllItems(HttpServletRequest httpServletRequest,
+                                         @RequestParam(required = false) String sort,
+                                         @RequestParam(required = false) String order,
+                                         @RequestParam(required = false) Integer size){
         Map<String, Object> responseBody = new HashMap<>();
         log.info("getAllItems 요청");
-        List<GetAllItemDTO> getAllItemDTOList = itemService.getAllItems(sort, order);
-        responseBody.put("items",getAllItemDTOList);
+        List<GetAllItemDTO> getAllItemDTOList = itemService.getAllItems(sort, order, size);
+
+        if(sort.equalsIgnoreCase("sales"))
+            responseBody.put("items", getAllItemDTOList.stream().limit(8));
+        else
+            responseBody.put("items",getAllItemDTOList);
+
         return ResponseEntity.ok(responseBody);
     }
 }
