@@ -26,4 +26,13 @@ public class Option {
 
     @Column(name="size", nullable = false, length = 11)
     private Integer size;
+
+    @Override
+    public String toString() {
+        return "Option{" +
+                "item=" + item.getItemName() +
+                ", stock=" + stock +
+                ", size=" + size +
+                '}';
+    }
 }
