@@ -14,6 +14,8 @@ import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
+
 
 import java.util.*;
 
@@ -26,11 +28,20 @@ public class ItemController {
     private final OptionService optionService;
 
     @GetMapping //물품전체조회
-    public ResponseEntity<?> getAllItems(HttpServletRequest httpServletRequest,@RequestParam(required = false) String sort, @RequestParam(required = false) String order){
+    public ResponseEntity<?> getAllItems(HttpServletRequest httpServletRequest,
+                                         @RequestParam(required = false) String sort,
+                                         @RequestParam(required = false) String order,
+                                         @RequestParam(required = false) Integer size){
         Map<String, Object> responseBody = new HashMap<>();
         log.info("getAllItems 요청");
-        List<GetAllItemDTO> getAllItemDTOList = itemService.getAllItems(sort, order);
-        responseBody.put("items",getAllItemDTOList);
+        List<GetAllItemDTO> getAllItemDTOList = itemService.getAllItems(sort, order, size);
+
+        if(sort != null && sort.equalsIgnoreCase("sales"))
+            responseBody.put("items", getAllItemDTOList.stream().limit(8));
+        else
+            responseBody.put("items", getAllItemDTOList);
+
         return ResponseEntity.ok(responseBody);
     }
+
 }
