@@ -4,7 +4,7 @@ package com.github.supercodingteam1.service;
 import com.github.supercodingteam1.config.security.JwtTokenProvider;
 import com.github.supercodingteam1.repository.user.User;
 import com.github.supercodingteam1.repository.user.UserRepository;
-import com.github.supercodingteam1.web.dto.LoginRequestDto;
+import com.github.supercodingteam1.web.dto.LoginDTO;
 import com.github.supercodingteam1.web.exceptions.NotAcceptException;
 import com.github.supercodingteam1.web.exceptions.NotFoundException;
 import lombok.RequiredArgsConstructor;
@@ -13,8 +13,9 @@ import org.springframework.security.authentication.UsernamePasswordAuthenticatio
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Service;
-
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 
 @RequiredArgsConstructor
@@ -25,27 +26,33 @@ public class AuthService {
     private final UserRepository userRepository;
     private final JwtTokenProvider jwtTokenProvider;
 
-    public String login(LoginRequestDto loginRequestDto) {
-        String email = loginRequestDto.getEmail();
-        String password = loginRequestDto.getPassword();
+    public Map<String, String> login(LoginDTO loginRequestDto) {
+        String email = loginRequestDto.getUser_email();
+        String password = loginRequestDto.getUser_password();
 
         try {
             Authentication authentication = authenticationManager.authenticate(
                     new UsernamePasswordAuthenticationToken(email, password)
             );
-            SecurityContextHolder.getContext()
-                    .setAuthentication(authentication);
+            SecurityContextHolder.getContext().setAuthentication(authentication);
 
             User user = userRepository.findByEmail(email)
-                    .orElseThrow(() -> new NotFoundException("UserPrincipal 을 찾을 수 없습니다."));
+                    .orElseThrow(() -> new NotFoundException("사용자를 찾을 수 없습니다."));
 
             List<String> roles = user.getRoles();
 
-            return jwtTokenProvider.createToken(email, roles);
-        } catch (Exception e){
-            e.printStackTrace();
-            throw new NotAcceptException("로그인 할 수 없습니다.");
-        }
+            String accessToken = jwtTokenProvider.createAccessToken(email, roles);
+            String refreshToken = jwtTokenProvider.createRefreshToken();
 
+            Map<String, String> tokens = new HashMap<>();
+            tokens.put("accessToken", accessToken);
+            tokens.put("refreshToken", refreshToken);
+
+            return tokens;
+
+        } catch (Exception e) {
+            e.printStackTrace();
+            throw new NotAcceptException("로그인에 실패했습니다.");
+        }
     }
 }
