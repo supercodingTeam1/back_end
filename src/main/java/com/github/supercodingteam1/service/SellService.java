@@ -35,7 +35,6 @@ public class SellService {
     public void addSellItem(List<MultipartFile> item_image, AddSellItemDTO addSellItemDTO) {
         log.info(addSellItemDTO.toString());
 
-
         Category category = categoryRepository.findByCategoryTypeAndCategoryGender( //카테고리 설정
                         addSellItemDTO.getCategory_type(),
                         addSellItemDTO.getCategory_gender()) //리포지토리에서 해당 카테고리가 있으면 가져오고
