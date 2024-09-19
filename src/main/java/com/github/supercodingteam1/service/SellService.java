@@ -59,7 +59,7 @@ public class SellService {
             Option option = Option.builder()
                     .item(newItem)
                     .size(option_size.get(i))
-                    .stock(option_stock.get(i))
+                    .optionStock(option_stock.get(i))
                     .build();
             options.add(option);
         }
