@@ -9,6 +9,7 @@ import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
 import org.springframework.security.config.http.SessionCreationPolicy;
 import org.springframework.security.web.SecurityFilterChain;
+import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
 
 @Configuration
 @EnableWebSecurity
@@ -23,9 +24,15 @@ public class SecurityConfiguration {
                 .csrf(csrf -> csrf.disable())  // CSRF 보호 비활성화
                 .sessionManagement(session -> session
                         .sessionCreationPolicy(SessionCreationPolicy.STATELESS))  // Stateless 설정
+                .addFilterBefore(new JwtAuthenticationFilter(jwtTokenProvider), UsernamePasswordAuthenticationFilter.class)
                 .authorizeHttpRequests(authorize -> authorize
-                        .anyRequest().authenticated())  // 모든 요청 인증 필요
-                .formLogin(form -> form.disable())  // 폼 로그인 비활성화
+                        .requestMatchers("/swagger-ui.html", "/v3/api-docs", "/swagger-resources/**", "/webjars/**").permitAll()
+                        .requestMatchers("/auth/signup", "/auth/duplicate","/auth/login","/items/**").permitAll()
+                        .requestMatchers("/sell").hasRole("SELLER")
+                        .requestMatchers("/auth/logout","/auth/withdraw", "/cart/**","/mypage/**").authenticated()
+                        .anyRequest().denyAll()
+                )
+                .formLogin(form -> form.permitAll())  // 폼 로그인 활성화(form-data)
                 .httpBasic(httpBasic -> httpBasic.disable())  // HTTP Basic 인증 비활성화
                 .rememberMe(rememberMe -> rememberMe.disable());  // Remember Me 기능 비활성화
 
