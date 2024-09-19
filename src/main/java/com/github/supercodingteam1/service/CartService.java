@@ -96,18 +96,9 @@ public class CartService {
     public void deleteCartItem(DeleteCartDTO deleteCartDTO, User user) {
         //TODO : user 관련하여 현재 멈춰있는 상태.
         Option option = optionRepository.findById(deleteCartDTO.getOption_id()).orElse(null);
-        List<Cart> userCartList = cartRepository.findAllByUser(user);
+        OptionCart optionCart = optionCartRepository.findByOptionAndCart_User(option,user);
 
-        Cart cart = null;
-        OptionCart optionCart = null;
-
-        for(Cart existingCart : userCartList) {
-            optionCart = optionCartRepository.findByOptionAndCart(option, existingCart); //optionCart table에서 option과 cart가 일치하는지 확인
-            if(optionCart != null) { //일치하는 정보 있으면
-                cart = existingCart; //cart에 해당 카트 정보 대입
-                break;
-            }
-        }
+        Cart cart = optionCart.getCart();
 
         cartRepository.delete(cart);
     }

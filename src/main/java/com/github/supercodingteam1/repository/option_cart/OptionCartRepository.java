@@ -17,4 +17,5 @@ import java.util.Optional;
 @Repository
 public interface OptionCartRepository extends JpaRepository<OptionCart,Integer> {
     OptionCart findByOptionAndCart(Option option, Cart existingCart);
+    OptionCart findByOptionAndCart_User(Option option, User user);
 }
