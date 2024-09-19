@@ -1,10 +1,10 @@
 package com.github.supercodingteam1.repository.option_cart;
 
+import com.github.supercodingteam1.repository.cart.Cart;
+import com.github.supercodingteam1.repository.option.Option;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.stereotype.Repository;
 
-@Repository
-public interface OptionCartRepository extends JpaRepository<OptionCart,Integer> {
 import com.github.supercodingteam1.repository.cart.Cart;
 import com.github.supercodingteam1.repository.option.Option;
 import com.github.supercodingteam1.repository.user.User;
