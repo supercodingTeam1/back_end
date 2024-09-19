@@ -21,7 +21,7 @@ public class S3Config {
     private String region;
 
     @Bean
-    public AmazonS3 amazonS3() {
+    public AmazonS3 amazonS3() { // AWS 키를 이용하여 AWS 인증 처리
         AWSCredentials credentials = new BasicAWSCredentials(accessKey, secretKey);
 
         return AmazonS3ClientBuilder

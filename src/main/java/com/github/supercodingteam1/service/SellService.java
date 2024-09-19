@@ -55,28 +55,27 @@ public class SellService {
 
         itemRepository.save(newItem);
 
-        List<String> filenameList = new ArrayList<>();
         List<String> imageUrlList = new ArrayList<>();
+        List<Image> imageList = new ArrayList<>();
+
         for(MultipartFile multipartFile : item_image) {
             try {
                 imageUrlList.add(s3Uploader.upload(multipartFile, "images"));
-
-                List<Image> imageList = new ArrayList<>();
-
-                for (String imageUrl : imageUrlList) {
-                    Image image = Image.builder()
-                            .imageLink(imageUrl)
-                            .item(newItem)
-                            .build();
-                    imageList.add(image);
-                }
-                imageList.get(0).setImageFirst(true);
-                imageRepository.saveAll(imageList);
 
             }catch (IOException e) {
                 e.printStackTrace();
             }
         }
+
+        for (String imageUrl : imageUrlList) {
+            Image image = Image.builder()
+                    .imageLink(imageUrl)
+                    .item(newItem)
+                    .build();
+            imageList.add(image);
+        }
+        imageList.get(0).setImageFirst(true);
+        imageRepository.saveAll(imageList);
 
         List<Integer> option_size = addSellItemDTO.getOptions().stream().map(OptionDTO::getSize).toList();
         List<Integer> option_stock = addSellItemDTO.getOptions().stream().map(OptionDTO::getStock).toList();
