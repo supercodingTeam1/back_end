@@ -27,4 +27,11 @@ public class OptionCart {
     @JoinColumn(name="cart_id", nullable = false)
     private Cart cart;
 
+    @Override
+    public String toString() {
+        return "OptionCart{" +
+                "option_cart_id=" + option_cart_id +
+                ", option=" + option +
+                '}';
+    }
 }
