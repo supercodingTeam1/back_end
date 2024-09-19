@@ -31,7 +31,7 @@ public class Option {
     public String toString() {
         return "Option{" +
                 "item=" + item.getItemName() +
-                ", stock=" + stock +
+                ", stock=" + optionStock +
                 ", size=" + size +
                 '}';
     }
