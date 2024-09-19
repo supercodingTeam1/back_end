@@ -9,11 +9,13 @@ import com.github.supercodingteam1.repository.item.ItemRepository;
 import com.github.supercodingteam1.repository.option.Option;
 import com.github.supercodingteam1.repository.option.OptionRepository;
 import com.github.supercodingteam1.web.dto.AddSellItemDTO;
+import com.github.supercodingteam1.web.dto.OptionDTO;
 import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Service;
+import org.springframework.web.multipart.MultipartFile;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -28,11 +30,16 @@ public class SellService {
     private final ImageRepository imageRepository;
 
     @Transactional
-    public void addSellItem(AddSellItemDTO addSellItemDTO) {
+    public void addSellItem(List<MultipartFile> item_image, AddSellItemDTO addSellItemDTO) {
         log.info(addSellItemDTO.toString());
 
-        Category category = categoryRepository.findByCategoryTypeAndCategoryGender(
-                addSellItemDTO.getCategory_type(),
+        for(MultipartFile multipartFile : item_image) {
+            System.out.println(multipartFile.getOriginalFilename());
+        }
+
+
+        Category category = categoryRepository.findByCategoryTypeAndCategoryGender( //카테고리 설정
+                        addSellItemDTO.getCategory_type(),
                         addSellItemDTO.getCategory_gender()) //리포지토리에서 해당 카테고리가 있으면 가져오고
                 .orElse(Category.builder()                   //없으면 카테고리 새로 생성
                         .categoryType(addSellItemDTO.getCategory_type())
@@ -41,7 +48,7 @@ public class SellService {
 
         categoryRepository.save(category); //이미 존재하는 카테고리는 저장 안됨
 
-        Item newItem = Item.builder()
+        Item newItem = Item.builder() //아이템 객체 생성
                 .itemName(addSellItemDTO.getItem_name())
                 .itemPrice(addSellItemDTO.getPrice())
                 .category(category)
@@ -52,23 +59,23 @@ public class SellService {
 
 
         List<Image> images = new ArrayList<>();
-        List<String> imageStrings = addSellItemDTO.getItem_image();
-        for (String imageString : imageStrings) { //입력한 사진 링크로 Image 객체를 만들어 List에 추가
-            Image newImage = Image.builder()
-                    .item(newItem)
-                    .imageLink(imageString)
-                    .build();
-            images.add(newImage);
-        }
-        imageRepository.saveAll(images);
-        images.get(0).setImageFirst(true);
-        newItem.setImageList(images); //만들어진 List를 Item에 추가
+        //TODO : 클라이언트에서 받아온 이미지를 AWS S3에 업로드 하고, url을 받아와 DB에 저장
+//        List<String> imageStrings = addSellItemDTO.getItem_image();
+//        for (String imageString : imageStrings) { //입력한 사진 링크로 Image 객체를 만들어 List에 추가
+//            Image newImage = Image.builder()
+//                    .item(newItem)
+//                    .imageLink(imageString)
+//                    .build();
+//            images.add(newImage);
+//        }
+//        imageRepository.saveAll(images);
+//        images.get(0).setImageFirst(true);
+//        newItem.setImageList(images); //만들어진 List를 Item에 추가
 
-        List<Integer> option_size = addSellItemDTO.getOption_size();
-        List<Integer> option_stock = addSellItemDTO.getOption_stock();
+        List<Integer> option_size = addSellItemDTO.getOptions().stream().map(OptionDTO::getSize).toList();
+        List<Integer> option_stock = addSellItemDTO.getOptions().stream().map(OptionDTO::getStock).toList();
 
         List<Option> options = new ArrayList<>(); //Option List 생성
-
         for(int i =0; i < option_size.size(); i++){ //입력한 옵션 size와 stock으로 Option 생성하여 optionList에 추가
             Option option = Option.builder()
                     .item(newItem)
@@ -76,13 +83,9 @@ public class SellService {
                     .stock(option_stock.get(i))
                     .build();
             options.add(option);
-            optionRepository.save(option);
         }
+        optionRepository.saveAll(options);
 
-        itemRepository.save(newItem);
 
-
-        System.out.println("item : " + newItem);
-        System.out.println("options : " + options);
     }
 }
