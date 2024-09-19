@@ -39,7 +39,7 @@ public class CartController {
         //TODO : 헤더에 담긴 토큰을 파싱해서 유저 누구인지 가져오는 기능 구현 필요
         // httpServletRequest.getHeader("X-AUTH-TOKEN");
         // 임시 유저 생성하여 사용
-        User user = userRepository.findById(4).orElse(null);
+        User user = userRepository.findById(6).orElse(null);
         cartService.modifyCartItem(modifyCartDTO, user);
         //TODO 받아온 옵션 id와 수량으로 cart 테이블에 있는 quantity 바꾸고, option_cart에 있는 option id 변경
         return ResponseEntity.ok(ResponseDTO.builder()
