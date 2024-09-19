@@ -25,6 +25,7 @@ public class Category {
     @Override
     public String toString() {
         return "Category{" +
+                "categoryId=" + categoryId +
                 "categoryType='" + categoryType + '\'' +
                 ",\n categoryGender='" + categoryGender + '\'' +
                 '}';
