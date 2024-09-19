@@ -15,7 +15,6 @@ import java.util.Optional;
 @Builder
 public class AddSellItemDTO {
     private String item_name;
-//    private List<MultipartFile> item_image;
     private String description;
     private Integer price;
     private String category_type;
@@ -26,7 +25,6 @@ public class AddSellItemDTO {
     public String toString() {
         return "AddSellItemDTO{" +
                 "item_name='" + item_name + '\'' +
-//                ", item_image=" + item_image +
                 ", description='" + description + '\'' +
                 ", price=" + price +
                 ", category_type='" + category_type + '\'' +
