@@ -38,23 +38,18 @@ dependencies {
     implementation 'org.mapstruct:mapstruct:1.5.5.Final'
     annotationProcessor 'org.mapstruct:mapstruct-processor:1.5.5.Final'
 
-<<<<<<< HEAD
 
     //jwt token
     implementation 'io.jsonwebtoken:jjwt-api:0.11.5'
     runtimeOnly 'io.jsonwebtoken:jjwt-impl:0.11.5'
     runtimeOnly 'io.jsonwebtoken:jjwt-jackson:0.11.5'
-=======
+
     //AWS S3
-<<<<<<< HEAD
     implementation 'org.springframework.cloud:spring-cloud-starter-aws:2.2.6.RELEASE'
->>>>>>> featAddItemToCart
-=======
-    implementation 'io.awspring.cloud:spring-cloud-starter-aws:2.4.4' // AWS S3
-    implementation 'javax.xml.bind:jaxb-api:2.3.1' // AWS S3
-    implementation 'com.sun.xml.bind:jaxb-core:2.3.0.1' // AWS S3
-    implementation 'com.sun.xml.bind:jaxb-impl:2.3.2' // AWS S3
->>>>>>> fixAddItemToCart
+
+    implementation 'javax.xml.bind:jaxb-api:2.3.1'
+    implementation 'org.glassfish.jaxb:jaxb-runtime:2.3.1'
+    implementation 'javax.activation:activation:1.1.1'
 
 }
 

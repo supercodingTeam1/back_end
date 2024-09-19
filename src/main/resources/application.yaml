@@ -18,6 +18,8 @@ spring:
       max-file-size: 10MB
       max-request-size: 10MB
 
+  profiles:
+    include: aws
 
 cloud:
   aws:
@@ -26,6 +28,9 @@ cloud:
     credentials:
       access-key: ${AWS_ACCESS_KEY}
       secret-key: ${AWS_SECRET_KEY}
+    s3:
+      bucket: supercoding2406
+
 
 
 logging:
