@@ -2,7 +2,6 @@ package com.github.supercodingteam1.repository.user;
 
 import jakarta.persistence.*;
 import lombok.*;
-
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
@@ -42,7 +41,6 @@ public class User {
     @CollectionTable(name = "user_roles", joinColumns = @JoinColumn(name = "user_id"))
     @Column(name = "user_role", nullable = false, length = 30)
     private List<String> roles = new ArrayList<>();
-
 
     @Column(name="user_img",nullable = false, length = 255)
     private String userImg;

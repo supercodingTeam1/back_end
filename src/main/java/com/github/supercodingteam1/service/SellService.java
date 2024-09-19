@@ -29,11 +29,14 @@ public class SellService {
     private final ItemRepository itemRepository;
     private final OptionRepository optionRepository;
     private final ImageRepository imageRepository;
+
     private final S3Uploader s3Uploader;
+
 
     @Transactional
     public void addSellItem(List<MultipartFile> item_image, AddSellItemDTO addSellItemDTO) {
         log.info(addSellItemDTO.toString());
+
 
         Category category = categoryRepository.findByCategoryTypeAndCategoryGender( //카테고리 설정
                         addSellItemDTO.getCategory_type(),
@@ -53,7 +56,7 @@ public class SellService {
                 .build();
 
         itemRepository.save(newItem);
-
+  
         List<String> imageUrlList = new ArrayList<>();
         List<Image> imageList = new ArrayList<>();
 
