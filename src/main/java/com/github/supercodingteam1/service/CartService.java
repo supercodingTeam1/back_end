@@ -11,8 +11,6 @@ import com.github.supercodingteam1.repository.option_cart.OptionCartRepository;
 import com.github.supercodingteam1.repository.user.User;
 import com.github.supercodingteam1.repository.user.UserRepository;
 import com.github.supercodingteam1.web.dto.AddToCartDTO;
-import lombok.RequiredArgsConstructor;
-import org.springframework.stereotype.Service;
 import com.github.supercodingteam1.web.dto.DeleteCartDTO;
 import com.github.supercodingteam1.web.dto.ModifyCartDTO;
 import lombok.RequiredArgsConstructor;
@@ -20,6 +18,7 @@ import org.springframework.stereotype.Service;
 
 import java.util.List;
 import java.util.Objects;
+
 @Service
 @RequiredArgsConstructor
 public class CartService {
@@ -30,27 +29,6 @@ public class CartService {
     private final OptionCartRepository optionCartRepository;
 
     public void addItemToCart(AddToCartDTO addToCartDTO) {
-        Option option = optionRepository.findById(addToCartDTO.getOption_id())
-                .orElseThrow(null);
-        Cart newCart = Cart.builder()
-                .cartQuantity(addToCartDTO.getQuantity())
-                .user(userRepository.findById(4).orElseThrow(null))
-                .build();
-        Item item = option.getItem();
-        OptionCart optionCart = OptionCart.builder()
-                        .cart(newCart)
-                        .option(option)
-                        .build();
-
-        cartRepository.save(newCart);
-        optionCartRepository.save(optionCart);
-
-        System.out.println("option_id : "+option.getOptionId());
-        System.out.println("option_name : "+option.getSize());
-        System.out.println("item_image : "+item.getImageList().get(0).getImageLink());
-        System.out.println("item_name : "+item.getItemName());
-        System.out.println("quantity : "+newCart.getCartQuantity());
-        System.out.println("price : "+item.getItemPrice());
         //TODO : 카트 담을 때 같은 아이템의 같은 옵션을 또 장바구니에 담으면 quantity 만큼만 수량 증가하고 메소드 종료
 
         User user = userRepository.findById(6).orElse(null);
@@ -113,6 +91,7 @@ public class CartService {
 
         optionCartRepository.save(optionCart);
     }
+
 
     public void deleteCartItem(DeleteCartDTO deleteCartDTO, User user) {
         //TODO : user 관련하여 현재 멈춰있는 상태.
