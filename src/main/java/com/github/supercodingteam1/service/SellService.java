@@ -85,7 +85,5 @@ public class SellService {
             options.add(option);
         }
         optionRepository.saveAll(options);
-
-
     }
 }
