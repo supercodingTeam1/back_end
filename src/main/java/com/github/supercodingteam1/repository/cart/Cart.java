@@ -24,6 +24,7 @@ public class Cart {
     @Column(name = "cart_quantity", nullable = false, length = 11)
     private Integer cartQuantity;
 
+
     @Override
     public String toString() {
         return "Cart{" +

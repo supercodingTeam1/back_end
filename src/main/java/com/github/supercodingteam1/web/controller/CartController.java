@@ -1,5 +1,8 @@
 package com.github.supercodingteam1.web.controller;
 
+import com.github.supercodingteam1.service.CartService;
+import com.github.supercodingteam1.service.ItemService;
+import com.github.supercodingteam1.web.dto.AddToCartDTO;
 import com.github.supercodingteam1.repository.user.User;
 import com.github.supercodingteam1.repository.user.UserRepository;
 import com.github.supercodingteam1.service.CartService;
@@ -13,7 +16,12 @@ import lombok.RequiredArgsConstructor;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.http.ResponseEntity;
+import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.RequestBody;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.bind.annotation.*;
+
 
 @RestController
 @RequestMapping("/cart")
@@ -29,6 +37,7 @@ public class CartController {
         log.info("addItemCart 메소드 호출, {},{}", addToCartDTO.getOption_id(), addToCartDTO.getQuantity());
 
         cartService.addItemToCart(addToCartDTO);
+
         return ResponseEntity.ok(ResponseDTO.builder()
                 .status(200)
                 .message("장바구니에 담았습니다.")
