@@ -11,6 +11,7 @@ import com.github.supercodingteam1.repository.option_cart.OptionCartRepository;
 import com.github.supercodingteam1.repository.user.User;
 import com.github.supercodingteam1.repository.user.UserRepository;
 import com.github.supercodingteam1.web.dto.AddToCartDTO;
+import com.github.supercodingteam1.web.dto.DeleteCartDTO;
 import com.github.supercodingteam1.web.dto.ModifyCartDTO;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
@@ -89,5 +90,25 @@ public class CartService {
         optionCart.getCart().setCartQuantity(quantity);
 
         optionCartRepository.save(optionCart);
+    }
+
+
+    public void deleteCartItem(DeleteCartDTO deleteCartDTO, User user) {
+        //TODO : user 관련하여 현재 멈춰있는 상태.
+        Option option = optionRepository.findById(deleteCartDTO.getOption_id()).orElse(null);
+        List<Cart> userCartList = cartRepository.findAllByUser(user);
+
+        Cart cart = null;
+        OptionCart optionCart = null;
+
+        for(Cart existingCart : userCartList) {
+            optionCart = optionCartRepository.findByOptionAndCart(option, existingCart); //optionCart table에서 option과 cart가 일치하는지 확인
+            if(optionCart != null) { //일치하는 정보 있으면
+                cart = existingCart; //cart에 해당 카트 정보 대입
+                break;
+            }
+        }
+
+        cartRepository.delete(cart);
     }
 }

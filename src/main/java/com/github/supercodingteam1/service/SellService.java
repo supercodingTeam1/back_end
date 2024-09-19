@@ -17,6 +17,7 @@ import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
 
+import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -28,15 +29,11 @@ public class SellService {
     private final ItemRepository itemRepository;
     private final OptionRepository optionRepository;
     private final ImageRepository imageRepository;
+    private final S3Uploader s3Uploader;
 
     @Transactional
     public void addSellItem(List<MultipartFile> item_image, AddSellItemDTO addSellItemDTO) {
         log.info(addSellItemDTO.toString());
-
-        for(MultipartFile multipartFile : item_image) {
-            System.out.println(multipartFile.getOriginalFilename());
-        }
-
 
         Category category = categoryRepository.findByCategoryTypeAndCategoryGender( //카테고리 설정
                         addSellItemDTO.getCategory_type(),
@@ -57,20 +54,27 @@ public class SellService {
 
         itemRepository.save(newItem);
 
+        List<String> imageUrlList = new ArrayList<>();
+        List<Image> imageList = new ArrayList<>();
 
-        List<Image> images = new ArrayList<>();
-        //TODO : 클라이언트에서 받아온 이미지를 AWS S3에 업로드 하고, url을 받아와 DB에 저장
-//        List<String> imageStrings = addSellItemDTO.getItem_image();
-//        for (String imageString : imageStrings) { //입력한 사진 링크로 Image 객체를 만들어 List에 추가
-//            Image newImage = Image.builder()
-//                    .item(newItem)
-//                    .imageLink(imageString)
-//                    .build();
-//            images.add(newImage);
-//        }
-//        imageRepository.saveAll(images);
-//        images.get(0).setImageFirst(true);
-//        newItem.setImageList(images); //만들어진 List를 Item에 추가
+        for(MultipartFile multipartFile : item_image) {
+            try {
+                imageUrlList.add(s3Uploader.upload(multipartFile, "images"));
+
+            }catch (IOException e) {
+                e.printStackTrace();
+            }
+        }
+
+        for (String imageUrl : imageUrlList) {
+            Image image = Image.builder()
+                    .imageLink(imageUrl)
+                    .item(newItem)
+                    .build();
+            imageList.add(image);
+        }
+        imageList.get(0).setImageFirst(true);
+        imageRepository.saveAll(imageList);
 
         List<Integer> option_size = addSellItemDTO.getOptions().stream().map(OptionDTO::getSize).toList();
         List<Integer> option_stock = addSellItemDTO.getOptions().stream().map(OptionDTO::getStock).toList();

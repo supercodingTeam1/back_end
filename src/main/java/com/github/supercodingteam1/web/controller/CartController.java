@@ -5,6 +5,7 @@ import com.github.supercodingteam1.repository.user.UserRepository;
 import com.github.supercodingteam1.service.CartService;
 import com.github.supercodingteam1.service.ItemService;
 import com.github.supercodingteam1.web.dto.AddToCartDTO;
+import com.github.supercodingteam1.web.dto.DeleteCartDTO;
 import com.github.supercodingteam1.web.dto.ModifyCartDTO;
 import com.github.supercodingteam1.web.dto.ResponseDTO;
 import jakarta.servlet.http.HttpServletRequest;
@@ -45,6 +46,18 @@ public class CartController {
         return ResponseEntity.ok(ResponseDTO.builder()
                 .status(200)
                 .message("성공적으로 수정되었습니다.")
+                .build());
+    }
+
+    @DeleteMapping
+    public ResponseEntity<?> deleteCartItem(HttpServletRequest httpServletRequest, @RequestBody DeleteCartDTO deleteCartDTO){
+        User user = userRepository.findById(6).orElse(null);
+
+        cartService.deleteCartItem(deleteCartDTO, user);
+
+        return ResponseEntity.ok(ResponseDTO.builder()
+                .status(200)
+                .message("성공적으로 삭제되었습니다.")
                 .build());
     }
 }

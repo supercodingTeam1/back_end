@@ -21,7 +21,8 @@ public class Image {
     @JoinColumn(name = "item_id", nullable = false)
     private Item item;
 
-    @Column(name = "image_link",nullable = false, length = 255)
+
+    @Column(name = "image_link",nullable = false)
     private String imageLink;
 
     @Builder.Default
