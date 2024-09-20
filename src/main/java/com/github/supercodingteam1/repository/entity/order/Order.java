@@ -20,7 +20,7 @@ public class Order {
     private Integer order_id;
 
     @Column(name="order_num",nullable = false)
-    private Double orderNum;
+    private String orderNum;
 
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "cart_id", nullable = false)

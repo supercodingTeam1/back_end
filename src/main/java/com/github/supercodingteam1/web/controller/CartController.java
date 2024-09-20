@@ -2,12 +2,9 @@ package com.github.supercodingteam1.web.controller;
 
 import com.github.supercodingteam1.service.CartService;
 import com.github.supercodingteam1.service.ItemService;
-import com.github.supercodingteam1.web.dto.AddToCartDTO;
+import com.github.supercodingteam1.web.dto.*;
 import com.github.supercodingteam1.repository.entity.user.User;
 import com.github.supercodingteam1.repository.entity.user.UserRepository;
-import com.github.supercodingteam1.web.dto.DeleteCartDTO;
-import com.github.supercodingteam1.web.dto.ModifyCartDTO;
-import com.github.supercodingteam1.web.dto.ResponseDTO;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.responses.ApiResponses;
@@ -87,6 +84,21 @@ public class CartController {
         return ResponseEntity.ok(ResponseDTO.builder()
                 .status(200)
                 .message("성공적으로 삭제되었습니다.")
+                .build());
+    }
+
+    @Operation(summary = "장바구니에 담긴 물품 주문 및 결제")
+    @ApiResponses({
+            @ApiResponse(responseCode = "200", description = "성공적으로 결제했습니다."),
+            @ApiResponse(responseCode = "403", description = "권한이 없습니다."),
+            @ApiResponse(responseCode = "500", description = "서버 오류")
+    })
+    @PostMapping("/order")
+    public ResponseEntity<?> orderCartItem(HttpServletRequest httpServletRequest, @RequestBody OrderDTO orderDTO) {
+        cartService.orderCartItem(orderDTO);
+        return ResponseEntity.ok(ResponseDTO.builder()
+                .status(200)
+                .message("성공적으로 주문되었습니다.")
                 .build());
     }
 }

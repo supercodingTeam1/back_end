@@ -7,14 +7,21 @@ import com.github.supercodingteam1.repository.entity.option.Option;
 import com.github.supercodingteam1.repository.entity.option.OptionRepository;
 import com.github.supercodingteam1.repository.entity.option_cart.OptionCart;
 import com.github.supercodingteam1.repository.entity.option_cart.OptionCartRepository;
+import com.github.supercodingteam1.repository.entity.order.Order;
+import com.github.supercodingteam1.repository.entity.order.OrderRepository;
 import com.github.supercodingteam1.repository.entity.user.User;
 import com.github.supercodingteam1.repository.entity.user.UserRepository;
 import com.github.supercodingteam1.web.dto.AddToCartDTO;
 import com.github.supercodingteam1.web.dto.DeleteCartDTO;
 import com.github.supercodingteam1.web.dto.ModifyCartDTO;
+import com.github.supercodingteam1.web.dto.OrderDTO;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
+import java.time.LocalDate;
+import java.time.LocalDateTime;
+import java.time.LocalTime;
+import java.time.format.DateTimeFormatter;
 import java.util.List;
 import java.util.Objects;
 
@@ -26,6 +33,7 @@ public class CartService {
     private final OptionRepository optionRepository;
     private final UserRepository userRepository;
     private final OptionCartRepository optionCartRepository;
+    private final OrderRepository orderRepository;
 
     public void addItemToCart(AddToCartDTO addToCartDTO) {
         //TODO : 카트 담을 때 같은 아이템의 같은 옵션을 또 장바구니에 담으면 quantity 만큼만 수량 증가하고 메소드 종료
@@ -99,5 +107,33 @@ public class CartService {
         Cart cart = optionCart.getCart();
 
         cartRepository.delete(cart);
+    }
+
+    public void orderCartItem(OrderDTO orderDTO) {
+        //TODO : 장바구니에 담긴 물품 주문 시 option에 stock 조정, order테이블에 주문기록 저장
+        String orderNum = generateOrderId(); //주문번호 생성
+
+        System.out.println("주문번호 : " + orderNum);
+
+    }
+
+    //주문번호는 날짜(yyyyMMdd) + 현재시간(HHmmssSSS) 으로 구성
+    private String generateOrderId() {
+        // 현재 날짜와 시간을 가져옵니다.
+        LocalDate currentDate = LocalDate.now(); // YYYY-MM-DD 형태
+        LocalTime currentTime = LocalTime.now(); // HH:MM:SS 형태
+
+        // 날짜를 "yyyyMMdd" 형식으로 포맷팅
+        DateTimeFormatter dateFormatter = DateTimeFormatter.ofPattern("yyyyMMdd");
+        String date = currentDate.format(dateFormatter);
+
+        // 시간을 "HHmmssSSS" 형식으로 포맷팅 (밀리초까지 포함한 8자리 시간)
+        DateTimeFormatter timeFormatter = DateTimeFormatter.ofPattern("HHmmssSSS");
+        String time = currentTime.format(timeFormatter);
+
+        // 날짜와 시간을 결합하여 주문 번호 생성
+        String orderNumber = date + time;
+
+        return orderNumber;
     }
 }
