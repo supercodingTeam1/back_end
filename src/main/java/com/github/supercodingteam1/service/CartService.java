@@ -92,7 +92,6 @@ public class CartService {
         optionCartRepository.save(optionCart);
     }
 
-
     public void deleteCartItem(DeleteCartDTO deleteCartDTO, User user) {
         //TODO : user 관련하여 현재 멈춰있는 상태.
         Option option = optionRepository.findById(deleteCartDTO.getOption_id()).orElse(null);
