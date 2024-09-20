@@ -2,6 +2,7 @@ package com.github.supercodingteam1.service;
 
 
 import com.github.supercodingteam1.config.security.JwtTokenProvider;
+import com.github.supercodingteam1.repository.entity.user.Role;
 import com.github.supercodingteam1.repository.entity.user.User;
 import com.github.supercodingteam1.repository.entity.user.UserRepository;
 import com.github.supercodingteam1.web.dto.LoginDTO;
@@ -27,7 +28,7 @@ public class AuthService {
     private final JwtTokenProvider jwtTokenProvider;
 
     public Map<String, String> login(LoginDTO loginRequestDto) {
-        String email = loginRequestDto.getUser_email();
+        String email = loginRequestDto.getUser_name();
         String password = loginRequestDto.getUser_password();
 
         try {
@@ -39,7 +40,7 @@ public class AuthService {
             User user = userRepository.findByEmail(email)
                     .orElseThrow(() -> new NotFoundException("사용자를 찾을 수 없습니다."));
 
-            List<String> roles = user.getRoles();
+            List<String> roles = user.getUser_role().stream().map(role->role.getRoleName().toString()).toList();
 
             String accessToken = jwtTokenProvider.createAccessToken(email, roles);
             String refreshToken = jwtTokenProvider.createRefreshToken();
