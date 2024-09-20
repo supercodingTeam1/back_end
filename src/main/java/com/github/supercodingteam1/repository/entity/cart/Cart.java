@@ -1,6 +1,6 @@
-package com.github.supercodingteam1.repository.cart;
+package com.github.supercodingteam1.repository.entity.cart;
 
-import com.github.supercodingteam1.repository.user.User;
+import com.github.supercodingteam1.repository.entity.user.User;
 import jakarta.persistence.*;
 import lombok.*;
 

@@ -1,4 +1,4 @@
-package com.github.supercodingteam1.repository.image;
+package com.github.supercodingteam1.repository.entity.image;
 
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.stereotype.Repository;

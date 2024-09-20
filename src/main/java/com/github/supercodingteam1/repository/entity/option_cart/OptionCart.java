@@ -1,8 +1,7 @@
-package com.github.supercodingteam1.repository.option_cart;
+package com.github.supercodingteam1.repository.entity.option_cart;
 
-import com.github.supercodingteam1.repository.cart.Cart;
-import com.github.supercodingteam1.repository.item.Item;
-import com.github.supercodingteam1.repository.option.Option;
+import com.github.supercodingteam1.repository.entity.cart.Cart;
+import com.github.supercodingteam1.repository.entity.option.Option;
 import jakarta.persistence.*;
 import lombok.*;
 

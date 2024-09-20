@@ -1,4 +1,4 @@
-package com.github.supercodingteam1.repository.user;
+package com.github.supercodingteam1.repository.entity.user;
 
 import jakarta.persistence.*;
 import lombok.*;

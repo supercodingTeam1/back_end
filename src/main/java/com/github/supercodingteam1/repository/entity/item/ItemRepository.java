@@ -1,4 +1,4 @@
-package com.github.supercodingteam1.repository.item;
+package com.github.supercodingteam1.repository.entity.item;
 
 
 import org.springframework.data.jpa.repository.JpaRepository;

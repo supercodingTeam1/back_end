@@ -1,13 +1,13 @@
 package com.github.supercodingteam1.service;
 
-import com.github.supercodingteam1.repository.category.Category;
-import com.github.supercodingteam1.repository.category.CategoryRepository;
-import com.github.supercodingteam1.repository.image.Image;
-import com.github.supercodingteam1.repository.image.ImageRepository;
-import com.github.supercodingteam1.repository.item.Item;
-import com.github.supercodingteam1.repository.item.ItemRepository;
-import com.github.supercodingteam1.repository.option.Option;
-import com.github.supercodingteam1.repository.option.OptionRepository;
+import com.github.supercodingteam1.repository.entity.category.Category;
+import com.github.supercodingteam1.repository.entity.category.CategoryRepository;
+import com.github.supercodingteam1.repository.entity.image.Image;
+import com.github.supercodingteam1.repository.entity.image.ImageRepository;
+import com.github.supercodingteam1.repository.entity.item.Item;
+import com.github.supercodingteam1.repository.entity.item.ItemRepository;
+import com.github.supercodingteam1.repository.entity.option.Option;
+import com.github.supercodingteam1.repository.entity.option.OptionRepository;
 import com.github.supercodingteam1.web.dto.AddSellItemDTO;
 import com.github.supercodingteam1.web.dto.OptionDTO;
 import jakarta.transaction.Transactional;
@@ -35,7 +35,6 @@ public class SellService {
 
     @Transactional
     public void addSellItem(List<MultipartFile> item_image, AddSellItemDTO addSellItemDTO) {
-        log.info(addSellItemDTO.toString());
 
         Category category = categoryRepository.findByCategoryTypeAndCategoryGender( //카테고리 설정
                         addSellItemDTO.getCategory_type(),

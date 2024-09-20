@@ -2,8 +2,8 @@ package com.github.supercodingteam1.service;
 
 
 import com.github.supercodingteam1.config.security.JwtTokenProvider;
-import com.github.supercodingteam1.repository.user.User;
-import com.github.supercodingteam1.repository.user.UserRepository;
+import com.github.supercodingteam1.repository.entity.user.User;
+import com.github.supercodingteam1.repository.entity.user.UserRepository;
 import com.github.supercodingteam1.web.dto.LoginDTO;
 import com.github.supercodingteam1.web.exceptions.NotAcceptException;
 import com.github.supercodingteam1.web.exceptions.NotFoundException;

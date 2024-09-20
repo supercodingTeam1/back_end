@@ -1,6 +1,6 @@
 package com.github.supercodingteam1.service.mapper;
 
-import com.github.supercodingteam1.repository.item.Item;
+import com.github.supercodingteam1.repository.entity.item.Item;
 import com.github.supercodingteam1.web.dto.GetAllItemDTO;
 import org.mapstruct.Mapper;
 import org.mapstruct.Mapping;

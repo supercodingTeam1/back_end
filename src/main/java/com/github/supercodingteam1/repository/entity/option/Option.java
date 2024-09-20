@@ -1,6 +1,6 @@
-package com.github.supercodingteam1.repository.option;
+package com.github.supercodingteam1.repository.entity.option;
 
-import com.github.supercodingteam1.repository.item.Item;
+import com.github.supercodingteam1.repository.entity.item.Item;
 import jakarta.persistence.*;
 import lombok.*;
 

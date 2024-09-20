@@ -1,10 +1,8 @@
-package com.github.supercodingteam1.repository.order;
+package com.github.supercodingteam1.repository.entity.order;
 
-import com.github.supercodingteam1.repository.cart.Cart;
-import com.github.supercodingteam1.repository.item.Item;
+import com.github.supercodingteam1.repository.entity.cart.Cart;
 import jakarta.persistence.*;
 import lombok.*;
-import org.hibernate.boot.archive.scan.spi.ClassFileArchiveEntryHandler;
 
 import java.time.LocalDateTime;
 
