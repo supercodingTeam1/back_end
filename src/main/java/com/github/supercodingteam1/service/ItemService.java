@@ -36,6 +36,9 @@ public class ItemService {
             comparator = comparator.reversed();
         }
 
+        //option 중 모든 option에 대한 stock이 0이면 아이템 전체를 안보여주고
+        //option 중 일부 option에 대한 stock이 0이면 해당 option만 안보여주게 filtering 구현
+
         return itemRepository.findAll().stream()
                 .filter(item -> (size == null || hasOptionWithSize(item,size)))
                 .filter(this::isStockMoreThanZero) //item의 options 중 stock이 모두 0 이면 출력 안되게 filter 적용
@@ -55,7 +58,7 @@ public class ItemService {
     }
 
     private GetAllItemDTO convertToGetAllItemDTO(Item item) {
-        //재고가 있는 option만 보여지도록
+        //item에 해당하는 option 중 재고가 있는 option만 보여지도록
         List<Option> options = optionRepository.findAllByItem(item)
                 .stream()
                 .filter(option -> option.getStock() > 0)
