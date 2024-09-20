@@ -90,32 +90,32 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
         }
 
         try{
-            log.info("Filter running ..");
-            //요청에서 토큰 가져오기
-            String token=parseBearerToken(request);
-
-            //토큰 검사하기 . JWT 이므로 인가 서버에 요청하지 않고도 검증 가능.  userId 가져오기. 위조된 경우 예외 처리된다.
-            if(token!=null && !token.equalsIgnoreCase("null")){
-                String userId =null;
-                try{
-                    userId = tokenProvider.validateAndGetUserId(token);
-                }catch(Exception e){
-                    throw new CustomAuthenticationException("접근 토큰시간이 만료되었습니다.","ACCESS_TOKEN_EXPIRED");
-                }
-
-                //JWT 토큰로그인 인증에서는 API ,  oauth2 는  loadUserApiByUsername 커스텀으로 생성한 메서드로  id 값으로 인증처리
-                PrincipalDetails principalDetails =(PrincipalDetails)principalDetailsService.loadUserByUsername(userId);
-
-                if(principalDetails!=null){
-                    log.info("필터 ===principalDetails  {}", principalDetails.getUser().getUser_role().toString());
-
-                    authSetConfirm( request,  principalDetails);
-                    filterChain.doFilter(request, response);
-
-                }else throw new CustomAuthenticationException("해당하는 유저가 없습니다.", "USER_NOT_FOUND");
-
-            }else   throw new CustomAuthenticationException("유효하지 않은 토큰 입니다.","INVALID_TOKEN" );
-
+//            log.info("Filter running ..");
+//            //요청에서 토큰 가져오기
+//            String token=parseBearerToken(request);
+//
+//            //토큰 검사하기 . JWT 이므로 인가 서버에 요청하지 않고도 검증 가능.  userId 가져오기. 위조된 경우 예외 처리된다.
+//            if(token!=null && !token.equalsIgnoreCase("null")){
+//                String userId =null;
+//                try{
+//                    userId = tokenProvider.validateAndGetUserId(token);
+//                }catch(Exception e){
+//                    throw new CustomAuthenticationException("접근 토큰시간이 만료되었습니다.","ACCESS_TOKEN_EXPIRED");
+//                }
+//
+//                //JWT 토큰로그인 인증에서는 API ,  oauth2 는  loadUserApiByUsername 커스텀으로 생성한 메서드로  id 값으로 인증처리
+//                PrincipalDetails principalDetails =(PrincipalDetails)principalDetailsService.loadUserByUsername(userId);
+//
+//                if(principalDetails!=null){
+//                    log.info("필터 ===principalDetails  {}", principalDetails.getUser().getUser_role().toString());
+//
+//                    authSetConfirm( request,  principalDetails);
+//                    filterChain.doFilter(request, response);
+//
+//                }else throw new CustomAuthenticationException("해당하는 유저가 없습니다.", "USER_NOT_FOUND");
+//
+//            }else   throw new CustomAuthenticationException("유효하지 않은 토큰 입니다.","INVALID_TOKEN" );
+            filterChain.doFilter(request, response);
 
         }catch (CustomAuthenticationException e  ){
             log.info("JWT CustomAuthenticationException 에러 처리  ");
@@ -160,9 +160,6 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
         SecurityContextHolder.setContext(securityContext);
     }
 
-
-
-
     /**
      * Http 요청의 헤더를 파싱해 Bearer 토큰을 리턴한다.
      * @param request
@@ -176,9 +173,4 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
         }
         return null;
     }
-
-
-
-
-
 }
