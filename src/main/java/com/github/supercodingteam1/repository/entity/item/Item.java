@@ -1,7 +1,7 @@
-package com.github.supercodingteam1.repository.item;
+package com.github.supercodingteam1.repository.entity.item;
 
-import com.github.supercodingteam1.repository.category.Category;
-import com.github.supercodingteam1.repository.image.Image;
+import com.github.supercodingteam1.repository.entity.category.Category;
+import com.github.supercodingteam1.repository.entity.image.Image;
 import jakarta.persistence.*;
 import lombok.*;
 

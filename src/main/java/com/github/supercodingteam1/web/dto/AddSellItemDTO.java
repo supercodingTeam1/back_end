@@ -1,12 +1,8 @@
 package com.github.supercodingteam1.web.dto;
 
-import com.github.supercodingteam1.repository.category.Category;
-import com.github.supercodingteam1.repository.option.Option;
 import lombok.*;
-import org.springframework.web.multipart.MultipartFile;
 
 import java.util.List;
-import java.util.Optional;
 
 @Getter
 @Setter

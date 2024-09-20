@@ -1,7 +1,7 @@
-package com.github.supercodingteam1.repository.option;
+package com.github.supercodingteam1.repository.entity.option;
 
 
-import com.github.supercodingteam1.repository.item.Item;
+import com.github.supercodingteam1.repository.entity.item.Item;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.stereotype.Repository;
 

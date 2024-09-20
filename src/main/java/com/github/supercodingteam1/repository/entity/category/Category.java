@@ -1,4 +1,4 @@
-package com.github.supercodingteam1.repository.category;
+package com.github.supercodingteam1.repository.entity.category;
 
 import jakarta.persistence.*;
 import lombok.*;

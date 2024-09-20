@@ -1,8 +1,8 @@
 package com.github.supercodingteam1.service;
 
-import com.github.supercodingteam1.repository.item.Item;
-import com.github.supercodingteam1.repository.item.ItemRepository;
-import com.github.supercodingteam1.repository.option.OptionRepository;
+import com.github.supercodingteam1.repository.entity.item.Item;
+import com.github.supercodingteam1.repository.entity.item.ItemRepository;
+import com.github.supercodingteam1.repository.entity.option.OptionRepository;
 import com.github.supercodingteam1.service.mapper.OptionToGetAllItemDTOMapper;
 import com.github.supercodingteam1.web.dto.GetAllItemDTO;
 import lombok.RequiredArgsConstructor;
@@ -10,10 +10,8 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Service;
 
-import java.util.Arrays;
 import java.util.Comparator;
 import java.util.List;
-import java.util.Objects;
 
 @Service
 @RequiredArgsConstructor

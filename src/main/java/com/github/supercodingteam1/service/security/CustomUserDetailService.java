@@ -1,12 +1,11 @@
 package com.github.supercodingteam1.service.security;
 
 import com.github.supercodingteam1.repository.UserDetails.CustomUserDetails;
-import com.github.supercodingteam1.repository.user.User;
-import com.github.supercodingteam1.repository.user.UserRepository;
+import com.github.supercodingteam1.repository.entity.user.User;
+import com.github.supercodingteam1.repository.entity.user.UserRepository;
 import com.github.supercodingteam1.web.exceptions.NotFoundException;
 import lombok.RequiredArgsConstructor;
 import org.springframework.context.annotation.Primary;
-import org.springframework.data.crossstore.ChangeSetPersister;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;

@@ -1,15 +1,14 @@
 package com.github.supercodingteam1.service;
 
-import com.github.supercodingteam1.repository.cart.Cart;
-import com.github.supercodingteam1.repository.cart.CartRepository;
-import com.github.supercodingteam1.repository.item.Item;
-import com.github.supercodingteam1.repository.item.ItemRepository;
-import com.github.supercodingteam1.repository.option.Option;
-import com.github.supercodingteam1.repository.option.OptionRepository;
-import com.github.supercodingteam1.repository.option_cart.OptionCart;
-import com.github.supercodingteam1.repository.option_cart.OptionCartRepository;
-import com.github.supercodingteam1.repository.user.User;
-import com.github.supercodingteam1.repository.user.UserRepository;
+import com.github.supercodingteam1.repository.entity.cart.Cart;
+import com.github.supercodingteam1.repository.entity.cart.CartRepository;
+import com.github.supercodingteam1.repository.entity.item.ItemRepository;
+import com.github.supercodingteam1.repository.entity.option.Option;
+import com.github.supercodingteam1.repository.entity.option.OptionRepository;
+import com.github.supercodingteam1.repository.entity.option_cart.OptionCart;
+import com.github.supercodingteam1.repository.entity.option_cart.OptionCartRepository;
+import com.github.supercodingteam1.repository.entity.user.User;
+import com.github.supercodingteam1.repository.entity.user.UserRepository;
 import com.github.supercodingteam1.web.dto.AddToCartDTO;
 import com.github.supercodingteam1.web.dto.DeleteCartDTO;
 import com.github.supercodingteam1.web.dto.ModifyCartDTO;
@@ -91,7 +90,6 @@ public class CartService {
 
         optionCartRepository.save(optionCart);
     }
-
 
     public void deleteCartItem(DeleteCartDTO deleteCartDTO, User user) {
         //TODO : user 관련하여 현재 멈춰있는 상태.

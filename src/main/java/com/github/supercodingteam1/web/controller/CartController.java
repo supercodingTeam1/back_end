@@ -3,14 +3,14 @@ package com.github.supercodingteam1.web.controller;
 import com.github.supercodingteam1.service.CartService;
 import com.github.supercodingteam1.service.ItemService;
 import com.github.supercodingteam1.web.dto.AddToCartDTO;
-import com.github.supercodingteam1.repository.user.User;
-import com.github.supercodingteam1.repository.user.UserRepository;
-import com.github.supercodingteam1.service.CartService;
-import com.github.supercodingteam1.service.ItemService;
-import com.github.supercodingteam1.web.dto.AddToCartDTO;
+import com.github.supercodingteam1.repository.entity.user.User;
+import com.github.supercodingteam1.repository.entity.user.UserRepository;
 import com.github.supercodingteam1.web.dto.DeleteCartDTO;
 import com.github.supercodingteam1.web.dto.ModifyCartDTO;
 import com.github.supercodingteam1.web.dto.ResponseDTO;
+import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.responses.ApiResponse;
+import io.swagger.v3.oas.annotations.responses.ApiResponses;
 import jakarta.servlet.http.HttpServletRequest;
 import lombok.RequiredArgsConstructor;
 import org.slf4j.Logger;
@@ -32,6 +32,12 @@ public class CartController {
     private final CartService cartService;
     private final UserRepository userRepository;
 
+    @Operation(summary = "장바구니에 물품 추가")
+    @ApiResponses({
+            @ApiResponse(responseCode = "200", description = "성공적으로 등록했습니다."),
+            @ApiResponse(responseCode = "403", description = "권한이 없습니다."),
+            @ApiResponse(responseCode = "500", description = "서버 오류")
+    })
     @PostMapping
     public ResponseEntity<?> addItemToCart(HttpServletRequest httpServletRequest, @RequestBody AddToCartDTO addToCartDTO) { //장바구니 담기
         log.info("addItemCart 메소드 호출, {},{}", addToCartDTO.getOption_id(), addToCartDTO.getQuantity());
@@ -44,8 +50,15 @@ public class CartController {
                 .build());
     }
 
+    @Operation(summary = "장바구니에 담긴 물품 옵션 or 재고 수정")
+    @ApiResponses({
+            @ApiResponse(responseCode = "200", description = "성공적으로 수정했습니다."),
+            @ApiResponse(responseCode = "403", description = "권한이 없습니다."),
+            @ApiResponse(responseCode = "500", description = "서버 오류")
+    })
     @PutMapping
     public ResponseEntity<?> modifyCartItem(HttpServletRequest httpServletRequest, @RequestBody ModifyCartDTO modifyCartDTO) {
+        log.info("modifyCartItem 메소드 호출");
         //TODO : 헤더에 담긴 토큰을 파싱해서 유저 누구인지 가져오는 기능 구현 필요
         // httpServletRequest.getHeader("X-AUTH-TOKEN");
         // 임시 유저 생성하여 사용
@@ -58,8 +71,15 @@ public class CartController {
                 .build());
     }
 
+    @Operation(summary = "장바구니에 담긴 물품 삭제")
+    @ApiResponses({
+            @ApiResponse(responseCode = "200", description = "성공적으로 삭제했습니다."),
+            @ApiResponse(responseCode = "403", description = "권한이 없습니다."),
+            @ApiResponse(responseCode = "500", description = "서버 오류")
+    })
     @DeleteMapping
     public ResponseEntity<?> deleteCartItem(HttpServletRequest httpServletRequest, @RequestBody DeleteCartDTO deleteCartDTO){
+        log.info("deleteCartItem 메소드 호출");
         User user = userRepository.findById(6).orElse(null);
 
         cartService.deleteCartItem(deleteCartDTO, user);

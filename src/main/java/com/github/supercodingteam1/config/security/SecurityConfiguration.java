@@ -25,13 +25,15 @@ public class SecurityConfiguration {
                 .sessionManagement(session -> session
                         .sessionCreationPolicy(SessionCreationPolicy.STATELESS))  // Stateless 설정
                 .addFilterBefore(new JwtAuthenticationFilter(jwtTokenProvider), UsernamePasswordAuthenticationFilter.class)
-                .authorizeHttpRequests(authorize -> authorize
-                        .requestMatchers("/swagger-ui.html", "/v3/api-docs", "/swagger-resources/**", "/webjars/**").permitAll()
-                        .requestMatchers("/auth/signup", "/auth/duplicate","/auth/login","/items/**").permitAll()
-                        .requestMatchers("/sell").hasRole("SELLER")
-                        .requestMatchers("/auth/logout","/auth/withdraw", "/cart/**","/mypage/**").authenticated()
-                        .anyRequest().denyAll()
-                )
+//                .authorizeHttpRequests(authorize -> authorize
+//                        .requestMatchers("/api-docs/**","/swagger-ui.html", "/v3/api-docs/**", "/swagger-resources/**", "/webjars/**","/swagger-ui/**").permitAll()
+//                        .requestMatchers("/auth/signup", "/auth/duplicate","/auth/login","/items/**").permitAll()
+//                        .requestMatchers("/sell").hasRole("SELLER")
+//                        .requestMatchers("/auth/logout","/auth/withdraw", "/cart/**","/mypage/**").authenticated()
+//                        .anyRequest().denyAll()
+//                )
+                .authorizeHttpRequests(authorize->authorize
+                        .anyRequest().permitAll())
                 .formLogin(form -> form.permitAll())  // 폼 로그인 활성화(form-data)
                 .httpBasic(httpBasic -> httpBasic.disable())  // HTTP Basic 인증 비활성화
                 .rememberMe(rememberMe -> rememberMe.disable());  // Remember Me 기능 비활성화
