@@ -2,6 +2,7 @@ package com.github.supercodingteam1.service;
 
 import com.github.supercodingteam1.repository.entity.item.Item;
 import com.github.supercodingteam1.repository.entity.item.ItemRepository;
+import com.github.supercodingteam1.repository.entity.option.Option;
 import com.github.supercodingteam1.repository.entity.option.OptionRepository;
 import com.github.supercodingteam1.service.mapper.OptionToGetAllItemDTOMapper;
 import com.github.supercodingteam1.web.dto.GetAllItemDTO;
@@ -37,9 +38,15 @@ public class ItemService {
 
         return itemRepository.findAll().stream()
                 .filter(item -> (size == null || hasOptionWithSize(item,size)))
+                .filter(this::isStockMoreThanZero) //item의 options 중 stock이 모두 0 이면 출력 안되게 filter 적용
                 .sorted(comparator)
                 .map(this::convertToGetAllItemDTO)
                 .toList();
+    }
+
+    private boolean isStockMoreThanZero(Item item) {
+        return optionRepository.findAllByItem(item).stream()
+                .anyMatch(option -> option.getStock() > 0);
     }
 
     private boolean hasOptionWithSize(Item item, Integer size) {
@@ -48,12 +55,19 @@ public class ItemService {
     }
 
     private GetAllItemDTO convertToGetAllItemDTO(Item item) {
+        //재고가 있는 option만 보여지도록
+        List<Option> options = optionRepository.findAllByItem(item)
+                .stream()
+                .filter(option -> option.getStock() > 0)
+                .toList();
+
+
         return GetAllItemDTO.builder()
                 .item_id(item.getItemId())
                 .item_name(item.getItemName())
                 .item_image(item.getImageList().get(0).getImageLink())
                 .category(item.getCategory())
-                .option(OptionToGetAllItemDTOMapper.INSTANCE.OptionToGetAllItemOptionDTO(optionRepository.findAllByItem(item)))
+                .option(OptionToGetAllItemDTOMapper.INSTANCE.OptionToGetAllItemOptionDTO(options))
                 .price(item.getItemPrice())
                 .build();
     }
