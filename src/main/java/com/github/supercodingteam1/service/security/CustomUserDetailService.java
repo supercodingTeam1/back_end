@@ -1,10 +1,12 @@
 package com.github.supercodingteam1.service.security;
 
+import com.github.supercodingteam1.config.auth.PrincipalDetails;
 import com.github.supercodingteam1.repository.UserDetails.CustomUserDetails;
 import com.github.supercodingteam1.repository.entity.user.User;
 import com.github.supercodingteam1.repository.entity.user.UserRepository;
 import com.github.supercodingteam1.web.exceptions.NotFoundException;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.context.annotation.Primary;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.core.userdetails.UserDetailsService;
@@ -14,6 +16,7 @@ import org.springframework.stereotype.Service;
 @Primary
 @RequiredArgsConstructor
 @Service
+@Slf4j
 public class CustomUserDetailService implements UserDetailsService {
 
     private final UserRepository userRepository;
