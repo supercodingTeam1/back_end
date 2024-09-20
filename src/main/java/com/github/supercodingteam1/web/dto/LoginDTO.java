@@ -1,15 +1,26 @@
 package com.github.supercodingteam1.web.dto;
 
-import lombok.AllArgsConstructor;
-import lombok.Getter;
-import lombok.NoArgsConstructor;
-import lombok.Setter;
+import com.github.supercodingteam1.repository.entity.user.User;
+import jakarta.validation.constraints.NotEmpty;
+import lombok.*;
 
-@Setter
-@Getter
-@NoArgsConstructor
 @AllArgsConstructor
+@NoArgsConstructor
+@Data
+@Builder
 public class LoginDTO {
-    private String user_email;
+
+    @NotEmpty(message = "유저 이름은 필수입니다.")
+    private String user_name;
+
+    @NotEmpty(message = "패스워드는 필수입니다.")
     private String user_password;
+
+
+    public static User toLoginUser(LoginDTO loginDTO) {
+        return User.builder()
+                .userName(loginDTO.getUser_name())
+                .password(loginDTO.getUser_password())
+                .build();
+    }
 }

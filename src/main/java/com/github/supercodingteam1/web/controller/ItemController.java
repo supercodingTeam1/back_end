@@ -1,7 +1,6 @@
 package com.github.supercodingteam1.web.controller;
 
 import com.github.supercodingteam1.service.ItemService;
-import com.github.supercodingteam1.service.OptionService;
 import com.github.supercodingteam1.web.dto.GetAllItemDTO;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.media.Schema;
@@ -26,7 +25,6 @@ import java.util.*;
 public class ItemController {
     private static final Logger log = LoggerFactory.getLogger(ItemController.class);
     private final ItemService itemService;
-    private final OptionService optionService;
 
     @Operation(summary = "모든 아이템 조회")
     @ApiResponses({

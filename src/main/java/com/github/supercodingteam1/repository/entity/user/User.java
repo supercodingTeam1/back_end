@@ -37,10 +37,13 @@ public class User {
     @Column(name = "user_gender", nullable = false, length = 2)
     private String userGender;
 
-    @ElementCollection(fetch = FetchType.EAGER)
-    @CollectionTable(name = "user_roles", joinColumns = @JoinColumn(name = "user_id"))
-    @Column(name = "user_role", nullable = false, length = 30)
-    private List<String> roles = new ArrayList<>();
+    @ManyToMany(fetch = FetchType.EAGER)
+    @JoinTable(
+            name = "user_role_mapping",
+            joinColumns = @JoinColumn(name = "user_id", referencedColumnName = "user_id"),
+            inverseJoinColumns = @JoinColumn(name = "role_id", referencedColumnName = "role_id")
+    )
+    private List<UserRole> user_role;
 
     @Column(name="user_img",nullable = false, length = 255)
     private String userImg;

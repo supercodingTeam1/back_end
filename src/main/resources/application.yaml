@@ -21,6 +21,12 @@ spring:
   profiles:
     include: aws
 
+  jwt:
+    token:
+      access-expiration-time: 3600000  # 접근 토큰 시간: 1 시간 (60*60*1000 = 3600000 밀리초)
+      refresh-expiration-time: 1209600000  # 갱신 토큰 시간: 14일 (60*60*24*14*1000 = 1209600000 밀리초)
+
+
 cloud:
   aws:
     region:
