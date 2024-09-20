@@ -5,6 +5,7 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import com.github.supercodingteam1.config.auth.PrincipalDetails;
 import com.github.supercodingteam1.config.auth.PrincipalDetailsService;
 import com.github.supercodingteam1.config.auth.jwt.JwtTokenProviderService;
+import com.github.supercodingteam1.config.security.JwtTokenProvider;
 import com.github.supercodingteam1.exception.CustomAuthenticationException;
 import com.github.supercodingteam1.web.dto.ResponseDTO;
 import jakarta.servlet.FilterChain;
@@ -41,6 +42,7 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
             "/auth/signup","/auth/login" , "/auth/reissue", "/auth/duplicate",
             "/auth/refreshToken",
     };
+    private final JwtTokenProvider jwtTokenProvider;
 
 
     // 필터 제외 페이지 설정
@@ -74,6 +76,8 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
     protected void doFilterInternal(HttpServletRequest request,
                                     HttpServletResponse response,
                                     FilterChain filterChain) throws ServletException, IOException {
+
+        String jwtToken = jwtTokenProvider.resolveToken(request);
         String requestURI = request.getRequestURI();
         log.info("=========  doFilterInternal getRequestURI  : {}", requestURI);
 

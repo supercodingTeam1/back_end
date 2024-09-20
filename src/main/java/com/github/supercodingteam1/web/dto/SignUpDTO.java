@@ -38,7 +38,12 @@ public class SignUpDTO {
   @Size(min = 10, max = 15, message = "전화번호는 10자에서 15자 사이여야 합니다.")
   private String user_phone;
 
+  @NotEmpty(message = "주소는 필수입니다.")
+  private String user_address;
+
   private String user_profile;
+
+  private String user_gender;
 
   private Role[] roles;
 
@@ -53,10 +58,11 @@ public class SignUpDTO {
     List<UserRole> userRoles=null;
     if(signUpDTO.getRoles()==null || signUpDTO.getRoles().length == 0) {
           userRoles = new ArrayList<>();
-          UserRole userRole1 = userRoleService.findByRoleName(Role.BUYER);
+          UserRole userRole1 = userRoleService.findByRoleName(Role.ROLE_BUYER);
+
           if (userRole1 == null) {
             userRole1 = new UserRole();
-            userRole1.setRoleName(Role.SELLER);
+            userRole1.setRoleName(Role.ROLE_SELLER);
             userRole1 = userRoleService.save(userRole1);
           }
            userRoles.add(userRole1);

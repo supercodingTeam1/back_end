@@ -47,71 +47,50 @@ public class AuthController {
     }
      */
     @PostMapping("/signup")
-    public ResponseEntity<?> registerUser(@Valid @RequestBody SignUpDTO signUpDTO, BindingResult bindingResult) {
+    public ResponseDTO registerUser(@Valid @RequestBody SignUpDTO signUpDTO, BindingResult bindingResult) {
         log.info("회원 가입 처리 요청 수신");
         try {
-            // 유효성 검사 결과 처리
-            if (bindingResult.hasErrors()) {
-                String errorMessage = Objects.requireNonNull(bindingResult.getFieldError()).getDefaultMessage();
-                return ResponseEntity.badRequest().body(ResponseDTO.builder().status(400).message(errorMessage).build());
-            }
-
-            // 회원가입 DTO를 User 엔티티로 변환
-            User user = SignUpDTO.toCreateUser(signUpDTO, userRoleService);
-
-            // 회원가입 처리
-            User registeredUser = userService.registerUser(user);
-
-            // 성공 응답 생성
-            ResponseDTO responseDTO = ResponseDTO.builder()
+            authService.signUp(signUpDTO, bindingResult);
+            return ResponseDTO.builder()
                     .status(200)
-                    .message("회원가입이 성공적으로 완료되었습니다.")
+                    .message("성공적으로 회원가입하였습니다.")
                     .build();
-            return ResponseEntity.ok().body(responseDTO);
         } catch (Exception e) {
             log.error("회원가입 처리 중 오류 발생: ", e);
             ResponseDTO responseDTO = ResponseDTO.builder()
                     .status(400)
                     .message(e.getMessage())
                     .build();
-            return ResponseEntity.badRequest().body(responseDTO);
+            return ResponseDTO.builder()
+                    .status(HttpStatus.BAD_REQUEST.value())
+                    .message(e.getMessage())
+                    .build();
         }
     }
 
     /**
      * 회원가입시 중복확인
-     * @param signUpDTO
+     * @param checkDuplicateDTO
      * @return
      */
-    @GetMapping("/duplicate")
-    public ResponseEntity<?> duplicate(@RequestBody  SignUpDTO signUpDTO){
+    @PostMapping("/duplicate")
+    public ResponseDTO duplicate(@RequestBody CheckDuplicateDTO checkDuplicateDTO){
 
-        log.info("회원가입시 중복확인 -duplicate :signUpDTO  :{} ", signUpDTO);
+        log.info("회원가입시 중복확인 -duplicate :checkDuplicateDTO  :{} ", checkDuplicateDTO);
 
-        if(StringUtils.hasText(signUpDTO.getUser_name())){
-            boolean isDuplicate = userService.isDuplicateUserName(signUpDTO.getUser_name());
+        if(StringUtils.hasText(checkDuplicateDTO.getUser_email())){
+            boolean isDuplicate = userService.isDuplicateEmail(checkDuplicateDTO.getUser_email());
             if(isDuplicate){
-                return ResponseEntity.ok().body(ResponseDTO.builder()
-                        .status(400)
-                        .message("유저네임이 중복되었습니다.")
-                        .build());
+                return  ResponseDTO.builder()
+                        .status(HttpStatus.BAD_REQUEST.value())
+                        .message("이미 존재하는 이메일입니다.")
+                        .build();
             }
         }
-
-        if(StringUtils.hasText(signUpDTO.getUser_email())){
-            boolean isDuplicate = userService.isDuplicateEmail(signUpDTO.getUser_email());
-            if(isDuplicate){
-                return  ResponseEntity.ok().body(ResponseDTO.builder()
-                        .status(400)
-                        .message("이메일이 중복되었습니다.")
-                        .build());
-            }
-        }
-
-        return ResponseEntity.ok().body(ResponseDTO.builder()
+        return ResponseDTO.builder()
                 .status(200)
-                .message("success")
-                .build());
+                .message("사용가능한 이메일입니다.")
+                .build();
 
     }
 
