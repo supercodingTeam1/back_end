@@ -7,6 +7,7 @@ import com.github.supercodingteam1.service.AuthService;
 import com.github.supercodingteam1.service.UserRoleService;
 import com.github.supercodingteam1.service.UserService;
 import com.github.supercodingteam1.web.dto.*;
+import jakarta.servlet.http.HttpServletRequest;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -94,23 +95,6 @@ public class AuthController {
 
     }
 
-//    @PostMapping(value = "/login")
-//    public ResponseEntity<Map<String, String>> login(@RequestBody LoginDTO loginRequestDto) {
-//        try {
-//            Map<String, String> tokens = authService.login(loginRequestDto);
-//
-//            return ResponseEntity
-//                    .status(HttpStatus.OK)
-//                    .header("Authorization", "Bearer " + tokens.get("accessToken"))
-//                    .header("Refresh-Token", tokens.get("refreshToken"))
-//                    .body(Collections.singletonMap("message", "로그인에 성공했습니다."));
-//
-//        } catch (Exception e) {
-//            return ResponseEntity
-//                    .status(HttpStatus.UNAUTHORIZED)
-//                    .body(Collections.singletonMap("message", "로그인에 실패했습니다."));
-//        }
-//    }
 
     /** auth/login
      * 로그인 처리
@@ -131,9 +115,7 @@ public class AuthController {
             return ResponseEntity.badRequest().body(loginResponseDTO);
         }
 
-
-        User user=userService.getByCredentials(loginDTO.getUser_name(), loginDTO.getUser_password());
-
+        User user = userService.getByCredentials(loginDTO.getUser_name(), loginDTO.getUser_password());
 
         if(user!=null){
             //토큰 생성
@@ -181,8 +163,9 @@ public class AuthController {
 
     // auth/withdraw
     @DeleteMapping("/withdraw")
-    public ResponseEntity<?> withdraw(@RequestBody WithdrawDTO withdrawDTO){
+    public ResponseEntity<?> withdraw(HttpServletRequest httpServletRequest, @RequestBody WithdrawDTO withdrawDTO){
         try{
+            //TODO : httpServletRequest 헤더에서 토큰 가져와서 파싱 후 user 판단
             //DB 에서 토큰 삭제
             userService.withdraw(withdrawDTO);
             return ResponseEntity.ok().body(ResponseDTO.builder().status(200).message("success").build());
