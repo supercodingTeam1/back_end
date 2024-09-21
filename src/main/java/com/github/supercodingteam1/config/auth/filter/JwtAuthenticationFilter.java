@@ -3,10 +3,10 @@ package com.github.supercodingteam1.config.auth.filter;
 import com.fasterxml.jackson.databind.ObjectMapper;
 
 import com.github.supercodingteam1.config.auth.PrincipalDetails;
-import com.github.supercodingteam1.config.auth.PrincipalDetailsService;
 import com.github.supercodingteam1.config.auth.jwt.JwtTokenProviderService;
 import com.github.supercodingteam1.config.security.JwtTokenProvider;
 import com.github.supercodingteam1.exception.CustomAuthenticationException;
+import com.github.supercodingteam1.service.security.CustomUserDetailService;
 import com.github.supercodingteam1.web.dto.ResponseDTO;
 import jakarta.servlet.FilterChain;
 import jakarta.servlet.ServletException;
@@ -32,7 +32,7 @@ import java.io.PrintWriter;
 @Log4j2
 public class JwtAuthenticationFilter extends OncePerRequestFilter {
 
-    private final PrincipalDetailsService principalDetailsService;
+    private final CustomUserDetailService customUserDetailService;
     private final JwtTokenProviderService tokenProvider;
 
     //JWT 필터 제외 페이지 설정

@@ -10,6 +10,7 @@ import lombok.Setter;
 @NoArgsConstructor
 @AllArgsConstructor
 public class ModifyCartDTO {
+    private Integer cart_id;
     private Integer option_id;
     private Integer quantity;
 }
