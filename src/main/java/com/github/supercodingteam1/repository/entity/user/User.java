@@ -25,7 +25,7 @@ public class User {
     @Column(name = "email", nullable = false, length = 50)
     private String email;
 
-    @Column(name="password", nullable = false, length = 20)
+    @Column(name="password", nullable = false)
     private String password;
 
     @Column(name = "phone_num", nullable = false, length = 15)
@@ -45,7 +45,7 @@ public class User {
     )
     private List<UserRole> user_role;
 
-    @Column(name="user_img",nullable = false, length = 255)
+    @Column(name="user_img",nullable = true, length = 255)
     private String userImg;
 
 }
