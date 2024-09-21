@@ -2,6 +2,7 @@ package com.github.supercodingteam1.service;
 
 import com.github.supercodingteam1.repository.entity.cart.Cart;
 import com.github.supercodingteam1.repository.entity.cart.CartRepository;
+import com.github.supercodingteam1.repository.entity.item.Item;
 import com.github.supercodingteam1.repository.entity.item.ItemRepository;
 import com.github.supercodingteam1.repository.entity.option.Option;
 import com.github.supercodingteam1.repository.entity.option.OptionRepository;
@@ -15,6 +16,7 @@ import com.github.supercodingteam1.web.dto.AddToCartDTO;
 import com.github.supercodingteam1.web.dto.DeleteCartDTO;
 import com.github.supercodingteam1.web.dto.ModifyCartDTO;
 import com.github.supercodingteam1.web.dto.OrderDTO;
+import jakarta.servlet.http.HttpServletRequest;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
@@ -35,8 +37,9 @@ public class CartService {
     private final OptionCartRepository optionCartRepository;
     private final OrderRepository orderRepository;
 
-    public void addItemToCart(AddToCartDTO addToCartDTO) {
+    public void addItemToCart(AddToCartDTO addToCartDTO, HttpServletRequest httpServletRequest) {
         //TODO : 카트 담을 때 같은 아이템의 같은 옵션을 또 장바구니에 담으면 quantity 만큼만 수량 증가하고 메소드 종료
+        //TODO : httpServletRequest에서 헤더 가져와서 token 파싱하여 user 가져와야함.
 
         User user = userRepository.findById(6).orElse(null);
         Option option = optionRepository.findById(addToCartDTO.getOption_id()).orElse(null);
@@ -75,27 +78,23 @@ public class CartService {
         }
     }
 
-    public void modifyCartItem(ModifyCartDTO modifyCartDTO, User user) {
+    public void modifyCartItem(ModifyCartDTO modifyCartDTO, HttpServletRequest httpServletRequest) {
         //TODO : 사용자가 입력한 옵션이나 수량대로 Cart의 quantity 또는 optionCart의 option을 변경
+        //TODO : httpServletRequest에서 헤더 가져와서 토큰 파싱해서 user 가져와야함
+
+        User user = userRepository.findById(6).orElse(null);
+
         Option option = optionRepository.findById(modifyCartDTO.getOption_id()).orElse(null);
         Integer quantity = modifyCartDTO.getQuantity();
 
-        List<Cart> userCartList = cartRepository.findAllByUser(user);
+        Cart cart = cartRepository.findById(modifyCartDTO.getCart_id()).orElse(null);
 
-        Cart cart = null;
-        OptionCart optionCart = null;
-
-        for(Cart existingCart : userCartList) {
-            optionCart = optionCartRepository.findByOptionAndCart(option, existingCart); //optionCart table에서 option과 cart가 일치하는지 확인
-            if(optionCart != null) { //일치하는 정보 있으면
-                cart = existingCart; //cart에 해당 카트 정보 대입
-                break;
-            }
-        }
+        OptionCart optionCart = optionCartRepository.findByCart(cart);
 
         Objects.requireNonNull(optionCart).setOption(option);
         optionCart.getCart().setCartQuantity(quantity);
 
+        cartRepository.save(Objects.requireNonNull(cart));
         optionCartRepository.save(optionCart);
     }
 

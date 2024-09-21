@@ -26,34 +26,6 @@ public class UserService {
 
   private final JwtTokenProviderService jwtTokenProviderService;
 
-
-
-  /**
-   * 회원가입 처리
-   * @param user 회원가입 정보가 담긴 User 객체
-   * @return 저장된 User 객체
-   * @throws Exception 유효성 검사 실패 또는 중복된 사용자 존재 시 예외 발생
-   */
-  public User registerUser(User user) throws Exception {
-    // 1. User 정보 유효성 체크
-    if (user == null || user.getUserName() == null || user.getUserName().isEmpty()) {
-      throw new RuntimeException("유효하지 않은 userName입니다.");
-    }
-
-    // 2. 중복된 userName 체크
-    if (userRepository.existsByUserName(user.getUserName())) {
-      throw new RuntimeException("userName 이 이미 존재합니다.");
-    }
-
-    if (userRepository.existsByEmail(user.getEmail())) {
-      throw new RuntimeException("이메일이 이미 존재합니다.");
-    }
-
-    // 3. 유효성 통과 후 사용자 저장
-    return userRepository.save(user);
-  }
-
-
   /**
    * 중복된 userName 체크
    * @param userName
