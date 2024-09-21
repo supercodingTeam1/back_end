@@ -19,5 +19,5 @@ public class OrderDTO {
     private String payment;
     private String address;
     private String phone_num;
-    private Boolean isFromCart;
+    private Boolean isFromCart = false;
 }

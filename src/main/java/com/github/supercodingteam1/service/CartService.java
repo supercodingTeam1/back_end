@@ -100,10 +100,7 @@ public class CartService {
 
     public void deleteCartItem(DeleteCartDTO deleteCartDTO, User user) {
         //TODO : user 관련하여 현재 멈춰있는 상태.
-        Option option = optionRepository.findById(deleteCartDTO.getOption_id()).orElse(null);
-        OptionCart optionCart = optionCartRepository.findByOptionAndCart_User(option,user);
-
-        Cart cart = optionCart.getCart();
+        Cart cart = cartRepository.findById(deleteCartDTO.getCart_id()).orElse(null);
 
         cartRepository.delete(cart);
     }
