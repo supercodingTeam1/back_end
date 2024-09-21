@@ -31,4 +31,13 @@ public class Order {
 
     @Column(name = "order_address",nullable = false, length = 200)
     private String orderAddress;
+
+    @Column(name = "name", nullable = false, length = 20)
+    private String name;
+
+    @Column(name = "payment", nullable = false, length = 20)
+    private String payment;
+
+    @Column(name = "phone_num", nullable = false, length = 15)
+    private String phoneNum;
 }

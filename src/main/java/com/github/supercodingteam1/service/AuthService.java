@@ -83,7 +83,7 @@ public class AuthService {
             // 1. User 정보 유효성 체크
             String email = signUpDTO.getUser_email();
             if (email == null || email.isEmpty() || !isValidEmail(email)) {
-                throw new RuntimeException("유효하지 않은 형식입니다.");
+                throw new RuntimeException("유효하지 않은 이메일 형식입니다.");
             }
 
             if (userRepository.existsByEmail(email)) {
@@ -91,6 +91,8 @@ public class AuthService {
             }
 
             // 회원가입 DTO를 User 엔티티로 변환
+            System.out.println(signUpDTO.getRoles().toString()
+            );
             User user = User.builder()
                     .userName(signUpDTO.getUser_name())
                     .email(signUpDTO.getUser_email())

@@ -19,6 +19,7 @@ import com.github.supercodingteam1.web.dto.OrderDTO;
 import jakarta.servlet.http.HttpServletRequest;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.time.LocalDate;
 import java.time.LocalDateTime;
@@ -37,6 +38,7 @@ public class CartService {
     private final OptionCartRepository optionCartRepository;
     private final OrderRepository orderRepository;
 
+    @Transactional
     public void addItemToCart(AddToCartDTO addToCartDTO, HttpServletRequest httpServletRequest) {
         //TODO : 카트 담을 때 같은 아이템의 같은 옵션을 또 장바구니에 담으면 quantity 만큼만 수량 증가하고 메소드 종료
         //TODO : httpServletRequest에서 헤더 가져와서 token 파싱하여 user 가져와야함.
@@ -78,6 +80,7 @@ public class CartService {
         }
     }
 
+    @Transactional
     public void modifyCartItem(ModifyCartDTO modifyCartDTO, HttpServletRequest httpServletRequest) {
         //TODO : 사용자가 입력한 옵션이나 수량대로 Cart의 quantity 또는 optionCart의 option을 변경
         //TODO : httpServletRequest에서 헤더 가져와서 토큰 파싱해서 user 가져와야함
@@ -98,6 +101,7 @@ public class CartService {
         optionCartRepository.save(optionCart);
     }
 
+    @Transactional
     public void deleteCartItem(DeleteCartDTO deleteCartDTO, User user) {
         //TODO : user 관련하여 현재 멈춰있는 상태.
         Cart cart = cartRepository.findById(deleteCartDTO.getCart_id()).orElse(null);
@@ -105,12 +109,42 @@ public class CartService {
         cartRepository.delete(cart);
     }
 
+    @Transactional
     public void orderCartItem(OrderDTO orderDTO) {
         //TODO : 장바구니에 담긴 물품 주문 시 option에 stock 조정, order테이블에 주문기록 저장
         String orderNum = generateOrderId(); //주문번호 생성
 
-        System.out.println("주문번호 : " + orderNum);
+        // 1. 주문한 물품 정보 가져오기
+        // 2. 주문한 물품이 cart에 들어있는지 확인
+        Cart cart = cartRepository.findById(orderDTO.getCartId()).orElse(null);
+        OptionCart optionCart = optionCartRepository.findByCart(cart);
+        Option option = optionCart.getOption();
+        Item item = optionCart.getOption().getItem();
 
+        // 3. 주문한 item에 해당하는 option찾아서 stock 감소
+        // 4. 주문한 item의 totalsales 증가
+        Integer quantity = cart.getCartQuantity();
+        item.setTotalSales(item.getTotalSales() + quantity);
+        option.setStock(option.getStock() - quantity);
+
+        if(option.getStock() < 0)
+            throw new IllegalArgumentException(String.format("재고보다 주문한 수량이 많습니다. 현재 재고: %d", option.getStock()));
+
+//        itemRepository.save(item);
+//        optionRepository.save(option);
+
+        // 5. Order 엔티티 생성하여 DB에 저장
+        Order order = Order.builder()
+                .orderNum(orderNum)
+                .cart(cart)
+                .orderAt(LocalDateTime.now())
+                .name(orderDTO.getName())
+                .payment(orderDTO.getPayment())
+                .orderAddress(orderDTO.getAddress())
+                .phoneNum(orderDTO.getPhone_num())
+                .build();
+
+//        orderRepository.save(order);
     }
 
     //주문번호는 날짜(yyyyMMdd) + 현재시간(HHmmssSSS) 으로 구성
