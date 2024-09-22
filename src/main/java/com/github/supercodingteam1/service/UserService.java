@@ -38,7 +38,11 @@ public class UserService {
   }
 
   public User getByCredentials(String userName, String password) {
-    return userRepository.findByUserNameAndPassword(userName,passwordEncoder.encode(password));
+    User user = userRepository.findByEmail(userName).orElse(null);
+    if(passwordEncoder.matches(password, user.getPassword())) {
+      return user;
+    }
+    return null;
   }
 
 

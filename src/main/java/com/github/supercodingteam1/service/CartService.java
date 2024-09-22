@@ -1,22 +1,25 @@
 package com.github.supercodingteam1.service;
 
+import com.github.supercodingteam1.repository.UserDetails.CustomUserDetails;
 import com.github.supercodingteam1.repository.entity.cart.Cart;
 import com.github.supercodingteam1.repository.entity.cart.CartRepository;
+import com.github.supercodingteam1.repository.entity.image.Image;
 import com.github.supercodingteam1.repository.entity.item.Item;
 import com.github.supercodingteam1.repository.entity.item.ItemRepository;
 import com.github.supercodingteam1.repository.entity.option.Option;
 import com.github.supercodingteam1.repository.entity.option.OptionRepository;
-import com.github.supercodingteam1.repository.entity.option_cart.OptionCart;
-import com.github.supercodingteam1.repository.entity.option_cart.OptionCartRepository;
+import com.github.supercodingteam1.repository.entity.optionCart.OptionCart;
+import com.github.supercodingteam1.repository.entity.optionCart.OptionCartRepository;
 import com.github.supercodingteam1.repository.entity.order.Order;
+import com.github.supercodingteam1.repository.entity.orderDetail.OrderDetail;
 import com.github.supercodingteam1.repository.entity.order.OrderRepository;
+import com.github.supercodingteam1.repository.entity.orderDetail.OrderDetailRepository;
 import com.github.supercodingteam1.repository.entity.user.User;
 import com.github.supercodingteam1.repository.entity.user.UserRepository;
-import com.github.supercodingteam1.web.dto.AddToCartDTO;
-import com.github.supercodingteam1.web.dto.DeleteCartDTO;
-import com.github.supercodingteam1.web.dto.ModifyCartDTO;
-import com.github.supercodingteam1.web.dto.OrderDTO;
-import jakarta.servlet.http.HttpServletRequest;
+import com.github.supercodingteam1.service.security.CustomUserDetailService;
+import com.github.supercodingteam1.web.dto.*;
+import com.github.supercodingteam1.web.exceptions.NotFoundException;
+import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
@@ -38,11 +41,14 @@ public class CartService {
     private final OptionCartRepository optionCartRepository;
     private final OrderRepository orderRepository;
     private final CustomUserDetailService customUserDetailService;
+    private final OrderDetailRepository orderDetailRepository;
 
     public List<CartResponseDTO> getAllCartItem(CustomUserDetails userDetails) throws NotFoundException {
         Integer userId = userDetails.getUserId();
-        List<OptionCart> userOptionCartList = optionCartRepository.findAllByUserId(userId);
+        User user = userRepository.findByUserId(userId);
 
+//        List<OptionCart> userOptionCartList = optionCartRepository.findAllByUserId(userId);
+        List<OptionCart> userOptionCartList = optionCartRepository.findAllByCart_User(user);
         if (userOptionCartList.isEmpty()) {
             throw new NotFoundException("장바구니가 비었습니다.");
         }
@@ -155,60 +161,70 @@ public class CartService {
     public void orderItem(OrderDTO orderDTO, CustomUserDetails customUserDetails) {
         //TODO : 물품 주문 시 option에 stock 조정, order 테이블에 주문기록 저장
 
+        //현재 인증된 user 정보 가져오기
         String email = customUserDetails.getEmail();
         User user = userRepository.findByEmail(email).orElse(null);
+        System.out.println(user);
 
         String orderNum = generateOrderId(); //주문번호 생성
 
         Boolean isFromCart = orderDTO.getIsFromCart();
 
         // 1. 주문한 물품 정보 가져오기
-        Cart cart = null;
+        List<OrderItemDTO> orderItemDTOList = orderDTO.getItems(); //주문 아이템 정보 가져와서
+        List<OrderDetail> orderDetailList = new ArrayList<>();
+
+        Integer totalPrice = 0;
+
+        for(OrderItemDTO orderItemDTO : orderItemDTOList) { //OrderDetail 객체를 만들기 위함
+            OrderDetail orderDetail = OrderDetail.builder()
+                    .options(optionRepository.findById(orderItemDTO.getOption_id()).orElse(null))
+                    .quantity(orderItemDTO.getQuantity())
+                    .build();
+            totalPrice += orderItemDTO.getPrice() * orderItemDTO.getQuantity();
+            orderDetailList.add(orderDetail);
+        }
+
+        // 3. 주문한 item에 해당하는 option찾아서 stock 감소
+        for(OrderDetail orderDetail : orderDetailList) {
+            Option option = orderDetail.getOptions();
+
+            //주문한 수량이 재고보다 많으면
+            if(option.getStock() < orderDetail.getQuantity())
+                throw new IllegalArgumentException(String.format("재고보다 주문한 수량이 많습니다. 현재 재고: %d", option.getStock()));
+
+            option.setStock(option.getStock() - orderDetail.getQuantity());
+
+            Item item = option.getItem();
+            item.setTotalSales(item.getTotalSales() + orderDetail.getQuantity());
+
+//            itemRepository.save(item);
+//            optionRepository.save(option);
+        }
+
+//        orderDetailRepository.saveAll(orderDetailList);
 
         // 2. 장바구니에서 주문한 것인지?(true) / 바로구매로 주문한 것인지?(false)
         if(isFromCart){ //장바구니에서 주문한것이면
-            cart = cartRepository.findById(orderDTO.getCartId()).orElse(null);
+
         }else{ //바로구매 누른것이면 cart가 없으니까 새로 만들어야함.
-            List<Integer> orderItemDTOList = orderDTO.getItems().stream().map(OrderItemDTO::getItem_id).toList();
-            List<Item> itemList = itemRepository.findAll().stream()
-                    .filter(item->orderItemDTOList.contains(item.getItemId()))
-                    .toList();
-            cart = Cart.builder()
-                    .cartQuantity(orderDTO.)
+
         }
-        OptionCart optionCart = optionCartRepository.findByCart(cart);
-        Option option = optionCart.getOption();
-        Item item = optionCart.getOption().getItem();
-
-        // 3. 주문한 item에 해당하는 option찾아서 stock 감소
-        Integer quantity = cart.getCartQuantity();
-
-        //주문한 수량이 재고보다 많으면
-        if(option.getStock() < quantity)
-            throw new IllegalArgumentException(String.format("재고보다 주문한 수량이 많습니다. 현재 재고: %d", option.getStock()));
-
-        option.setStock(option.getStock() - quantity);
-
-        // 4. 주문한 item의 totalsales 증가
-        item.setTotalSales(item.getTotalSales() + quantity);
-
-
-        itemRepository.save(item);
-        optionRepository.save(option);
 
         // 5. Order 엔티티 생성하여 DB에 저장
         Order order = Order.builder()
+                .user(user)
                 .orderNum(orderNum)
-                .user_id(user.getUserId())
-                .cart(cart)
                 .orderAt(LocalDateTime.now())
                 .name(orderDTO.getName())
                 .payment(orderDTO.getPayment())
                 .orderAddress(orderDTO.getAddress())
                 .phoneNum(orderDTO.getPhone_num())
+                .totalPrice(totalPrice)
+                .orderDetails(orderDetailList)
                 .build();
 
-        orderRepository.save(order);
+//        orderRepository.save(order);
     }
 
     //주문번호는 날짜(yyyyMMdd) + 현재시간(HHmmssSSS) 으로 구성

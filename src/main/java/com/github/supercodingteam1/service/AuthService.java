@@ -2,13 +2,13 @@ package com.github.supercodingteam1.service;
 
 
 import com.github.supercodingteam1.config.security.JwtTokenProvider;
-import com.github.supercodingteam1.repository.entity.user.User;
-import com.github.supercodingteam1.repository.entity.user.UserRepository;
+import com.github.supercodingteam1.repository.entity.user.*;
 import com.github.supercodingteam1.web.dto.LoginDTO;
 import com.github.supercodingteam1.web.dto.ResponseDTO;
 import com.github.supercodingteam1.web.dto.SignUpDTO;
 import com.github.supercodingteam1.web.exceptions.NotAcceptException;
 import com.github.supercodingteam1.web.exceptions.NotFoundException;
+import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.authentication.AuthenticationManager;
@@ -19,10 +19,7 @@ import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.validation.BindingResult;
 
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
-import java.util.Objects;
+import java.util.*;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
@@ -40,6 +37,7 @@ public class AuthService {
     private final UserRepository userRepository;
     private final JwtTokenProvider jwtTokenProvider;
     private final PasswordEncoder passwordEncoder;
+    private final UserRoleRepository userRoleRepository;
 
     public Map<String, String> login(LoginDTO loginRequestDto) {
         String email = loginRequestDto.getUser_name();
@@ -71,6 +69,7 @@ public class AuthService {
         }
     }
 
+    @Transactional
     public void signUp(SignUpDTO signUpDTO, BindingResult bindingResult) {
         // 유효성 검사 결과 처리
         if (bindingResult.hasErrors()) {
@@ -91,8 +90,13 @@ public class AuthService {
             }
 
             // 회원가입 DTO를 User 엔티티로 변환
-            System.out.println(signUpDTO.getRoles().toString()
-            );
+            System.out.println(signUpDTO.getRoles().stream().map(Role::toString).toList());
+
+            List<UserRole> userRoleList = signUpDTO.getRoles().stream()
+                    .map(userRoleRepository::findByRoleName).toList();
+
+            userRoleRepository.saveAll(userRoleList);
+
             User user = User.builder()
                     .userName(signUpDTO.getUser_name())
                     .email(signUpDTO.getUser_email())
@@ -101,6 +105,7 @@ public class AuthService {
                     .phoneNum(signUpDTO.getUser_phone())
                     .userGender(signUpDTO.getUser_gender())
                     .userImg(signUpDTO.getUser_profile() != null? signUpDTO.getUser_profile() : null)
+                    .user_role(userRoleList)
                     .build();
 
             // 3. 유효성 통과 후 사용자 저장

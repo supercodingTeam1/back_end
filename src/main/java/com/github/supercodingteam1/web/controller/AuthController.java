@@ -3,6 +3,7 @@ package com.github.supercodingteam1.web.controller;
 import com.github.supercodingteam1.config.auth.dto.TokenDTO;
 import com.github.supercodingteam1.config.auth.jwt.JwtTokenProviderService;
 import com.github.supercodingteam1.repository.entity.user.User;
+import com.github.supercodingteam1.repository.entity.user.UserRole;
 import com.github.supercodingteam1.service.AuthService;
 import com.github.supercodingteam1.service.UserRoleService;
 import com.github.supercodingteam1.service.UserService;
@@ -101,7 +102,7 @@ public class AuthController {
      * @return
      */
     @PostMapping("/login")
-    public ResponseEntity<?> login(@RequestBody LoginDTO loginDTO, BindingResult bindingResult){
+    public ResponseEntity<?> login(@Valid @RequestBody LoginDTO loginDTO, BindingResult bindingResult){
 
         // 1. 유효성 체크 메서드 호출
         if (bindingResult.hasErrors()) {
@@ -128,10 +129,12 @@ public class AuthController {
                             tokenDTO.getAccessToken(),
                             tokenDTO.getRefreshToken(),
                             user.getUser_role().stream()
-                                    .map(userRole -> userRole.getRoleName().toString())  // Role 열거형을 문자열로 변환
+                                    .map(userRole -> userRole.getRoleName().getRole())  // Role 열거형을 문자열로 변환
                                     .collect(Collectors.joining(","))  // 여러 역할을 ','로 구분하여 하나의 문자열로 합침
                     ))
                     .build();
+
+            System.out.println(user.getUser_role().stream().map(userRole -> userRole.getRoleName().getRole()).toList());
 
             return ResponseEntity.ok().body(loginResponseDTO);
         }else{

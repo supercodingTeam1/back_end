@@ -14,8 +14,6 @@ import java.util.List;
 @AllArgsConstructor
 public class OrderDTO {
     private List<OrderItemDTO> items;
-    private Integer cartId;
-    private Double totalPrice;
     private String name;
     private String payment;
     private String address;

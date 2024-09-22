@@ -1,4 +1,4 @@
-package com.github.supercodingteam1.repository.entity.option_cart;
+package com.github.supercodingteam1.repository.entity.optionCart;
 
 import com.github.supercodingteam1.repository.entity.cart.Cart;
 import com.github.supercodingteam1.repository.entity.option.Option;

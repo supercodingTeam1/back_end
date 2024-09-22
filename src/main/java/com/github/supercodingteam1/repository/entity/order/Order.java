@@ -1,7 +1,6 @@
 package com.github.supercodingteam1.repository.entity.order;
 
-import com.github.supercodingteam1.repository.entity.cart.Cart;
-import com.github.supercodingteam1.repository.entity.option.Option;
+import com.github.supercodingteam1.repository.entity.orderDetail.OrderDetail;
 import com.github.supercodingteam1.repository.entity.user.User;
 import jakarta.persistence.*;
 import lombok.*;
@@ -29,10 +28,6 @@ public class Order {
     @Column(name="order_num",nullable = false)
     private String orderNum;
 
-    @OneToMany
-    @JoinColumn(name = "option_id", nullable = false)
-    private List<Option> options;
-
     @Column(name = "order_at", nullable = false)
     private LocalDateTime orderAt;
 
@@ -47,4 +42,11 @@ public class Order {
 
     @Column(name = "phone_num", nullable = false, length = 15)
     private String phoneNum;
+
+    @Column(name = "total_price", nullable = false)
+    private Integer totalPrice;
+
+    @OneToMany
+    @Column(name = "order_details_id", nullable = false)
+    private List<OrderDetail> orderDetails;
 }
