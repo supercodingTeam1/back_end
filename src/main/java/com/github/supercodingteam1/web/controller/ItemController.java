@@ -2,6 +2,7 @@ package com.github.supercodingteam1.web.controller;
 
 import com.github.supercodingteam1.service.ItemService;
 import com.github.supercodingteam1.web.dto.GetAllItemDTO;
+import com.github.supercodingteam1.web.dto.ItemDetailDTO;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.media.Schema;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
@@ -46,6 +47,21 @@ public class ItemController {
         else
             responseBody.put("items", getAllItemDTOList);
 
+        return ResponseEntity.ok(responseBody);
+    }
+
+    @Operation(summary = "상세 아이템 조회")
+    @ApiResponses({
+            @ApiResponse(responseCode = "200", description = "성공적으로 조회했습니다."),
+            @ApiResponse(responseCode = "403", description = "권한이 없습니다."),
+            @ApiResponse(responseCode = "500", description = "서버 오류")
+    })
+    @GetMapping("/detail")
+    public ResponseEntity getDetailItem(@RequestParam(required = false) Integer option_id){
+        Map<String, Object> responseBody = new HashMap<>();
+        log.info("getDetailItem 메소드 호출");
+        ItemDetailDTO getItemDetailDTO=itemService.getItemDetail(option_id);
+        responseBody.put("item_detail",getItemDetailDTO);
         return ResponseEntity.ok(responseBody);
     }
 

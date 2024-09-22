@@ -1,5 +1,6 @@
 package com.github.supercodingteam1.web.controller;
 
+import com.github.supercodingteam1.repository.UserDetails.CustomUserDetails;
 import com.github.supercodingteam1.service.CartService;
 import com.github.supercodingteam1.service.ItemService;
 import com.github.supercodingteam1.web.dto.*;
@@ -12,7 +13,9 @@ import jakarta.servlet.http.HttpServletRequest;
 import lombok.RequiredArgsConstructor;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -29,6 +32,26 @@ public class CartController {
     private final CartService cartService;
     private final UserRepository userRepository;
 
+    @Operation(summary = "장바구니 구매내역 조회")
+    @ApiResponses({
+            @ApiResponse(responseCode = "200", description = "성공적으로 조회되었습니다."),
+            @ApiResponse(responseCode = "403", description = "권한이 없습니다."),
+            @ApiResponse(responseCode = "500", description = "서버 오류")
+    })
+    @GetMapping
+    public ResponseEntity<?> getAllCartItem(@AuthenticationPrincipal CustomUserDetails userDetails) { //장바구니 조회
+        log.info("getAllCartItem 메소드 호출");
+
+        if (userDetails == null) {
+            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body("인증된 사용자가 아닙니다.");
+        }
+
+        cartService.getAllCartItem(userDetails);
+        return ResponseEntity.ok(ResponseDTO.builder()
+                .status(200)
+                .message("장바구니 조회에 성공했습니다.")
+                .build());
+    }
     @Operation(summary = "장바구니에 물품 추가")
     @ApiResponses({
             @ApiResponse(responseCode = "200", description = "성공적으로 등록했습니다."),
