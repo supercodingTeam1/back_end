@@ -1,29 +1,27 @@
 package com.github.supercodingteam1.service;
 
+import com.github.supercodingteam1.repository.UserDetails.CustomUserDetails;
 import com.github.supercodingteam1.repository.entity.cart.Cart;
 import com.github.supercodingteam1.repository.entity.cart.CartRepository;
-import com.github.supercodingteam1.repository.entity.item.Item;
+import com.github.supercodingteam1.repository.entity.image.Image;
 import com.github.supercodingteam1.repository.entity.item.ItemRepository;
 import com.github.supercodingteam1.repository.entity.option.Option;
 import com.github.supercodingteam1.repository.entity.option.OptionRepository;
 import com.github.supercodingteam1.repository.entity.option_cart.OptionCart;
 import com.github.supercodingteam1.repository.entity.option_cart.OptionCartRepository;
-import com.github.supercodingteam1.repository.entity.order.Order;
 import com.github.supercodingteam1.repository.entity.order.OrderRepository;
 import com.github.supercodingteam1.repository.entity.user.User;
 import com.github.supercodingteam1.repository.entity.user.UserRepository;
-import com.github.supercodingteam1.web.dto.AddToCartDTO;
-import com.github.supercodingteam1.web.dto.DeleteCartDTO;
-import com.github.supercodingteam1.web.dto.ModifyCartDTO;
-import com.github.supercodingteam1.web.dto.OrderDTO;
+import com.github.supercodingteam1.web.dto.*;
+import com.github.supercodingteam1.web.exceptions.NotFoundException;
 import jakarta.servlet.http.HttpServletRequest;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
 import java.time.LocalDate;
-import java.time.LocalDateTime;
 import java.time.LocalTime;
 import java.time.format.DateTimeFormatter;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Objects;
 
@@ -36,6 +34,39 @@ public class CartService {
     private final UserRepository userRepository;
     private final OptionCartRepository optionCartRepository;
     private final OrderRepository orderRepository;
+
+    public List<CartResponseDTO> getAllCartItem(CustomUserDetails userDetails) throws NotFoundException {
+        Integer userId = userDetails.getUserId();
+        List<OptionCart> userOptionCartList = optionCartRepository.findAllByUserId(userId);
+
+        if (userOptionCartList.isEmpty()) {
+            throw new NotFoundException("장바구니가 비었습니다.");
+        }
+
+        List<CartResponseDTO> cartResponseList = new ArrayList<>();
+
+        for (OptionCart existingCart : userOptionCartList) {
+            String mainImageUrl = existingCart.getOption().getItem().getImageList()
+                    .stream()
+                    .filter(Image::getImageFirst)
+                    .map(Image::getImageLink)
+                    .findFirst()
+                    .orElse(null);
+
+            CartResponseDTO cartResponseDTO = CartResponseDTO.builder()
+                    .option_id(existingCart.getOption().getOptionId())
+                    .size(existingCart.getOption().getSize())
+                    .item_image(mainImageUrl)
+                    .item_name(existingCart.getOption().getItem().getItemName())
+                    .quantity(existingCart.getCart().getCartQuantity())
+                    .price(existingCart.getOption().getItem().getItemPrice())
+                    .build();
+
+            cartResponseList.add(cartResponseDTO);
+        }
+
+        return cartResponseList;
+    }
 
     public void addItemToCart(AddToCartDTO addToCartDTO, HttpServletRequest httpServletRequest) {
         //TODO : 카트 담을 때 같은 아이템의 같은 옵션을 또 장바구니에 담으면 quantity 만큼만 수량 증가하고 메소드 종료
@@ -135,4 +166,6 @@ public class CartService {
 
         return orderNumber;
     }
+
+
 }
