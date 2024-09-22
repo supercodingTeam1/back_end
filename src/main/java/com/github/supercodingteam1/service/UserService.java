@@ -24,7 +24,7 @@ public class UserService {
 
   private final UserRepository userRepository;
   private final RefreshTokenRepository refreshTokenRepository;
-  private final PasswordEncoder passwordEncoder
+  private final PasswordEncoder passwordEncoder;
 
   private final JwtTokenProviderService jwtTokenProviderService;
 

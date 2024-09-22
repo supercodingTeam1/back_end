@@ -13,7 +13,7 @@ import java.util.List;
 @NoArgsConstructor
 @AllArgsConstructor
 public class OrderDTO {
-//    private List<OrderItemDTO> items;
+    private List<OrderItemDTO> items;
     private Integer cartId;
     private Double totalPrice;
     private String name;

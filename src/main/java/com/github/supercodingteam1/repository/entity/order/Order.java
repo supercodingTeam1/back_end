@@ -19,6 +19,9 @@ public class Order {
     @Column(name = "order_id", nullable = false, length = 11)
     private Integer order_id;
 
+    @Column(name = "user_id", nullable = false)
+    private Integer user_id;
+
     @Column(name="order_num",nullable = false)
     private String orderNum;
 

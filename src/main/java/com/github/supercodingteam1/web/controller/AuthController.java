@@ -17,8 +17,6 @@ import org.springframework.util.StringUtils;
 import org.springframework.validation.BindingResult;
 import org.springframework.web.bind.annotation.*;
 
-import java.util.Collections;
-import java.util.Map;
 import java.util.Objects;
 import java.util.stream.Collectors;
 
@@ -48,7 +46,7 @@ public class AuthController {
     }
      */
     @PostMapping("/signup")
-    public ResponseDTO registerUser(@Valid @RequestBody SignUpDTO signUpDTO, BindingResult bindingResult) {
+    public ResponseDTO signUp(@Valid @RequestBody SignUpDTO signUpDTO, BindingResult bindingResult) {
         log.info("회원 가입 처리 요청 수신");
         try {
             authService.signUp(signUpDTO, bindingResult);

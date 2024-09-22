@@ -1,5 +1,6 @@
 package com.github.supercodingteam1.service;
 
+import com.github.supercodingteam1.repository.UserDetails.CustomUserDetails;
 import com.github.supercodingteam1.repository.entity.cart.Cart;
 import com.github.supercodingteam1.repository.entity.cart.CartRepository;
 import com.github.supercodingteam1.repository.entity.item.Item;
@@ -12,12 +13,13 @@ import com.github.supercodingteam1.repository.entity.order.Order;
 import com.github.supercodingteam1.repository.entity.order.OrderRepository;
 import com.github.supercodingteam1.repository.entity.user.User;
 import com.github.supercodingteam1.repository.entity.user.UserRepository;
+import com.github.supercodingteam1.service.security.CustomUserDetailService;
 import com.github.supercodingteam1.web.dto.AddToCartDTO;
 import com.github.supercodingteam1.web.dto.DeleteCartDTO;
 import com.github.supercodingteam1.web.dto.ModifyCartDTO;
 import com.github.supercodingteam1.web.dto.OrderDTO;
-import jakarta.servlet.http.HttpServletRequest;
 import lombok.RequiredArgsConstructor;
+import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -37,13 +39,16 @@ public class CartService {
     private final UserRepository userRepository;
     private final OptionCartRepository optionCartRepository;
     private final OrderRepository orderRepository;
+    private final CustomUserDetailService customUserDetailService;
 
     @Transactional
-    public void addItemToCart(AddToCartDTO addToCartDTO, HttpServletRequest httpServletRequest) {
+    public void addItemToCart(AddToCartDTO addToCartDTO, CustomUserDetails customUserDetails) {
         //TODO : 카트 담을 때 같은 아이템의 같은 옵션을 또 장바구니에 담으면 quantity 만큼만 수량 증가하고 메소드 종료
         //TODO : httpServletRequest에서 헤더 가져와서 token 파싱하여 user 가져와야함.
+        String email = customUserDetails.getEmail();
 
-        User user = userRepository.findById(6).orElse(null);
+        User user = userRepository.findByEmail(email).orElse(null);
+
         Option option = optionRepository.findById(addToCartDTO.getOption_id()).orElse(null);
         Integer quantity = addToCartDTO.getQuantity();
 
@@ -81,11 +86,13 @@ public class CartService {
     }
 
     @Transactional
-    public void modifyCartItem(ModifyCartDTO modifyCartDTO, HttpServletRequest httpServletRequest) {
+    public void modifyCartItem(ModifyCartDTO modifyCartDTO, CustomUserDetails customUserDetails) {
         //TODO : 사용자가 입력한 옵션이나 수량대로 Cart의 quantity 또는 optionCart의 option을 변경
         //TODO : httpServletRequest에서 헤더 가져와서 토큰 파싱해서 user 가져와야함
 
-        User user = userRepository.findById(6).orElse(null);
+        String email = customUserDetails.getEmail();
+
+        User user = userRepository.findByEmail(email).orElse(null);
 
         Option option = optionRepository.findById(modifyCartDTO.getOption_id()).orElse(null);
         Integer quantity = modifyCartDTO.getQuantity();
@@ -102,30 +109,49 @@ public class CartService {
     }
 
     @Transactional
-    public void deleteCartItem(DeleteCartDTO deleteCartDTO, User user) {
+    public void deleteCartItem(DeleteCartDTO deleteCartDTO, CustomUserDetails customUserDetails) {
         //TODO : user 관련하여 현재 멈춰있는 상태.
-        Cart cart = cartRepository.findById(deleteCartDTO.getCart_id()).orElse(null);
+        String email = customUserDetails.getEmail();
+        User user = userRepository.findByEmail(email).orElse(null);
+        List<Cart> userCartList = cartRepository.findAllByUser(user);
+
+        Cart cart = userCartList.stream().filter(cartItem -> Objects.equals(cartItem.getCartId(), deleteCartDTO.getCart_id())).findFirst().orElse(null);
 
         cartRepository.delete(cart);
     }
 
     @Transactional
-    public void orderCartItem(OrderDTO orderDTO) {
+    public void orderItem(OrderDTO orderDTO, CustomUserDetails userDetails) {
         //TODO : 장바구니에 담긴 물품 주문 시 option에 stock 조정, order테이블에 주문기록 저장
+        String username = userDetails.getUsername();
+        User user = userRepository.findByUserName(username);
+        userDetails.getEmail();
+
         String orderNum = generateOrderId(); //주문번호 생성
 
+        Boolean isFromCart = orderDTO.getIsFromCart();
+
         // 1. 주문한 물품 정보 가져오기
-        // 2. 주문한 물품이 cart에 들어있는지 확인
-        Cart cart = cartRepository.findById(orderDTO.getCartId()).orElse(null);
+        Cart cart = null;
+        // 2. 장바구니에서 주문한 것인지?(true) / 바로구매로 주문한 것인지?(false)
+
+        if(isFromCart){ //장바구니에서 주문한것이면
+            cart = cartRepository.findById(orderDTO.getCartId()).orElse(null);
+        }else{ //바로구매 누른것이면 cart가 없으니까 새로 만들어야함.
+//            List<Item> itemList
+//            cart = Cart.builder()
+//                    .cartQuantity(orderDTO.)
+        }
         OptionCart optionCart = optionCartRepository.findByCart(cart);
         Option option = optionCart.getOption();
         Item item = optionCart.getOption().getItem();
 
         // 3. 주문한 item에 해당하는 option찾아서 stock 감소
-        // 4. 주문한 item의 totalsales 증가
         Integer quantity = cart.getCartQuantity();
-        item.setTotalSales(item.getTotalSales() + quantity);
         option.setStock(option.getStock() - quantity);
+
+        // 4. 주문한 item의 totalsales 증가
+        item.setTotalSales(item.getTotalSales() + quantity);
 
         if(option.getStock() < 0)
             throw new IllegalArgumentException(String.format("재고보다 주문한 수량이 많습니다. 현재 재고: %d", option.getStock()));
@@ -136,6 +162,7 @@ public class CartService {
         // 5. Order 엔티티 생성하여 DB에 저장
         Order order = Order.builder()
                 .orderNum(orderNum)
+                .user_id(user.getUserId())
                 .cart(cart)
                 .orderAt(LocalDateTime.now())
                 .name(orderDTO.getName())
@@ -162,8 +189,7 @@ public class CartService {
         String time = currentTime.format(timeFormatter);
 
         // 날짜와 시간을 결합하여 주문 번호 생성
-        String orderNumber = date + time;
 
-        return orderNumber;
+        return date + time;
     }
 }
