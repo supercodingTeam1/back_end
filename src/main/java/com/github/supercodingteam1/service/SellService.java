@@ -1,5 +1,6 @@
 package com.github.supercodingteam1.service;
 
+import com.github.supercodingteam1.repository.UserDetails.CustomUserDetails;
 import com.github.supercodingteam1.repository.entity.category.Category;
 import com.github.supercodingteam1.repository.entity.category.CategoryRepository;
 import com.github.supercodingteam1.repository.entity.image.Image;
@@ -9,6 +10,7 @@ import com.github.supercodingteam1.repository.entity.item.ItemRepository;
 import com.github.supercodingteam1.repository.entity.option.Option;
 import com.github.supercodingteam1.repository.entity.option.OptionRepository;
 import com.github.supercodingteam1.web.dto.AddSellItemDTO;
+import com.github.supercodingteam1.web.dto.GetAllSalesItemDTO;
 import com.github.supercodingteam1.web.dto.OptionDTO;
 import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
@@ -31,6 +33,13 @@ public class SellService {
     private final ImageRepository imageRepository;
 
     private final S3Uploader s3Uploader;
+
+
+    public List<GetAllSalesItemDTO> getAllSellItem(CustomUserDetails userDetails) {
+        int userId=userDetails.getUserId();
+        //DB 수정하기... item에 seller user_id를 저장해야 함
+        return null;
+    }
 
 
     @Transactional
@@ -91,4 +100,6 @@ public class SellService {
         }
         optionRepository.saveAll(options);
     }
+
+
 }
