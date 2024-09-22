@@ -59,11 +59,11 @@ public class CartController {
             @ApiResponse(responseCode = "500", description = "서버 오류")
     })
     @PostMapping
-    public ResponseEntity<?> addItemToCart(HttpServletRequest httpServletRequest, @RequestBody AddToCartDTO addToCartDTO) { //장바구니 담기
+    public ResponseEntity<?> addItemToCart(@AuthenticationPrincipal CustomUserDetails customUserDetails, @RequestBody AddToCartDTO addToCartDTO) { //장바구니 담기
         //TODO : httpServletRequest에서 토큰 가져와서 user 객체 생성 해야함
         log.info("addItemCart 메소드 호출, {},{}", addToCartDTO.getOption_id(), addToCartDTO.getQuantity());
 
-        cartService.addItemToCart(addToCartDTO, httpServletRequest);
+        cartService.addItemToCart(addToCartDTO, customUserDetails);
 
         return ResponseEntity.ok(ResponseDTO.builder()
                 .status(200)
@@ -78,13 +78,13 @@ public class CartController {
             @ApiResponse(responseCode = "500", description = "서버 오류")
     })
     @PutMapping
-    public ResponseEntity<?> modifyCartItem(HttpServletRequest httpServletRequest, @RequestBody ModifyCartDTO modifyCartDTO) {
+    public ResponseEntity<?> modifyCartItem(@AuthenticationPrincipal CustomUserDetails customUserDetails, @RequestBody ModifyCartDTO modifyCartDTO) {
         log.info("modifyCartItem 메소드 호출");
         //TODO : 헤더에 담긴 토큰을 파싱해서 유저 누구인지 가져오는 기능 구현 필요
         // httpServletRequest.getHeader("X-AUTH-TOKEN");
         // 임시 유저 생성하여 사용
 
-        cartService.modifyCartItem(modifyCartDTO, httpServletRequest);
+        cartService.modifyCartItem(modifyCartDTO, customUserDetails);
         //TODO 받아온 옵션 id와 수량으로 cart 테이블에 있는 quantity 바꾸고, option_cart에 있는 option id 변경
         return ResponseEntity.ok(ResponseDTO.builder()
                 .status(200)
@@ -99,11 +99,11 @@ public class CartController {
             @ApiResponse(responseCode = "500", description = "서버 오류")
     })
     @DeleteMapping
-    public ResponseEntity<?> deleteCartItem(HttpServletRequest httpServletRequest, @RequestBody DeleteCartDTO deleteCartDTO){
+    public ResponseEntity<?> deleteCartItem(@AuthenticationPrincipal CustomUserDetails customUserDetails, @RequestBody DeleteCartDTO deleteCartDTO){
         log.info("deleteCartItem 메소드 호출");
         User user = userRepository.findById(6).orElse(null);
 
-        cartService.deleteCartItem(deleteCartDTO, user);
+        cartService.deleteCartItem(deleteCartDTO, customUserDetails);
 
         return ResponseEntity.ok(ResponseDTO.builder()
                 .status(200)
@@ -118,8 +118,8 @@ public class CartController {
             @ApiResponse(responseCode = "500", description = "서버 오류")
     })
     @PostMapping("/order")
-    public ResponseEntity<?> orderCartItem(HttpServletRequest httpServletRequest, @RequestBody OrderDTO orderDTO) {
-        cartService.orderCartItem(orderDTO);
+    public ResponseEntity<?> orderItem(@AuthenticationPrincipal CustomUserDetails customUserDetails, @RequestBody OrderDTO orderDTO) {
+        cartService.orderItem(orderDTO, customUserDetails);
         return ResponseEntity.ok(ResponseDTO.builder()
                 .status(200)
                 .message("성공적으로 주문되었습니다.")

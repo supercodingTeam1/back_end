@@ -10,6 +10,7 @@ import com.github.supercodingteam1.web.dto.UserDTO;
 import com.github.supercodingteam1.web.dto.WithdrawDTO;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.log4j.Log4j2;
+import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -23,18 +24,9 @@ public class UserService {
 
   private final UserRepository userRepository;
   private final RefreshTokenRepository refreshTokenRepository;
+  private final PasswordEncoder passwordEncoder;
 
   private final JwtTokenProviderService jwtTokenProviderService;
-
-  /**
-   * 중복된 userName 체크
-   * @param userName
-   * @return
-   */
-  public boolean isDuplicateUserName(String userName) {
-    return userRepository.existsByUserName(userName);
-  }
-
 
   /**
    * 중복된 이메일 체크
@@ -45,9 +37,8 @@ public class UserService {
     return userRepository.existsByEmail(userEmail);
   }
 
-
   public User getByCredentials(String userName, String password) {
-    return userRepository.findByUserNameAndPassword(userName,password);
+    return userRepository.findByUserNameAndPassword(userName,passwordEncoder.encode(password));
   }
 
 
