@@ -11,13 +11,13 @@ import java.util.List;
 @AllArgsConstructor
 @Builder
 public class ItemDetailDTO {
-    private String item_id;
-    private String category_type;
-    private Integer category_gender;
-    private Integer option_size;
-    private Integer option_stock;
-    private List<Image> item_image;
+    private Integer item_id;
     private String item_name;
+    private List<Image> item_image;
     private Integer price;
     private String description;
+    private String category_type;
+    private String category_gender;
+    private Integer option_size;
+    private Integer option_stock;
 }
