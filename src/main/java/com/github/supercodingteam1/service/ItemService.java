@@ -1,11 +1,16 @@
 package com.github.supercodingteam1.service;
 
+import com.github.supercodingteam1.repository.entity.category.Category;
+import com.github.supercodingteam1.repository.entity.category.CategoryRepository;
+import com.github.supercodingteam1.repository.entity.image.Image;
 import com.github.supercodingteam1.repository.entity.item.Item;
 import com.github.supercodingteam1.repository.entity.item.ItemRepository;
 import com.github.supercodingteam1.repository.entity.option.Option;
 import com.github.supercodingteam1.repository.entity.option.OptionRepository;
 import com.github.supercodingteam1.service.mapper.OptionToGetAllItemDTOMapper;
 import com.github.supercodingteam1.web.dto.GetAllItemDTO;
+import com.github.supercodingteam1.web.dto.ItemDetailDTO;
+import com.github.supercodingteam1.web.exceptions.NotFoundException;
 import lombok.RequiredArgsConstructor;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -20,6 +25,7 @@ public class ItemService {
     private static final Logger log = LoggerFactory.getLogger(ItemService.class);
     private final ItemRepository itemRepository;
     private final OptionRepository optionRepository;
+    private final CategoryRepository categoryRepository;
 
     public List<GetAllItemDTO> getAllItems(String sort, String order, Integer size) { //전체물품조회
         Comparator<Item> comparator;
@@ -73,5 +79,26 @@ public class ItemService {
                 .option(OptionToGetAllItemDTOMapper.INSTANCE.OptionToGetAllItemOptionDTO(options))
                 .price(item.getItemPrice())
                 .build();
+    }
+
+    public ItemDetailDTO getItemDetail(Integer optionId) {
+        Option option=optionRepository.findById(optionId).orElseThrow(()->new NotFoundException("해당되는 option을 찾을 수 없습니다."));
+        Integer itemId=option.getItem().getItemId();
+        Item item=itemRepository.findById(itemId).orElseThrow(()->new NotFoundException("해당되는 item을 찾을 수 없습니다."));
+        Integer categoryId=item.getCategory().getCategoryId();
+        Category category=categoryRepository.findById(categoryId).orElseThrow(()->new NotFoundException("해당되는 category를 찾을 수 없습니다."));
+        List<Image> imageList=item.getImageList();
+
+        return ItemDetailDTO.builder()
+                .item_id(itemId)
+                .item_image(imageList)
+                .price(item.getItemPrice())
+                .description(item.getDescription())
+                .category_type(category.getCategoryType())
+                .category_gender(category.getCategoryGender())
+                .option_size(option.getSize())
+                .option_stock(option.getStock())
+                .build();
+
     }
 }
