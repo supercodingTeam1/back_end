@@ -43,8 +43,6 @@ public class SignUpDTO {
   @NotEmpty(message = "주소는 필수입니다.")
   private String user_address;
 
-  private String user_profile;
-
   @Schema(description = "사용자 성별", example = "남성, 여성")
   private String user_gender;
 
@@ -98,7 +96,7 @@ private List<Role> roles;
         .email(signUpDTO.getUser_email())
         .password(signUpDTO.getUser_password())
         .phoneNum(signUpDTO.getUser_phone())
-        .userAddress(signUpDTO.getUser_profile())
+        .userAddress(signUpDTO.getUser_address())
         .userGender("")
         .user_role(userRoles)
         .build();

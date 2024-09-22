@@ -18,7 +18,9 @@ import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.validation.BindingResult;
+import org.springframework.web.multipart.MultipartFile;
 
+import java.io.IOException;
 import java.util.*;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
@@ -38,6 +40,7 @@ public class AuthService {
     private final JwtTokenProvider jwtTokenProvider;
     private final PasswordEncoder passwordEncoder;
     private final UserRoleRepository userRoleRepository;
+    private final S3Uploader s3Uploader;
 
     public Map<String, String> login(LoginDTO loginRequestDto) {
         String email = loginRequestDto.getUser_name();
@@ -70,7 +73,7 @@ public class AuthService {
     }
 
     @Transactional
-    public void signUp(SignUpDTO signUpDTO, BindingResult bindingResult) {
+    public void signUp(MultipartFile profileImage, SignUpDTO signUpDTO, BindingResult bindingResult) throws IOException {
         // 유효성 검사 결과 처리
         if (bindingResult.hasErrors()) {
             String errorMessage = Objects.requireNonNull(bindingResult.getFieldError()).getDefaultMessage();
@@ -104,13 +107,18 @@ public class AuthService {
                     .userAddress(signUpDTO.getUser_address())
                     .phoneNum(signUpDTO.getUser_phone())
                     .userGender(signUpDTO.getUser_gender())
-                    .userImg(signUpDTO.getUser_profile() != null? signUpDTO.getUser_profile() : null)
+                    .userImg(profileImage != null? setProfileImage(profileImage) : null)
                     .user_role(userRoleList)
                     .build();
 
             // 3. 유효성 통과 후 사용자 저장
             userRepository.save(user);
         }
+    }
+
+    private String setProfileImage(MultipartFile profileImage) throws IOException {
+        //프로필 사진 S3 업로드
+        return s3Uploader.upload(profileImage, "userProfileImage");
     }
 
     private static boolean isValidEmail(String email) {

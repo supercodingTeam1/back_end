@@ -8,16 +8,20 @@ import com.github.supercodingteam1.service.AuthService;
 import com.github.supercodingteam1.service.UserRoleService;
 import com.github.supercodingteam1.service.UserService;
 import com.github.supercodingteam1.web.dto.*;
+import io.swagger.v3.oas.annotations.Parameter;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpStatus;
+import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.util.StringUtils;
 import org.springframework.validation.BindingResult;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.web.multipart.MultipartFile;
 
+import java.util.List;
 import java.util.Objects;
 import java.util.stream.Collectors;
 
@@ -46,11 +50,14 @@ public class AuthController {
     "roles" :["BUYER", "SELLER"]
     }
      */
-    @PostMapping("/signup")
-    public ResponseDTO signUp(@Valid @RequestBody SignUpDTO signUpDTO, BindingResult bindingResult) {
+    @PostMapping(value = "/signup", consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
+    public ResponseDTO signUp(
+            @Parameter(description = "사용자 프로필 이미지") @RequestPart(value = "profileImage", required = false) MultipartFile profileImage,
+            @Parameter(description = "회원가입정보", required = true) @RequestPart(value = "request") @Valid SignUpDTO signUpDTO
+            , BindingResult bindingResult) {
         log.info("회원 가입 처리 요청 수신");
         try {
-            authService.signUp(signUpDTO, bindingResult);
+            authService.signUp(profileImage, signUpDTO, bindingResult);
             return ResponseDTO.builder()
                     .status(200)
                     .message("성공적으로 회원가입하였습니다.")
@@ -129,12 +136,10 @@ public class AuthController {
                             tokenDTO.getAccessToken(),
                             tokenDTO.getRefreshToken(),
                             user.getUser_role().stream()
-                                    .map(userRole -> userRole.getRoleName().getRole())  // Role 열거형을 문자열로 변환
+                                    .map(userRole -> userRole.getRoleName().getRole())  // Role 열거형을 문자열로 변환 -> 반환형 ROLE_BUYER, ROLE_SELLER, ROLE_ADMIN 이렇게 출력되도록 수정하였음.
                                     .collect(Collectors.joining(","))  // 여러 역할을 ','로 구분하여 하나의 문자열로 합침
                     ))
                     .build();
-
-            System.out.println(user.getUser_role().stream().map(userRole -> userRole.getRoleName().getRole()).toList());
 
             return ResponseEntity.ok().body(loginResponseDTO);
         }else{
