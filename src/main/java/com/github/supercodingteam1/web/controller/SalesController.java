@@ -2,6 +2,7 @@ package com.github.supercodingteam1.web.controller;
 
 import com.github.supercodingteam1.service.SellService;
 import com.github.supercodingteam1.web.dto.AddSellItemDTO;
+import com.github.supercodingteam1.web.dto.ModifySalesItemDTO;
 import com.github.supercodingteam1.web.dto.ResponseDTO;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
@@ -40,6 +41,24 @@ public class SalesController {
         return ResponseDTO.builder()
                 .status(200)
                 .message("판매물품을 성공적으로 등록하였습니다").
+                build();
+    }
+
+    @Operation(summary = "판매 물품 옵션 재고 수정")
+    @ApiResponses({
+            @ApiResponse(responseCode = "200", description = "성공적으로 수정했습니다."),
+            @ApiResponse(responseCode = "403", description = "권한이 없습니다."),
+            @ApiResponse(responseCode = "500", description = "서버 오류")
+    })
+    @PutMapping(consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
+    public ResponseDTO updateSellItem(@Parameter(description = "옵션 재고 수정", required = true) @RequestBody ModifySalesItemDTO modifySalesItemDTO){
+
+        log.info("updateSellItem 메소드 호출 {}", modifySalesItemDTO);
+        sellService.updateSellItem(modifySalesItemDTO);
+
+        return ResponseDTO.builder()
+                .status(200)
+                .message("물품의 옵션을 성공적으로 수정하였습니다").
                 build();
     }
 }
