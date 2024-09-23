@@ -10,6 +10,8 @@ import com.github.supercodingteam1.repository.entity.item.ItemRepository;
 import com.github.supercodingteam1.repository.entity.option.Option;
 import com.github.supercodingteam1.repository.entity.option.OptionRepository;
 import com.github.supercodingteam1.service.Utils.ImageUtils;
+import com.github.supercodingteam1.service.mapper.CategoryToCategoryDTOMapper;
+import com.github.supercodingteam1.service.mapper.OptionListToOptionDTOList;
 import com.github.supercodingteam1.web.dto.AddSellItemDTO;
 import com.github.supercodingteam1.web.dto.GetAllSalesItemDTO;
 import com.github.supercodingteam1.web.dto.OptionDTO;
@@ -36,6 +38,7 @@ public class SellService {
     private final S3Uploader s3Uploader;
 
 
+
     public List<GetAllSalesItemDTO> getAllSellItem(CustomUserDetails userDetails) {
         int userId=userDetails.getUserId();
         List<Item> userSellItems=itemRepository.findAllByUserId(userId);
@@ -46,8 +49,8 @@ public class SellService {
                     .price(sellItems.getItemPrice())
                     .item_name(sellItems.getItemName())
                     .item_image(ImageUtils.getMainImageUrl(sellItems))
-                    .category(sellItems.getCategory())
-                    .options(sellItems.getOptionList())
+                    .category(CategoryToCategoryDTOMapper.INSTANCE.categoryToCategoryDTO(sellItems.getCategory()))
+                    .options(OptionListToOptionDTOList.INSTANCE.OptionListToOptionDTOList(sellItems.getOptionList()))
                     .build();
 
             getAllSalesItemDTOList.add(getAllSalesItemDTO);
