@@ -17,5 +17,5 @@ public class ItemDetailDTO {
     private Integer price;
     private String description;
     private CategoryDTO category;
-    private OptionDTO option;
+    private List<OptionDTO> option;
 }
