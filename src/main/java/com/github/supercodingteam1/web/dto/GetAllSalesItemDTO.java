@@ -17,6 +17,6 @@ public class GetAllSalesItemDTO {
     private String item_name;
     private Integer price;
     private CategoryDTO category;
-    private OptionDTO option;
+    private List<OptionDTO> options;
 
 }
