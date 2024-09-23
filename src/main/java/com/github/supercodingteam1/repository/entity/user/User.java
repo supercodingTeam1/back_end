@@ -47,5 +47,4 @@ public class User {
 
     @Column(name="user_img",nullable = true, length = 255)
     private String userImg;
-
 }

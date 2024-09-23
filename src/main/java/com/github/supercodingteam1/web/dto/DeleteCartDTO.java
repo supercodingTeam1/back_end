@@ -10,5 +10,5 @@ import lombok.Setter;
 @NoArgsConstructor
 @AllArgsConstructor
 public class DeleteCartDTO {
-    private Integer option_id;
+    private Integer cart_id;
 }
