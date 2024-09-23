@@ -9,6 +9,7 @@ import com.github.supercodingteam1.repository.entity.item.Item;
 import com.github.supercodingteam1.repository.entity.item.ItemRepository;
 import com.github.supercodingteam1.repository.entity.option.Option;
 import com.github.supercodingteam1.repository.entity.option.OptionRepository;
+import com.github.supercodingteam1.service.Utils.ImageUtils;
 import com.github.supercodingteam1.web.dto.AddSellItemDTO;
 import com.github.supercodingteam1.web.dto.GetAllSalesItemDTO;
 import com.github.supercodingteam1.web.dto.OptionDTO;
@@ -37,8 +38,21 @@ public class SellService {
 
     public List<GetAllSalesItemDTO> getAllSellItem(CustomUserDetails userDetails) {
         int userId=userDetails.getUserId();
-        //DB 수정하기... item에 seller user_id를 저장해야 함
-        return null;
+        List<Item> userSellItems=itemRepository.findAllByUserId(userId);
+        List<GetAllSalesItemDTO> getAllSalesItemDTOList=new ArrayList<>();
+        for(Item sellItems: userSellItems){
+            GetAllSalesItemDTO getAllSalesItemDTO=GetAllSalesItemDTO.builder()
+                    .item_id(sellItems.getItemId())
+                    .price(sellItems.getItemPrice())
+                    .item_name(sellItems.getItemName())
+                    .item_image(ImageUtils.getMainImageUrl(sellItems))
+                    .category(sellItems.getCategory())
+                    .options(sellItems.getOptionList())
+                    .build();
+
+            getAllSalesItemDTOList.add(getAllSalesItemDTO);
+        }
+        return getAllSalesItemDTOList;
     }
 
 
