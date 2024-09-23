@@ -9,6 +9,7 @@ import com.github.supercodingteam1.repository.entity.item.ItemRepository;
 import com.github.supercodingteam1.repository.entity.option.Option;
 import com.github.supercodingteam1.repository.entity.option.OptionRepository;
 import com.github.supercodingteam1.web.dto.AddSellItemDTO;
+import com.github.supercodingteam1.web.dto.ModifySalesItemDTO;
 import com.github.supercodingteam1.web.dto.OptionDTO;
 import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
@@ -32,6 +33,11 @@ public class SellService {
 
     private final S3Uploader s3Uploader;
 
+
+    public void updateSellItem(ModifySalesItemDTO modifySalesItemDTO){
+
+
+    }
 
     @Transactional
     public void addSellItem(List<MultipartFile> item_image, AddSellItemDTO addSellItemDTO) {
