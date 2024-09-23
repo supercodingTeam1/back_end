@@ -43,7 +43,7 @@ public class SellService {
 
     public List<GetAllSalesItemDTO> getAllSellItem(CustomUserDetails userDetails) {
         int userId=userDetails.getUserId();
-        List<Item> userSellItems=itemRepository.findAllByUserId(userId);
+        List<Item> userSellItems=itemRepository.findAllByUser_UserId(userId);
         List<GetAllSalesItemDTO> getAllSalesItemDTOList=new ArrayList<>();
         for(Item sellItems: userSellItems){
             GetAllSalesItemDTO getAllSalesItemDTO=GetAllSalesItemDTO.builder()
