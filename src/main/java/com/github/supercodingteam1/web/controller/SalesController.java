@@ -2,13 +2,12 @@ package com.github.supercodingteam1.web.controller;
 
 import com.github.supercodingteam1.service.SellService;
 import com.github.supercodingteam1.web.dto.AddSellItemDTO;
-import com.github.supercodingteam1.web.dto.ModifySalesItemDTO;
+import com.github.supercodingteam1.web.dto.ModifySalesItemOptionDTO;
 import com.github.supercodingteam1.web.dto.ResponseDTO;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.responses.ApiResponses;
-import jakarta.servlet.http.HttpServletRequest;
 import lombok.RequiredArgsConstructor;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -51,14 +50,14 @@ public class SalesController {
             @ApiResponse(responseCode = "500", description = "서버 오류")
     })
     @PutMapping(consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
-    public ResponseDTO updateSellItem(@Parameter(description = "옵션 재고 수정", required = true) @RequestBody ModifySalesItemDTO modifySalesItemDTO){
+    public ResponseDTO updateSellItem(@Parameter(description = "옵션 재고 수정", required = true) @RequestBody List<ModifySalesItemOptionDTO> modifySalesItemOptionDTO){
 
-        log.info("updateSellItem 메소드 호출 {}", modifySalesItemDTO);
-        sellService.updateSellItem(modifySalesItemDTO);
+        log.info("updateSellItem 메소드 호출 {}", modifySalesItemOptionDTO);
+        sellService.updateSellItem(modifySalesItemOptionDTO);
 
         return ResponseDTO.builder()
                 .status(200)
-                .message("물품의 옵션을 성공적으로 수정하였습니다").
+                .message("상품 옵션의 재고를 성공적으로 수정하였습니다").
                 build();
     }
 }
