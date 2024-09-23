@@ -4,6 +4,7 @@ import com.github.supercodingteam1.repository.entity.user.Role;
 import com.github.supercodingteam1.repository.entity.user.User;
 import com.github.supercodingteam1.repository.entity.user.UserRole;
 import com.github.supercodingteam1.service.UserRoleService;
+import io.swagger.v3.oas.annotations.media.Schema;
 import jakarta.validation.constraints.Email;
 import jakarta.validation.constraints.NotEmpty;
 import jakarta.validation.constraints.Size;
@@ -35,17 +36,18 @@ public class SignUpDTO {
   private String user_password;
 
   @NotEmpty(message = "전화번호는 필수입니다.")
+  @Schema(example = "010-0000-0000")
   @Size(min = 10, max = 15, message = "전화번호는 10자에서 15자 사이여야 합니다.")
   private String user_phone;
 
   @NotEmpty(message = "주소는 필수입니다.")
   private String user_address;
 
-  private String user_profile;
-
+  @Schema(description = "사용자 성별", example = "남성, 여성")
   private String user_gender;
 
-  private Role[] roles;
+@Schema(description = "사용자 권한", example = "[\"ROLE_BUYER\", \"ROLE_SELLER\", \"ROLE_ADMIN\"]")
+private List<Role> roles;
 
 
   /**
@@ -56,7 +58,7 @@ public class SignUpDTO {
   public static User toCreateUser(SignUpDTO signUpDTO, UserRoleService userRoleService) {
 
     List<UserRole> userRoles=null;
-    if(signUpDTO.getRoles()==null || signUpDTO.getRoles().length == 0) {
+    if(signUpDTO.getRoles()==null || signUpDTO.getRoles().isEmpty()) {
           userRoles = new ArrayList<>();
           UserRole userRole1 = userRoleService.findByRoleName(Role.ROLE_BUYER);
 
@@ -75,7 +77,7 @@ public class SignUpDTO {
 //          userRoles.add(userRole2);
 
     }else{
-      userRoles = Arrays.stream(signUpDTO.getRoles())
+      userRoles = signUpDTO.getRoles().stream()
               .map(roleName -> {
                 UserRole userRole = userRoleService.findByRoleName(roleName); // 기존 Role을 조회
                 if (userRole == null) {
@@ -94,7 +96,7 @@ public class SignUpDTO {
         .email(signUpDTO.getUser_email())
         .password(signUpDTO.getUser_password())
         .phoneNum(signUpDTO.getUser_phone())
-        .userAddress(signUpDTO.getUser_profile())
+        .userAddress(signUpDTO.getUser_address())
         .userGender("")
         .user_role(userRoles)
         .build();

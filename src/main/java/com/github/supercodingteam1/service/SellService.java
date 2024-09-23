@@ -61,7 +61,6 @@ public class SellService {
         for(MultipartFile multipartFile : item_image) {
             try {
                 imageUrlList.add(s3Uploader.upload(multipartFile, "images"));
-
             }catch (IOException e) {
                 e.printStackTrace();
             }

@@ -3,21 +3,25 @@ package com.github.supercodingteam1.web.controller;
 import com.github.supercodingteam1.config.auth.dto.TokenDTO;
 import com.github.supercodingteam1.config.auth.jwt.JwtTokenProviderService;
 import com.github.supercodingteam1.repository.entity.user.User;
+import com.github.supercodingteam1.repository.entity.user.UserRole;
 import com.github.supercodingteam1.service.AuthService;
 import com.github.supercodingteam1.service.UserRoleService;
 import com.github.supercodingteam1.service.UserService;
 import com.github.supercodingteam1.web.dto.*;
+import io.swagger.v3.oas.annotations.Parameter;
+import jakarta.servlet.http.HttpServletRequest;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpStatus;
+import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.util.StringUtils;
 import org.springframework.validation.BindingResult;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.web.multipart.MultipartFile;
 
-import java.util.Collections;
-import java.util.Map;
+import java.util.List;
 import java.util.Objects;
 import java.util.stream.Collectors;
 
@@ -46,11 +50,14 @@ public class AuthController {
     "roles" :["BUYER", "SELLER"]
     }
      */
-    @PostMapping("/signup")
-    public ResponseDTO registerUser(@Valid @RequestBody SignUpDTO signUpDTO, BindingResult bindingResult) {
+    @PostMapping(value = "/signup", consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
+    public ResponseDTO signUp(
+            @Parameter(description = "사용자 프로필 이미지") @RequestPart(value = "profileImage", required = false) MultipartFile profileImage,
+            @Parameter(description = "회원가입정보", required = true) @RequestPart(value = "request") @Valid SignUpDTO signUpDTO
+            , BindingResult bindingResult) {
         log.info("회원 가입 처리 요청 수신");
         try {
-            authService.signUp(signUpDTO, bindingResult);
+            authService.signUp(profileImage, signUpDTO, bindingResult);
             return ResponseDTO.builder()
                     .status(200)
                     .message("성공적으로 회원가입하였습니다.")
@@ -94,23 +101,6 @@ public class AuthController {
 
     }
 
-//    @PostMapping(value = "/login")
-//    public ResponseEntity<Map<String, String>> login(@RequestBody LoginDTO loginRequestDto) {
-//        try {
-//            Map<String, String> tokens = authService.login(loginRequestDto);
-//
-//            return ResponseEntity
-//                    .status(HttpStatus.OK)
-//                    .header("Authorization", "Bearer " + tokens.get("accessToken"))
-//                    .header("Refresh-Token", tokens.get("refreshToken"))
-//                    .body(Collections.singletonMap("message", "로그인에 성공했습니다."));
-//
-//        } catch (Exception e) {
-//            return ResponseEntity
-//                    .status(HttpStatus.UNAUTHORIZED)
-//                    .body(Collections.singletonMap("message", "로그인에 실패했습니다."));
-//        }
-//    }
 
     /** auth/login
      * 로그인 처리
@@ -119,7 +109,7 @@ public class AuthController {
      * @return
      */
     @PostMapping("/login")
-    public ResponseEntity<?> login(@RequestBody LoginDTO loginDTO, BindingResult bindingResult){
+    public ResponseEntity<?> login(@Valid @RequestBody LoginDTO loginDTO, BindingResult bindingResult){
 
         // 1. 유효성 체크 메서드 호출
         if (bindingResult.hasErrors()) {
@@ -131,9 +121,7 @@ public class AuthController {
             return ResponseEntity.badRequest().body(loginResponseDTO);
         }
 
-
-        User user=userService.getByCredentials(loginDTO.getUser_name(), loginDTO.getUser_password());
-
+        User user = userService.getByCredentials(loginDTO.getUser_name(), loginDTO.getUser_password());
 
         if(user!=null){
             //토큰 생성
@@ -148,7 +136,7 @@ public class AuthController {
                             tokenDTO.getAccessToken(),
                             tokenDTO.getRefreshToken(),
                             user.getUser_role().stream()
-                                    .map(userRole -> userRole.getRoleName().toString())  // Role 열거형을 문자열로 변환
+                                    .map(userRole -> userRole.getRoleName().getRole())  // Role 열거형을 문자열로 변환 -> 반환형 ROLE_BUYER, ROLE_SELLER, ROLE_ADMIN 이렇게 출력되도록 수정하였음.
                                     .collect(Collectors.joining(","))  // 여러 역할을 ','로 구분하여 하나의 문자열로 합침
                     ))
                     .build();
@@ -181,8 +169,9 @@ public class AuthController {
 
     // auth/withdraw
     @DeleteMapping("/withdraw")
-    public ResponseEntity<?> withdraw(@RequestBody WithdrawDTO withdrawDTO){
+    public ResponseEntity<?> withdraw(HttpServletRequest httpServletRequest, @RequestBody WithdrawDTO withdrawDTO){
         try{
+            //TODO : httpServletRequest 헤더에서 토큰 가져와서 파싱 후 user 판단
             //DB 에서 토큰 삭제
             userService.withdraw(withdrawDTO);
             return ResponseEntity.ok().body(ResponseDTO.builder().status(200).message("success").build());
