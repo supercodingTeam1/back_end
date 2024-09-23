@@ -1,5 +1,6 @@
 package com.github.supercodingteam1.service;
 
+import com.github.supercodingteam1.repository.UserDetails.CustomUserDetails;
 import com.github.supercodingteam1.repository.entity.category.Category;
 import com.github.supercodingteam1.repository.entity.category.CategoryRepository;
 import com.github.supercodingteam1.repository.entity.image.Image;
@@ -8,7 +9,11 @@ import com.github.supercodingteam1.repository.entity.item.Item;
 import com.github.supercodingteam1.repository.entity.item.ItemRepository;
 import com.github.supercodingteam1.repository.entity.option.Option;
 import com.github.supercodingteam1.repository.entity.option.OptionRepository;
+import com.github.supercodingteam1.service.Utils.ImageUtils;
+import com.github.supercodingteam1.service.mapper.CategoryToCategoryDTOMapper;
+import com.github.supercodingteam1.service.mapper.OptionListToOptionDTOListMapper;
 import com.github.supercodingteam1.web.dto.AddSellItemDTO;
+import com.github.supercodingteam1.web.dto.GetAllSalesItemDTO;
 import com.github.supercodingteam1.web.dto.ModifySalesItemOptionDTO;
 import com.github.supercodingteam1.web.dto.OptionDTO;
 import com.github.supercodingteam1.web.exceptions.NotFoundException;
@@ -33,6 +38,27 @@ public class SellService {
     private final ImageRepository imageRepository;
 
     private final S3Uploader s3Uploader;
+
+
+
+    public List<GetAllSalesItemDTO> getAllSellItem(CustomUserDetails userDetails) {
+        int userId=userDetails.getUserId();
+        List<Item> userSellItems=itemRepository.findAllByUserId(userId);
+        List<GetAllSalesItemDTO> getAllSalesItemDTOList=new ArrayList<>();
+        for(Item sellItems: userSellItems){
+            GetAllSalesItemDTO getAllSalesItemDTO=GetAllSalesItemDTO.builder()
+                    .item_id(sellItems.getItemId())
+                    .price(sellItems.getItemPrice())
+                    .item_name(sellItems.getItemName())
+                    .item_image(ImageUtils.getMainImageUrl(sellItems))
+                    .category(CategoryToCategoryDTOMapper.INSTANCE.categoryToCategoryDTO(sellItems.getCategory()))
+                    .options(OptionListToOptionDTOListMapper.INSTANCE.OptionListToOptionDTOList(sellItems.getOptionList()))
+                    .build();
+
+            getAllSalesItemDTOList.add(getAllSalesItemDTO);
+        }
+        return getAllSalesItemDTOList;
+    }
 
 
     @Transactional
@@ -111,4 +137,6 @@ public class SellService {
         }
         optionRepository.saveAll(options);
     }
+
+
 }

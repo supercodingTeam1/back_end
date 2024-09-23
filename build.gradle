@@ -15,6 +15,7 @@ java {
     targetCompatibility = JavaVersion.VERSION_17
 }
 
+
 configurations {
     compileOnly {
         extendsFrom annotationProcessor
@@ -32,7 +33,7 @@ dependencies {
     implementation 'org.springframework.boot:spring-boot-starter-security'
 
     compileOnly 'org.projectlombok:lombok'
-    runtimeOnly 'org.mariadb.jdbc:mariadb-java-client'
+    implementation 'org.mariadb.jdbc:mariadb-java-client'
     annotationProcessor 'org.projectlombok:lombok'
     testImplementation 'org.springframework.boot:spring-boot-starter-test'
     testRuntimeOnly 'org.junit.platform:junit-platform-launcher'
@@ -64,4 +65,8 @@ dependencies {
 
 tasks.named('test') {
     useJUnitPlatform()
+}
+
+tasks.named('bootJar'){
+    mainClass="com.github.supercodingteam1.SuperCodingTeam1Application"
 }

@@ -2,6 +2,7 @@ package com.github.supercodingteam1.repository.entity.item;
 
 import com.github.supercodingteam1.repository.entity.category.Category;
 import com.github.supercodingteam1.repository.entity.image.Image;
+import com.github.supercodingteam1.repository.entity.option.Option;
 import jakarta.persistence.*;
 import lombok.*;
 
@@ -39,6 +40,9 @@ public class Item {
 
     @OneToMany(mappedBy="item",cascade = CascadeType.ALL,fetch = FetchType.LAZY)
     private List<Image> imageList;
+
+    @OneToMany(mappedBy = "item", cascade = CascadeType.ALL,fetch = FetchType.LAZY)
+    private List<Option> optionList;
 
     @Override
     public String toString() {
