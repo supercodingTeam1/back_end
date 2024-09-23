@@ -59,7 +59,7 @@ public class SecurityConfiguration {
     @Bean
     public CorsConfigurationSource corsConfigurationSource() {
         CorsConfiguration configuration = new CorsConfiguration();
-        configuration.setAllowedOrigins(List.of("http://localhost:63342","http://localhost:3000", "https://notice-board-fe.pages.dev"));
+        configuration.setAllowedOrigins(List.of("http://localhost:63342","http://localhost:3000", "https://notice-board-fe.pages.dev","http://ec2-15-165-190-65.ap-northeast-2.compute.amazonaws.com:8080"));
 
         configuration.setAllowCredentials(true); // token 주고 받을때 필요
         configuration.addExposedHeader("Authorization"); //token

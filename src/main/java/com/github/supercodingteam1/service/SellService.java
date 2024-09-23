@@ -1,5 +1,6 @@
 package com.github.supercodingteam1.service;
 
+import com.github.supercodingteam1.repository.UserDetails.CustomUserDetails;
 import com.github.supercodingteam1.repository.entity.category.Category;
 import com.github.supercodingteam1.repository.entity.category.CategoryRepository;
 import com.github.supercodingteam1.repository.entity.image.Image;
@@ -8,8 +9,14 @@ import com.github.supercodingteam1.repository.entity.item.Item;
 import com.github.supercodingteam1.repository.entity.item.ItemRepository;
 import com.github.supercodingteam1.repository.entity.option.Option;
 import com.github.supercodingteam1.repository.entity.option.OptionRepository;
+import com.github.supercodingteam1.service.Utils.ImageUtils;
+import com.github.supercodingteam1.service.mapper.CategoryToCategoryDTOMapper;
+import com.github.supercodingteam1.service.mapper.OptionListToOptionDTOListMapper;
 import com.github.supercodingteam1.web.dto.AddSellItemDTO;
+import com.github.supercodingteam1.web.dto.GetAllSalesItemDTO;
+import com.github.supercodingteam1.web.dto.ModifySalesItemOptionDTO;
 import com.github.supercodingteam1.web.dto.OptionDTO;
+import com.github.supercodingteam1.web.exceptions.NotFoundException;
 import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
 import org.slf4j.Logger;
@@ -31,6 +38,46 @@ public class SellService {
     private final ImageRepository imageRepository;
 
     private final S3Uploader s3Uploader;
+
+
+
+    public List<GetAllSalesItemDTO> getAllSellItem(CustomUserDetails userDetails) {
+        int userId=userDetails.getUserId();
+        List<Item> userSellItems=itemRepository.findAllByUser_UserId(userId);
+        List<GetAllSalesItemDTO> getAllSalesItemDTOList=new ArrayList<>();
+        for(Item sellItems: userSellItems){
+            GetAllSalesItemDTO getAllSalesItemDTO=GetAllSalesItemDTO.builder()
+                    .item_id(sellItems.getItemId())
+                    .price(sellItems.getItemPrice())
+                    .item_name(sellItems.getItemName())
+                    .item_image(ImageUtils.getMainImageUrl(sellItems))
+                    .category(CategoryToCategoryDTOMapper.INSTANCE.categoryToCategoryDTO(sellItems.getCategory()))
+                    .options(OptionListToOptionDTOListMapper.INSTANCE.OptionListToOptionDTOList(sellItems.getOptionList()))
+                    .build();
+
+            getAllSalesItemDTOList.add(getAllSalesItemDTO);
+        }
+        return getAllSalesItemDTOList;
+    }
+
+
+    @Transactional
+    public void updateSellItem(List<ModifySalesItemOptionDTO> modifySalesItemOptionDTOList) {
+        // 각 옵션에 대해 업데이트
+        for (ModifySalesItemOptionDTO dto : modifySalesItemOptionDTOList) {
+            // 옵션 ID에 해당하는 옵션을 조회
+            Option option = optionRepository.findById(dto.getOptionId())
+                    .orElseThrow(() -> new NotFoundException("Option not found with id: " + dto.getOptionId()));
+
+            // 재고(stock)를 업데이트
+            option.setStock(dto.getNewStock());
+
+            // 변경된 값을 저장
+            optionRepository.save(option);
+
+            log.info("Option {}의 재고가 {}로 업데이트되었습니다.", dto.getOptionId(), dto.getNewStock());
+        }
+    }
 
 
     @Transactional
@@ -90,4 +137,6 @@ public class SellService {
         }
         optionRepository.saveAll(options);
     }
+
+
 }
