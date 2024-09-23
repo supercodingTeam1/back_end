@@ -11,7 +11,7 @@ import com.github.supercodingteam1.repository.entity.option.Option;
 import com.github.supercodingteam1.repository.entity.option.OptionRepository;
 import com.github.supercodingteam1.service.Utils.ImageUtils;
 import com.github.supercodingteam1.service.mapper.CategoryToCategoryDTOMapper;
-import com.github.supercodingteam1.service.mapper.OptionListToOptionDTOList;
+import com.github.supercodingteam1.service.mapper.OptionListToOptionDTOListMapper;
 import com.github.supercodingteam1.web.dto.AddSellItemDTO;
 import com.github.supercodingteam1.web.dto.GetAllSalesItemDTO;
 import com.github.supercodingteam1.web.dto.OptionDTO;
@@ -50,7 +50,7 @@ public class SellService {
                     .item_name(sellItems.getItemName())
                     .item_image(ImageUtils.getMainImageUrl(sellItems))
                     .category(CategoryToCategoryDTOMapper.INSTANCE.categoryToCategoryDTO(sellItems.getCategory()))
-                    .options(OptionListToOptionDTOList.INSTANCE.OptionListToOptionDTOList(sellItems.getOptionList()))
+                    .options(OptionListToOptionDTOListMapper.INSTANCE.OptionListToOptionDTOList(sellItems.getOptionList()))
                     .build();
 
             getAllSalesItemDTOList.add(getAllSalesItemDTO);
