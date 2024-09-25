@@ -7,6 +7,9 @@ import com.github.supercodingteam1.repository.entity.item.Item;
 import com.github.supercodingteam1.repository.entity.item.ItemRepository;
 import com.github.supercodingteam1.repository.entity.option.Option;
 import com.github.supercodingteam1.repository.entity.option.OptionRepository;
+import com.github.supercodingteam1.repository.entity.user.Role;
+import com.github.supercodingteam1.service.mapper.CategoryToCategoryDTOMapper;
+import com.github.supercodingteam1.service.mapper.OptionListToOptionDTOListMapper;
 import com.github.supercodingteam1.service.mapper.OptionToGetAllItemDTOMapper;
 import com.github.supercodingteam1.web.dto.GetAllItemDTO;
 import com.github.supercodingteam1.web.dto.ItemDetailDTO;
@@ -78,6 +81,7 @@ public class ItemService {
                 .category(item.getCategory())
                 .option(OptionToGetAllItemDTOMapper.INSTANCE.OptionToGetAllItemOptionDTO(options))
                 .price(item.getItemPrice())
+                .seller_id(item.getUser().getUserId())
                 .build();
     }
 
@@ -85,8 +89,6 @@ public class ItemService {
         Option option=optionRepository.findById(optionId).orElseThrow(()->new NotFoundException("해당되는 option을 찾을 수 없습니다."));
         Integer itemId=option.getItem().getItemId();
         Item item=itemRepository.findById(itemId).orElseThrow(()->new NotFoundException("해당되는 item을 찾을 수 없습니다."));
-        Integer categoryId=item.getCategory().getCategoryId();
-        Category category=categoryRepository.findById(categoryId).orElseThrow(()->new NotFoundException("해당되는 category를 찾을 수 없습니다."));
         List<Image> imageList=item.getImageList();
 
         return ItemDetailDTO.builder()
@@ -94,10 +96,8 @@ public class ItemService {
                 .item_image(imageList)
                 .price(item.getItemPrice())
                 .description(item.getDescription())
-                .category_type(category.getCategoryType())
-                .category_gender(category.getCategoryGender())
-                .option_size(option.getSize())
-                .option_stock(option.getStock())
+                .category(CategoryToCategoryDTOMapper.INSTANCE.categoryToCategoryDTO(item.getCategory()))
+                .option(OptionListToOptionDTOListMapper.INSTANCE.OptionListToOptionDTOList(item.getOptionList()))
                 .build();
 
     }
