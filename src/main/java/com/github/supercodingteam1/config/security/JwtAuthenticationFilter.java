@@ -7,6 +7,7 @@ import com.github.supercodingteam1.exception.CustomAuthenticationException;
 import com.github.supercodingteam1.repository.UserDetails.CustomUserDetails;
 import com.github.supercodingteam1.repository.entity.user.User;
 import com.github.supercodingteam1.repository.entity.user.UserRepository;
+import com.github.supercodingteam1.repository.entity.user.UserRole;
 import com.github.supercodingteam1.service.security.CustomUserDetailService;
 import com.github.supercodingteam1.web.dto.ResponseDTO;
 import jakarta.servlet.FilterChain;
@@ -16,6 +17,7 @@ import jakarta.servlet.http.HttpServletResponse;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.log4j.Log4j2;
 import lombok.extern.slf4j.Slf4j;
+import org.springdoc.core.parsers.ReturnTypeParser;
 import org.springframework.context.annotation.Bean;
 import org.springframework.security.authentication.AbstractAuthenticationToken;
 import org.springframework.security.authentication.BadCredentialsException;
@@ -50,6 +52,7 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
     };
     private final JwtTokenProvider jwtTokenProvider;
     private final UserRepository userRepository;
+    private final ReturnTypeParser genericReturnTypeParser;
 
     // 필터 제외 페이지 설정
     @Override
@@ -104,7 +107,7 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
                 CustomUserDetails customUserDetails = customUserDetailService.loadUserByUsername(user.getEmail());
 
                 if(customUserDetails!=null){
-                    log.info("필터 ===principalDetails  {}", customUserDetails.getUser().getUser_role().toString());
+                    log.info("필터 === customUserDetails  {}", customUserDetails.getUser().getUser_role().stream().map(userRole -> userRole.getRoleName().getRole()).toList());
 
                     authSetConfirm( request,  customUserDetails);
                     filterChain.doFilter(request, response);

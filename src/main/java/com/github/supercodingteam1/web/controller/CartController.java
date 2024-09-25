@@ -14,6 +14,7 @@ import lombok.RequiredArgsConstructor;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.http.HttpStatus;
+import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.PostMapping;
@@ -118,11 +119,30 @@ public class CartController {
             @ApiResponse(responseCode = "500", description = "서버 오류")
     })
     @PostMapping("/order")
-    public ResponseEntity<?> orderItem(@AuthenticationPrincipal CustomUserDetails customUserDetails, @RequestBody OrderDTO orderDTO) {
-        cartService.orderItem(orderDTO, customUserDetails);
-        return ResponseEntity.ok(ResponseDTO.builder()
-                .status(200)
-                .message("성공적으로 주문되었습니다.")
-                .build());
+    public ResponseEntity<?> orderItem(@AuthenticationPrincipal CustomUserDetails customUserDetails, @RequestBody OrderDTO orderDTO){
+        try {
+            cartService.orderItem(orderDTO, customUserDetails);
+            return ResponseEntity.ok(ResponseDTO.builder()
+                    .status(200)
+                    .message("성공적으로 주문되었습니다.")
+                    .build());
+        }catch (IllegalArgumentException e){
+            return ResponseEntity.badRequest().body(
+                    ResponseDTO.builder()
+                    .status(400)
+                    .message(e.getMessage())
+                    .build()
+            );
+
+        }catch (Exception e){
+            return ResponseEntity
+                    .badRequest().body(
+                        ResponseDTO.builder()
+                        .status(500)
+                        .message(e.getMessage())
+                        .build()
+                    );
+        }
+
     }
 }
