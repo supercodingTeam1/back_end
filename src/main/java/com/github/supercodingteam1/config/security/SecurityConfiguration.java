@@ -34,7 +34,7 @@ public class SecurityConfiguration {
                 .authorizeHttpRequests(authorize -> authorize
                         .requestMatchers("/api-docs/**","/swagger-ui.html", "/v3/api-docs/**", "/swagger-resources/**", "/webjars/**","/swagger-ui/**").permitAll()
                         .requestMatchers("/auth/signup", "/auth/duplicate","/auth/login","/items/**").permitAll()
-                        .requestMatchers("/sell").hasAuthority("ROLE_SELLER")
+                        .requestMatchers("/sell").hasRole("SELLER")
                         .requestMatchers("/auth/logout","/auth/withdraw", "/cart/**","/mypage/**").authenticated()
                         .anyRequest().denyAll()
                 )
