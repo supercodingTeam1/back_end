@@ -7,6 +7,7 @@ import com.github.supercodingteam1.repository.entity.item.Item;
 import com.github.supercodingteam1.repository.entity.item.ItemRepository;
 import com.github.supercodingteam1.repository.entity.option.Option;
 import com.github.supercodingteam1.repository.entity.option.OptionRepository;
+import com.github.supercodingteam1.repository.entity.user.Role;
 import com.github.supercodingteam1.service.mapper.CategoryToCategoryDTOMapper;
 import com.github.supercodingteam1.service.mapper.OptionListToOptionDTOListMapper;
 import com.github.supercodingteam1.service.mapper.OptionToGetAllItemDTOMapper;
@@ -80,6 +81,7 @@ public class ItemService {
                 .category(item.getCategory())
                 .option(OptionToGetAllItemDTOMapper.INSTANCE.OptionToGetAllItemOptionDTO(options))
                 .price(item.getItemPrice())
+                .seller_id(item.getUser().getUserId())
                 .build();
     }
 

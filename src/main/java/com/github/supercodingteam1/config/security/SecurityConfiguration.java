@@ -22,7 +22,7 @@ import java.util.List;
 @RequiredArgsConstructor
 public class SecurityConfiguration {
 
-    private final JwtTokenProvider jwtTokenProvider;
+    private final JwtAuthenticationFilter jwtAuthenticationFilter;
 
     @Bean
     public SecurityFilterChain filterChain(HttpSecurity http) throws Exception {
@@ -30,17 +30,15 @@ public class SecurityConfiguration {
                 .csrf(csrf -> csrf.disable())  // CSRF 보호 비활성화
                 .sessionManagement(session -> session
                         .sessionCreationPolicy(SessionCreationPolicy.STATELESS))  // Stateless 설정
-//                .addFilterBefore(new JwtAuthenticationFilter(jwtTokenProvider), UsernamePasswordAuthenticationFilter.class)
-//                .authorizeHttpRequests(authorize -> authorize
-//                        .requestMatchers("/api-docs/**","/swagger-ui.html", "/v3/api-docs/**", "/swagger-resources/**", "/webjars/**","/swagger-ui/**").permitAll()
-//                        .requestMatchers("/auth/signup", "/auth/duplicate","/auth/login","/items/**").permitAll()
-//                        .requestMatchers("/sell").hasRole("SELLER")
-//                        .requestMatchers("/auth/logout","/auth/withdraw", "/cart/**","/mypage/**").authenticated()
-//                        .anyRequest().denyAll()
-//                )
-                .authorizeHttpRequests(authorize->authorize
-                        .anyRequest().permitAll())
-                .formLogin(form -> form.permitAll())  // 폼 로그인 활성화(form-data)
+                .addFilterBefore(jwtAuthenticationFilter, UsernamePasswordAuthenticationFilter.class)
+                .authorizeHttpRequests(authorize -> authorize
+                        .requestMatchers("/api-docs/**","/swagger-ui.html", "/v3/api-docs/**", "/swagger-resources/**", "/webjars/**","/swagger-ui/**").permitAll()
+                        .requestMatchers("/auth/signup", "/auth/duplicate","/auth/login","/items/**").permitAll()
+                        .requestMatchers("/sell").hasAuthority("ROLE_SELLER")
+                        .requestMatchers("/auth/logout","/auth/withdraw", "/cart/**","/mypage/**").authenticated()
+                        .anyRequest().denyAll()
+                )
+                .formLogin(form -> form.disable())  // 폼 로그인 활성화(form-data)
                 .httpBasic(httpBasic -> httpBasic.disable())  // HTTP Basic 인증 비활성화
                 .rememberMe(rememberMe -> rememberMe.disable());  // Remember Me 기능 비활성화
 
@@ -59,7 +57,7 @@ public class SecurityConfiguration {
     @Bean
     public CorsConfigurationSource corsConfigurationSource() {
         CorsConfiguration configuration = new CorsConfiguration();
-        configuration.setAllowedOrigins(List.of("http://localhost:63342","http://localhost:3000", "https://notice-board-fe.pages.dev","http://ec2-15-165-190-65.ap-northeast-2.compute.amazonaws.com:8080"));
+        configuration.setAllowedOrigins(List.of("*"));
 
         configuration.setAllowCredentials(true); // token 주고 받을때 필요
         configuration.addExposedHeader("Authorization"); //token

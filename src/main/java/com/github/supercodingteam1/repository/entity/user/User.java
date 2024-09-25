@@ -1,5 +1,6 @@
 package com.github.supercodingteam1.repository.entity.user;
 
+import com.github.supercodingteam1.repository.entity.item.Item;
 import jakarta.persistence.*;
 import lombok.*;
 import java.util.ArrayList;
@@ -47,4 +48,7 @@ public class User {
 
     @Column(name="user_img",nullable = true, length = 255)
     private String userImg;
+
+    @OneToMany(mappedBy = "user", fetch = FetchType.EAGER)
+    private List<Item> items;
 }
