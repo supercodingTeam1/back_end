@@ -7,7 +7,7 @@ spring:
     config: classpath:logback-spring-prod.xml
 
   datasource:
-    url: jdbc:mariadb://shoes-project-mariadb.cn6ioosku2ij.ap-northeast-2.rds.amazonaws.com:3306/supercoding_team1
+    url: jdbc:mariadb://shoes-project-mariadb.cn6ioosku2ij.ap-northeast-2.rds.amazonaws.com:3306/shoes_project
     username: ${RDS_USERNAME}
     password: ${RDS_PASSWORD}
     driver-class-name: org.mariadb.jdbc.Driver
