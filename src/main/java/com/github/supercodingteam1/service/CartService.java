@@ -16,6 +16,7 @@ import com.github.supercodingteam1.repository.entity.order.OrderRepository;
 import com.github.supercodingteam1.repository.entity.orderDetail.OrderDetailRepository;
 import com.github.supercodingteam1.repository.entity.user.User;
 import com.github.supercodingteam1.repository.entity.user.UserRepository;
+import com.github.supercodingteam1.service.Utils.ImageUtils;
 import com.github.supercodingteam1.service.security.CustomUserDetailService;
 import com.github.supercodingteam1.web.dto.*;
 import com.github.supercodingteam1.web.exceptions.NotFoundException;
@@ -56,12 +57,15 @@ public class CartService {
         List<CartResponseDTO> cartResponseList = new ArrayList<>();
 
         for (OptionCart existingCart : userOptionCartList) {
-            String mainImageUrl = existingCart.getOption().getItem().getImageList()
-                    .stream()
-                    .filter(Image::getImageFirst)
-                    .map(Image::getImageLink)
-                    .findFirst()
-                    .orElse(null);
+//            String mainImageUrl = existingCart.getOption().getItem().getImageList()
+//                    .stream()
+//                    .filter(Image::getImageFirst)
+//                    .map(Image::getImageLink)
+//                    .findFirst()
+//                    .orElse(null);
+
+            Item item= existingCart.getOption().getItem();
+            String mainImageUrl= ImageUtils.getMainImageUrl(item);
 
             CartResponseDTO cartResponseDTO = CartResponseDTO.builder()
                     .option_id(existingCart.getOption().getOptionId())
