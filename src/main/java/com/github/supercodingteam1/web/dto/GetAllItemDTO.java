@@ -17,4 +17,5 @@ public class GetAllItemDTO {
     private Category category;
     private List<GetAllItemOptionDTO> option;
     private String item_image;
+    private Integer seller_id;
 }

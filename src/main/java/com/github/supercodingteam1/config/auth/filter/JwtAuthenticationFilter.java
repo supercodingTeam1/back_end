@@ -6,6 +6,9 @@ import com.github.supercodingteam1.config.auth.PrincipalDetails;
 import com.github.supercodingteam1.config.auth.jwt.JwtTokenProviderService;
 import com.github.supercodingteam1.config.security.JwtTokenProvider;
 import com.github.supercodingteam1.exception.CustomAuthenticationException;
+import com.github.supercodingteam1.repository.UserDetails.CustomUserDetails;
+import com.github.supercodingteam1.repository.entity.user.User;
+import com.github.supercodingteam1.repository.entity.user.UserRepository;
 import com.github.supercodingteam1.service.security.CustomUserDetailService;
 import com.github.supercodingteam1.web.dto.ResponseDTO;
 import jakarta.servlet.FilterChain;
@@ -43,6 +46,7 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
             "/auth/refreshToken",
     };
     private final JwtTokenProvider jwtTokenProvider;
+    private final UserRepository userRepository;
 
 
     // 필터 제외 페이지 설정
@@ -88,37 +92,41 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
                 requestURI.startsWith("/swagger-resources/") ||
                 requestURI.startsWith("/webjars/") ||
                 "/api/login".equals(requestURI) ||
-                "/api/signup".equals(requestURI)) {
+                "/api/signup".equals(requestURI) ||
+                "/items".equals(requestURI)) {
             filterChain.doFilter(request, response);
             return;
         }
+//        filterChain.doFilter(request, response);
 
         try{
-//            log.info("Filter running ..");
-//            //요청에서 토큰 가져오기
-//            String token=parseBearerToken(request);
-//
-//            //토큰 검사하기 . JWT 이므로 인가 서버에 요청하지 않고도 검증 가능.  userId 가져오기. 위조된 경우 예외 처리된다.
-//            if(token!=null && !token.equalsIgnoreCase("null")){
-//                String userId =null;
-//                try{
-//                    userId = tokenProvider.validateAndGetUserId(token);
-//                }catch(Exception e){
-//                    throw new CustomAuthenticationException("접근 토큰시간이 만료되었습니다.","ACCESS_TOKEN_EXPIRED");
-//                }
-//
-//                //JWT 토큰로그인 인증에서는 API ,  oauth2 는  loadUserApiByUsername 커스텀으로 생성한 메서드로  id 값으로 인증처리
-//                PrincipalDetails principalDetails =(PrincipalDetails)principalDetailsService.loadUserByUsername(userId);
-//
-//                if(principalDetails!=null){
-//                    log.info("필터 ===principalDetails  {}", principalDetails.getUser().getUser_role().toString());
-//
-//                    authSetConfirm( request,  principalDetails);
-//                    filterChain.doFilter(request, response);
-//
-//                }else throw new CustomAuthenticationException("해당하는 유저가 없습니다.", "USER_NOT_FOUND");
-//
-//            }else   throw new CustomAuthenticationException("유효하지 않은 토큰 입니다.","INVALID_TOKEN" );
+            log.info("Filter running ..");
+            //요청에서 토큰 가져오기
+            String token = parseBearerToken(request);
+
+            //토큰 검사하기 . JWT 이므로 인가 서버에 요청하지 않고도 검증 가능.  userId 가져오기. 위조된 경우 예외 처리된다.
+            if(jwtToken!=null && !jwtToken.equalsIgnoreCase("null")){
+                String userId = null;
+                try{
+                    userId = tokenProvider.validateAndGetUserId(jwtToken);
+                }catch(Exception e){
+                    throw new CustomAuthenticationException("접근 토큰시간이 만료되었습니다.","ACCESS_TOKEN_EXPIRED");
+                }
+
+                //JWT 토큰로그인 인증에서는 API ,  oauth2 는  loadUserApiByUsername 커스텀으로 생성한 메서드로  id 값으로 인증처리
+                User user = userRepository.findByUserId(Integer.parseInt(userId));
+                CustomUserDetails customUserDetails = customUserDetailService.loadUserByUsername(user.getEmail());
+
+                if(customUserDetails!=null){
+                    log.info("필터 ===principalDetails  {}", customUserDetails.getUser().getUser_role().toString());
+
+                    authSetConfirm( request,  customUserDetails);
+                    filterChain.doFilter(request, response);
+
+                }else throw new CustomAuthenticationException("해당하는 유저가 없습니다.", "USER_NOT_FOUND");
+
+            }else   throw new CustomAuthenticationException("유효하지 않은 토큰 입니다.","INVALID_TOKEN" );
+
             filterChain.doFilter(request, response);
 
         }catch (CustomAuthenticationException e  ){
@@ -149,12 +157,12 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
         }
     }
 
-    private void authSetConfirm(HttpServletRequest request, PrincipalDetails principalDetails){
+    private void authSetConfirm(HttpServletRequest request, CustomUserDetails customUserDetails){
         //인증 완료; SecurityContextHolder 에 등록해야 인증된 사용자라고 생각한다.
         AbstractAuthenticationToken authentication = new UsernamePasswordAuthenticationToken(
-                principalDetails ,// userId,//인증된 사용자의 정보. 문자열이 아니어도 아무거나 넣을 수 있다. 보통 UserDetails 를 넣는다.
+                customUserDetails ,// userId,//인증된 사용자의 정보. 문자열이 아니어도 아무거나 넣을 수 있다. 보통 UserDetails 를 넣는다.
                 null,
-                principalDetails.getAuthorities() //권한 설정값을 넣어 준다.
+                customUserDetails.getAuthorities() //권한 설정값을 넣어 준다.
         );
 
         authentication.setDetails(new WebAuthenticationDetailsSource().buildDetails(request));
@@ -170,11 +178,11 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
      * @return
      */
     public static String parseBearerToken(HttpServletRequest request){
-        String bearerToken = request.getHeader("Authorization");
+        String bearerToken = request.getHeader("X-AUTH-TOKEN");
 
         if(StringUtils.hasText(bearerToken) && bearerToken.startsWith("Bearer ")){
             return bearerToken.substring(7);
         }
-        return null;
+        return bearerToken;
     }
 }

@@ -2,6 +2,7 @@ package com.github.supercodingteam1.repository.entity.item;
 
 import com.github.supercodingteam1.repository.entity.category.Category;
 import com.github.supercodingteam1.repository.entity.image.Image;
+import com.github.supercodingteam1.repository.entity.user.User;
 import jakarta.persistence.*;
 import lombok.*;
 
@@ -37,8 +38,12 @@ public class Item {
     @JoinColumn(name = "category_id", nullable = false)
     private Category category;
 
-    @OneToMany(mappedBy="item",cascade = CascadeType.ALL,fetch = FetchType.LAZY)
+    @OneToMany(mappedBy="item",cascade = CascadeType.ALL,fetch = FetchType.EAGER)
     private List<Image> imageList;
+
+    @ManyToOne(fetch = FetchType.EAGER)
+    @JoinColumn(name = "user_id", nullable = false)
+    private User user;
 
     @Override
     public String toString() {

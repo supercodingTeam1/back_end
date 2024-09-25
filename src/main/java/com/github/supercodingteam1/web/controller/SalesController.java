@@ -1,5 +1,6 @@
 package com.github.supercodingteam1.web.controller;
 
+import com.github.supercodingteam1.repository.UserDetails.CustomUserDetails;
 import com.github.supercodingteam1.service.SellService;
 import com.github.supercodingteam1.web.dto.AddSellItemDTO;
 import com.github.supercodingteam1.web.dto.ResponseDTO;
@@ -11,7 +12,10 @@ import jakarta.servlet.http.HttpServletRequest;
 import lombok.RequiredArgsConstructor;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
+import org.springframework.http.ResponseEntity;
+import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 
@@ -31,15 +35,21 @@ public class SalesController {
             @ApiResponse(responseCode = "500", description = "서버 오류")
     })
     @PostMapping(consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
-    public ResponseDTO AddSellItem(@Parameter(description = "상품 이미지 파일 목록", required = true) @RequestPart(value = "item_image", required = true) List<MultipartFile> item_image,
-                                   @Parameter(description = "상품 상세 정보", required = true) @RequestPart(value = "request") AddSellItemDTO addSellItemDTO){
+    public ResponseEntity<?> AddSellItem(@Parameter(description = "상품 이미지 파일 목록", required = true) @RequestPart(value = "item_image", required = true) List<MultipartFile> item_image,
+                                      @Parameter(description = "상품 상세 정보", required = true) @RequestPart(value = "request") AddSellItemDTO addSellItemDTO,
+                                      @AuthenticationPrincipal CustomUserDetails customUserDetails){
 
-        log.info("AddSellItem 메소드 호출 {}", addSellItemDTO);
-        sellService.addSellItem(item_image,addSellItemDTO);
+        try {
+            log.info("AddSellItem 메소드 호출 {}", addSellItemDTO);
+            sellService.addSellItem(item_image,addSellItemDTO, customUserDetails);
 
-        return ResponseDTO.builder()
-                .status(200)
-                .message("판매물품을 성공적으로 등록하였습니다").
-                build();
+            return ResponseEntity.ok().body(ResponseDTO.builder()
+                    .status(200)
+                    .message("판매물품을 성공적으로 등록하였습니다").
+                    build());
+        }catch (Exception e){
+            return ResponseEntity.status(HttpStatus.NOT_FOUND).body(ResponseDTO.builder()
+                    .status(404).message(e.getMessage()).build());
+        }
     }
 }
