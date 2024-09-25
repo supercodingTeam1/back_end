@@ -171,7 +171,6 @@ public class CartService {
             //현재 인증된 user 정보 가져오기
             String email = customUserDetails.getEmail();
             User user = userRepository.findByEmail(email).orElse(null);
-            System.out.println(user);
 
             String orderNum = generateOrderId(); //주문번호 생성
 
