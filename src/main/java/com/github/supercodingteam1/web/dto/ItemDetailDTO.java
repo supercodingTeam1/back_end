@@ -16,8 +16,6 @@ public class ItemDetailDTO {
     private List<Image> item_image;
     private Integer price;
     private String description;
-    private String category_type;
-    private String category_gender;
-    private Integer option_size;
-    private Integer option_stock;
+    private CategoryDTO category;
+    private List<OptionDTO> option;
 }
