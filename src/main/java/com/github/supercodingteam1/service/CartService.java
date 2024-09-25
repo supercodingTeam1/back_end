@@ -22,6 +22,7 @@ import com.github.supercodingteam1.web.dto.*;
 import com.github.supercodingteam1.web.exceptions.NotFoundException;
 import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 
 import java.time.LocalDate;
@@ -34,6 +35,7 @@ import java.util.Objects;
 
 @Service
 @RequiredArgsConstructor
+@Slf4j
 public class CartService {
     private final CartRepository cartRepository;
     private final ItemRepository itemRepository;
@@ -162,73 +164,88 @@ public class CartService {
     }
 
     @Transactional
-    public void orderItem(OrderDTO orderDTO, CustomUserDetails customUserDetails) {
+    public void orderItem(OrderDTO orderDTO, CustomUserDetails customUserDetails) throws Exception {
         //TODO : 물품 주문 시 option에 stock 조정, order 테이블에 주문기록 저장
 
-        //현재 인증된 user 정보 가져오기
-        String email = customUserDetails.getEmail();
-        User user = userRepository.findByEmail(email).orElse(null);
-        System.out.println(user);
+        try {
+            //현재 인증된 user 정보 가져오기
+            String email = customUserDetails.getEmail();
+            User user = userRepository.findByEmail(email).orElse(null);
+            System.out.println(user);
 
-        String orderNum = generateOrderId(); //주문번호 생성
+            String orderNum = generateOrderId(); //주문번호 생성
 
-        Boolean isFromCart = orderDTO.getIsFromCart();
+            Boolean isFromCart = orderDTO.getIsFromCart();
 
-        // 1. 주문한 물품 정보 가져오기
-        List<OrderItemDTO> orderItemDTOList = orderDTO.getItems(); //주문 아이템 정보 가져와서
-        List<OrderDetail> orderDetailList = new ArrayList<>();
+            // 1. 주문한 물품 정보 가져오기
+            List<OrderItemDTO> orderItemDTOList = orderDTO.getItems(); //주문 아이템 정보 가져와서
+            List<OrderDetail> orderDetailList = new ArrayList<>();
 
-        Integer totalPrice = 0;
+            Integer totalPrice = 0;
 
-        for(OrderItemDTO orderItemDTO : orderItemDTOList) { //OrderDetail 객체를 만들기 위함
-            OrderDetail orderDetail = OrderDetail.builder()
-                    .options(optionRepository.findById(orderItemDTO.getOption_id()).orElse(null))
-                    .quantity(orderItemDTO.getQuantity())
+            for(OrderItemDTO orderItemDTO : orderItemDTOList) { //OrderDetail 객체를 만들기 위함
+                OrderDetail orderDetail = OrderDetail.builder()
+                        .options(optionRepository.findById(orderItemDTO.getOption_id()).orElse(null))
+                        .quantity(orderItemDTO.getQuantity())
+                        .build();
+                Item item = optionRepository.findById(orderItemDTO.getOption_id()).get().getItem();
+                totalPrice += item.getItemPrice() * orderItemDTO.getQuantity();
+                orderDetailList.add(orderDetail);
+            }
+
+            // 5. Order 엔티티 생성하여 DB에 저장
+            Order order = Order.builder()
+                    .user(user)
+                    .orderNum(orderNum)
+                    .orderAt(LocalDateTime.now())
+                    .name(orderDTO.getName())
+                    .payment(orderDTO.getPayment())
+                    .orderAddress(orderDTO.getAddress())
+                    .phoneNum(orderDTO.getPhone_num())
+                    .totalPrice(totalPrice)
                     .build();
-            totalPrice += orderItemDTO.getPrice() * orderItemDTO.getQuantity();
-            orderDetailList.add(orderDetail);
+
+            orderRepository.save(order);
+
+            // 3. 주문한 item에 해당하는 option찾아서 stock 감소
+            for(OrderDetail orderDetail : orderDetailList) {
+                Option option = orderDetail.getOptions();
+
+                //주문한 수량이 재고보다 많으면
+                if(option.getStock() < orderDetail.getQuantity()) {
+                    System.out.println("재고보다 주문한 수량이 많습니다. 현재재고 : " + option.getStock());
+                    throw new IllegalArgumentException(String.format("재고보다 주문한 수량이 많습니다. 현재 재고: %d", option.getStock()));
+                }
+
+                option.setStock(option.getStock() - orderDetail.getQuantity());
+
+                Item item = option.getItem();
+                item.setTotalSales(item.getTotalSales() + orderDetail.getQuantity());
+
+                orderDetail.setOrder(order);
+
+                itemRepository.save(item);
+                optionRepository.save(option);
+            }
+
+            orderDetailRepository.saveAll(orderDetailList);
+
+            // 2. 장바구니에서 주문한 것인지?(true) / 바로구매로 주문한 것인지?(false)
+            if(isFromCart){ //장바구니에서 주문한것이면
+                List<OptionCart> optionCartList = optionCartRepository.findAllByCart_User(user);
+                List<Cart> cartList = optionCartList.stream().map(OptionCart::getCart).toList();
+                cartRepository.deleteAll(cartList);
+            }else{ //바로구매 누른것이면 cart가 없으니까 새로 만들어야함.
+                System.out.println("바로구매 + " + orderDTO);
+            }
+        }catch (IllegalArgumentException e){
+            log.error("재고보다 주문한 수량이 많습니다.");
+            throw new IllegalArgumentException("재고보다 주문한 수량이 많습니다.");
+        }catch (Exception e){
+            log.error(e.getMessage());
+            throw new Exception(e.getMessage());
         }
 
-        // 3. 주문한 item에 해당하는 option찾아서 stock 감소
-        for(OrderDetail orderDetail : orderDetailList) {
-            Option option = orderDetail.getOptions();
-
-            //주문한 수량이 재고보다 많으면
-            if(option.getStock() < orderDetail.getQuantity())
-                throw new IllegalArgumentException(String.format("재고보다 주문한 수량이 많습니다. 현재 재고: %d", option.getStock()));
-
-            option.setStock(option.getStock() - orderDetail.getQuantity());
-
-            Item item = option.getItem();
-            item.setTotalSales(item.getTotalSales() + orderDetail.getQuantity());
-
-//            itemRepository.save(item);
-//            optionRepository.save(option);
-        }
-
-//        orderDetailRepository.saveAll(orderDetailList);
-
-        // 2. 장바구니에서 주문한 것인지?(true) / 바로구매로 주문한 것인지?(false)
-        if(isFromCart){ //장바구니에서 주문한것이면
-
-        }else{ //바로구매 누른것이면 cart가 없으니까 새로 만들어야함.
-
-        }
-
-        // 5. Order 엔티티 생성하여 DB에 저장
-        Order order = Order.builder()
-                .user(user)
-                .orderNum(orderNum)
-                .orderAt(LocalDateTime.now())
-                .name(orderDTO.getName())
-                .payment(orderDTO.getPayment())
-                .orderAddress(orderDTO.getAddress())
-                .phoneNum(orderDTO.getPhone_num())
-                .totalPrice(totalPrice)
-                .orderDetails(orderDetailList)
-                .build();
-
-//        orderRepository.save(order);
     }
 
     //주문번호는 날짜(yyyyMMdd) + 현재시간(HHmmssSSS) 으로 구성

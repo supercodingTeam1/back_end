@@ -10,8 +10,6 @@ import lombok.Setter;
 @NoArgsConstructor
 @AllArgsConstructor
 public class OrderItemDTO {
-    private Integer item_id;
     private Integer option_id;
     private Integer quantity;
-    private Integer price;
 }

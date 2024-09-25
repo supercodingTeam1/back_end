@@ -1,8 +1,10 @@
 package com.github.supercodingteam1.repository.entity.orderDetail;
 
 import com.github.supercodingteam1.repository.entity.option.Option;
+import com.github.supercodingteam1.repository.entity.order.Order;
 import jakarta.persistence.*;
 import lombok.*;
+import org.checkerframework.checker.units.qual.C;
 
 
 @Entity
@@ -24,4 +26,8 @@ public class OrderDetail {
 
     @Column(name = "quantity", nullable = false)
     private Integer quantity;
+
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "order_id", nullable = false)
+    private Order order;
 }
