@@ -40,12 +40,9 @@ public class CustomUserDetails implements UserDetails {
 
     @Override
     public Collection<? extends GrantedAuthority> getAuthorities() {
-//        return authorities.stream().map(SimpleGrantedAuthority::new).collect(Collectors.toList());
-        Collection<GrantedAuthority> collector=new ArrayList<>();
-
-        log.info("********* 시큐리티 로그인 :" +user.getUser_role().toString());
-        collector.add(()-> user.getUser_role().toString());
-        return collector;
+        return authorities.stream()
+                .map(grantedAuthority -> new SimpleGrantedAuthority(grantedAuthority.getAuthority()))
+                .toList();
     }
 
     @Override
