@@ -45,8 +45,4 @@ public class Order {
 
     @Column(name = "total_price", nullable = false)
     private Integer totalPrice;
-
-    @OneToMany
-    @Column(name = "order_details_id", nullable = false)
-    private List<OrderDetail> orderDetails;
 }
