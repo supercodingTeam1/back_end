@@ -61,7 +61,7 @@ public class SellService {
     }
 
 
-    @Transactional
+//    @Transactional
     public void updateSellItem(List<ModifySalesItemOptionDTO> modifySalesItemOptionDTOList) {
         // 각 옵션에 대해 업데이트
         for (ModifySalesItemOptionDTO dto : modifySalesItemOptionDTOList) {
