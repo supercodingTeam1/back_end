@@ -182,7 +182,12 @@ public class AuthController {
         }
     }
 
-    // auth/withdraw
+    @Operation(summary = "회원탈퇴")
+    @ApiResponses({
+            @ApiResponse(responseCode = "200", description = "성공적으로 탈퇴했습니다."),
+            @ApiResponse(responseCode = "403", description = "권한이 없습니다."),
+            @ApiResponse(responseCode = "500", description = "서버 오류")
+    })
     @DeleteMapping("/withdraw")
     public ResponseEntity<?> withdraw(@AuthenticationPrincipal CustomUserDetails customUserDetails, @RequestBody WithdrawDTO withdrawDTO){
         try{
@@ -200,15 +205,9 @@ public class AuthController {
      * @return
      */
     @PostMapping("/refreshToken")
-    public ResponseEntity<?> reissue(@RequestHeader(value = "refreshToken") String refreshToken, HttpServletRequest request) {
-
-        Enumeration<String> requestHeaders = request.getHeaderNames();
-        while (requestHeaders.hasMoreElements()) {
-            String header = requestHeaders.nextElement();
-            System.out.println(header + ": " + request.getHeader(header));
-        }
-
+    public ResponseEntity<?> reissue(@RequestHeader(value = "refreshToken") String refreshToken) {
         log.info("접근 토큰 재발행");
+
         try {
             UserDTO reissue = jwtTokenProviderService.reissue(refreshToken);
             LoginResponseDTO<?> loginResponseDTO = LoginResponseDTO.builder()

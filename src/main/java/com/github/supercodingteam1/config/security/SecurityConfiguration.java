@@ -30,17 +30,17 @@ public class SecurityConfiguration {
                 .csrf(csrf -> csrf.disable())  // CSRF 보호 비활성화
                 .sessionManagement(session -> session
                         .sessionCreationPolicy(SessionCreationPolicy.STATELESS))  // Stateless 설정
-                .addFilterBefore(jwtAuthenticationFilter, UsernamePasswordAuthenticationFilter.class)
                 .authorizeHttpRequests(authorize -> authorize
                         .requestMatchers("/api-docs/**","/swagger-ui.html", "/v3/api-docs/**", "/swagger-resources/**", "/webjars/**","/swagger-ui/**").permitAll()
-                        .requestMatchers("/auth/signup", "/auth/duplicate","/auth/login","/items/**").permitAll()
+                        .requestMatchers("/auth/signup", "/auth/duplicate","/auth/login","/items","/items/**", "/auth/refreshToken").permitAll()
                         .requestMatchers("/sell").hasRole("SELLER")
                         .requestMatchers("/auth/logout","/auth/withdraw", "/cart/**","/mypage/**").authenticated()
                         .anyRequest().denyAll()
                 )
                 .formLogin(form -> form.disable())  // 폼 로그인 활성화(form-data)
                 .httpBasic(httpBasic -> httpBasic.disable())  // HTTP Basic 인증 비활성화
-                .rememberMe(rememberMe -> rememberMe.disable());  // Remember Me 기능 비활성화
+                .rememberMe(rememberMe -> rememberMe.disable())
+                .addFilterBefore(jwtAuthenticationFilter, UsernamePasswordAuthenticationFilter.class);  // Remember Me 기능 비활성화
 
         // 기존 frameOptions().sameOrigin() 설정에 해당하는 부분을 직접 설정
         http.headers(headers -> headers.frameOptions(frameOptions -> frameOptions.sameOrigin()));

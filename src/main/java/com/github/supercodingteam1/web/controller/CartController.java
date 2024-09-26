@@ -23,6 +23,8 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.bind.annotation.*;
 
+import java.util.List;
+
 
 @RestController
 @RequestMapping("/cart")
@@ -33,7 +35,7 @@ public class CartController {
     private final CartService cartService;
     private final UserRepository userRepository;
 
-    @Operation(summary = "장바구니 구매내역 조회")
+    @Operation(summary = "장바구니 조회")
     @ApiResponses({
             @ApiResponse(responseCode = "200", description = "성공적으로 조회되었습니다."),
             @ApiResponse(responseCode = "403", description = "권한이 없습니다."),
@@ -47,11 +49,14 @@ public class CartController {
             return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body("인증된 사용자가 아닙니다.");
         }
 
-        cartService.getAllCartItem(userDetails);
-        return ResponseEntity.ok(ResponseDTO.builder()
-                .status(200)
-                .message("장바구니 조회에 성공했습니다.")
-                .build());
+        List<CartResponseDTO> cartResponseDTOList = cartService.getAllCartItem(userDetails);
+
+        return ResponseEntity.ok().body(cartResponseDTOList);
+//
+//        return ResponseEntity.ok(ResponseDTO.builder()
+//                .status(200)
+//                .message("장바구니 조회에 성공했습니다.")
+//                .build());
     }
     @Operation(summary = "장바구니에 물품 추가")
     @ApiResponses({

@@ -82,7 +82,7 @@ public class SalesController {
             @ApiResponse(responseCode = "403", description = "권한이 없습니다."),
             @ApiResponse(responseCode = "500", description = "서버 오류")
     })
-    @PutMapping(consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
+    @PutMapping
     public ResponseDTO updateSellItem(@Parameter(description = "옵션 재고 수정", required = true) @RequestBody List<ModifySalesItemOptionDTO> modifySalesItemOptionDTO){
 
         log.info("updateSellItem 메소드 호출 {}", modifySalesItemOptionDTO);

@@ -70,6 +70,7 @@ public class CartService {
             String mainImageUrl= ImageUtils.getMainImageUrl(item);
 
             CartResponseDTO cartResponseDTO = CartResponseDTO.builder()
+                    .cart_id(existingCart.getCart().getCartId())
                     .option_id(existingCart.getOption().getOptionId())
                     .size(existingCart.getOption().getSize())
                     .item_image(mainImageUrl)

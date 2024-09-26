@@ -1,13 +1,11 @@
 package com.github.supercodingteam1.service;
 
-import com.github.supercodingteam1.repository.entity.category.Category;
 import com.github.supercodingteam1.repository.entity.category.CategoryRepository;
 import com.github.supercodingteam1.repository.entity.image.Image;
 import com.github.supercodingteam1.repository.entity.item.Item;
 import com.github.supercodingteam1.repository.entity.item.ItemRepository;
 import com.github.supercodingteam1.repository.entity.option.Option;
 import com.github.supercodingteam1.repository.entity.option.OptionRepository;
-import com.github.supercodingteam1.repository.entity.user.Role;
 import com.github.supercodingteam1.service.mapper.CategoryToCategoryDTOMapper;
 import com.github.supercodingteam1.service.mapper.OptionListToOptionDTOListMapper;
 import com.github.supercodingteam1.service.mapper.OptionToGetAllItemDTOMapper;
@@ -17,6 +15,7 @@ import com.github.supercodingteam1.web.exceptions.NotFoundException;
 import lombok.RequiredArgsConstructor;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.data.domain.*;
 import org.springframework.stereotype.Service;
 
 import java.util.Comparator;
@@ -30,7 +29,9 @@ public class ItemService {
     private final OptionRepository optionRepository;
     private final CategoryRepository categoryRepository;
 
-    public List<GetAllItemDTO> getAllItems(String sort, String order, Integer size) { //전체물품조회
+
+    public Page<GetAllItemDTO> getAllItemsPage(Integer page, Integer size, String sort, String order, Integer optionSize) {
+        page -= 1;
         Comparator<Item> comparator;
 
         if ("sales".equalsIgnoreCase(sort)) {
@@ -48,12 +49,37 @@ public class ItemService {
         //option 중 모든 option에 대한 stock이 0이면 아이템 전체를 안보여주고
         //option 중 일부 option에 대한 stock이 0이면 해당 option만 안보여주게 filtering 구현
 
-        return itemRepository.findAll().stream()
-                .filter(item -> (size == null || hasOptionWithSize(item,size)))
-                .filter(this::isStockMoreThanZero) //item의 options 중 stock이 모두 0 이면 출력 안되게 filter 적용
+        Pageable pageable = PageRequest.of(page, size);
+
+        List<Item> filteredItems = itemRepository.findAll().stream()
+                .filter(item -> (optionSize == null || hasOptionWithSize(item, optionSize)))
+                .filter(this::isStockMoreThanZero)
                 .sorted(comparator)
+                .toList();
+
+        Integer totalItems = filteredItems.size();
+        Integer start = Math.toIntExact(Math.min(page*size, totalItems));
+        Integer end = Math.min(start + size, totalItems);
+
+        List<GetAllItemDTO> convertedAllItems = filteredItems.subList(start, end)
+                .stream()
                 .map(this::convertToGetAllItemDTO)
                 .toList();
+
+        return new PageImpl<>(convertedAllItems, PageRequest.of(page, size), totalItems);
+
+//
+//        Page<Item> itemPage = itemRepository.findAll(pageable);
+//
+//        List<GetAllItemDTO> filteredItems = itemPage.getContent().stream()
+//                .filter(item -> (optionSize == null || hasOptionWithSize(item, optionSize)))
+//                .filter(this::isStockMoreThanZero)
+//                .sorted(comparator)
+//                .map(this::convertToGetAllItemDTO)
+//                .toList();
+//
+//        return new PageImpl<>(filteredItems, pageable, itemPage.getTotalElements());
+
     }
 
     private boolean isStockMoreThanZero(Item item) {
@@ -101,4 +127,5 @@ public class ItemService {
                 .build();
 
     }
+
 }
