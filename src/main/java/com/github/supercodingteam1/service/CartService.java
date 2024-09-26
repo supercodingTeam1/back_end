@@ -50,7 +50,6 @@ public class CartService {
         Integer userId = userDetails.getUserId();
         User user = userRepository.findByUserId(userId);
 
-//        List<OptionCart> userOptionCartList = optionCartRepository.findAllByUserId(userId);
         List<OptionCart> userOptionCartList = optionCartRepository.findAllByCart_User(user);
         if (userOptionCartList.isEmpty()) {
             throw new NotFoundException("장바구니가 비었습니다.");
@@ -59,12 +58,6 @@ public class CartService {
         List<CartResponseDTO> cartResponseList = new ArrayList<>();
 
         for (OptionCart existingCart : userOptionCartList) {
-//            String mainImageUrl = existingCart.getOption().getItem().getImageList()
-//                    .stream()
-//                    .filter(Image::getImageFirst)
-//                    .map(Image::getImageLink)
-//                    .findFirst()
-//                    .orElse(null);
 
             Item item= existingCart.getOption().getItem();
             String mainImageUrl= ImageUtils.getMainImageUrl(item);

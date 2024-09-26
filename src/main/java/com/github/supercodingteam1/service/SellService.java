@@ -17,13 +17,11 @@ import com.github.supercodingteam1.service.mapper.OptionListToOptionDTOListMappe
 import com.github.supercodingteam1.web.dto.AddSellItemDTO;
 import com.github.supercodingteam1.web.dto.GetAllSalesItemDTO;
 import com.github.supercodingteam1.web.dto.ModifySalesItemOptionDTO;
-import com.github.supercodingteam1.web.dto.OptionDTO;
+import com.github.supercodingteam1.web.dto.OptionContentDTO;
 import com.github.supercodingteam1.web.exceptions.NotFoundException;
 import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
 
@@ -129,8 +127,8 @@ public class SellService {
             imageList.get(0).setImageFirst(true);
             imageRepository.saveAll(imageList);
 
-            List<Integer> option_size = addSellItemDTO.getOptions().stream().map(OptionDTO::getSize).toList();
-            List<Integer> option_stock = addSellItemDTO.getOptions().stream().map(OptionDTO::getStock).toList();
+            List<Integer> option_size = addSellItemDTO.getOptions().stream().map(OptionContentDTO::getSize).toList();
+            List<Integer> option_stock = addSellItemDTO.getOptions().stream().map(OptionContentDTO::getStock).toList();
 
             List<Option> options = new ArrayList<>(); //Option List 생성
             for(int i =0; i < option_size.size(); i++){ //입력한 옵션 size와 stock으로 Option 생성하여 optionList에 추가

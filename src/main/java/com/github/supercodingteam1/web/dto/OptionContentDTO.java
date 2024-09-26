@@ -9,7 +9,7 @@ import lombok.Setter;
 @Getter
 @NoArgsConstructor
 @AllArgsConstructor
-public class OptionDTO {
+public class OptionContentDTO {
     private Integer size;
     private Integer stock;
 }

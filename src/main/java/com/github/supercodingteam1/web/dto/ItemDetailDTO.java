@@ -1,6 +1,5 @@
 package com.github.supercodingteam1.web.dto;
 
-import com.github.supercodingteam1.repository.entity.image.Image;
 import lombok.*;
 
 import java.util.List;
@@ -17,5 +16,5 @@ public class ItemDetailDTO {
     private Integer price;
     private String description;
     private CategoryDTO category;
-    private List<OptionDTO> option;
+    private List<OptionContentDTO> option;
 }

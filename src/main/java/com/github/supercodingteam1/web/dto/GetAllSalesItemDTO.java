@@ -1,7 +1,5 @@
 package com.github.supercodingteam1.web.dto;
 
-import com.github.supercodingteam1.repository.entity.category.Category;
-import com.github.supercodingteam1.repository.entity.option.Option;
 import lombok.*;
 
 import java.util.List;
@@ -17,6 +15,6 @@ public class GetAllSalesItemDTO {
     private String item_name;
     private Integer price;
     private CategoryDTO category;
-    private List<OptionDTO> options;
+    private List<OptionContentDTO> options;
 
 }
