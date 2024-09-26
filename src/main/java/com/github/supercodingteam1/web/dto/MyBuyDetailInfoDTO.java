@@ -17,6 +17,5 @@ public class MyBuyDetailInfoDTO {
     private String item_name;
     private Double price;
     private Integer quantity;
-    private String category;
     private List<OptionDTO> option;  // 옵션 리스트
 }
