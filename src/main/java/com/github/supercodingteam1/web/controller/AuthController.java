@@ -123,6 +123,12 @@ public class AuthController {
      * @param bindingResult
      * @return
      */
+    @Operation(summary = "로그인")
+    @ApiResponses({
+            @ApiResponse(responseCode = "200", description = "로그인 되었습니다."),
+            @ApiResponse(responseCode = "403", description = "권한이 없습니다."),
+            @ApiResponse(responseCode = "500", description = "서버 오류")
+    })
     @PostMapping("/login")
     public ResponseEntity<?> login(@Valid @RequestBody LoginDTO loginDTO, BindingResult bindingResult){
 
@@ -171,6 +177,12 @@ public class AuthController {
      * @param loginDTO
      * @return
      */
+    @Operation(summary = "로그아웃")
+    @ApiResponses({
+            @ApiResponse(responseCode = "200", description = "로그아웃 되었습니다."),
+            @ApiResponse(responseCode = "403", description = "권한이 없습니다."),
+            @ApiResponse(responseCode = "500", description = "서버 오류")
+    })
     @PostMapping("/logout")
     public ResponseEntity<?> logout(@RequestBody LoginDTO loginDTO){
         try{
@@ -204,6 +216,12 @@ public class AuthController {
      * @param refreshToken
      * @return
      */
+    @Operation(summary = "토큰 재발급")
+    @ApiResponses({
+            @ApiResponse(responseCode = "200", description = "토큰 재발급."),
+            @ApiResponse(responseCode = "403", description = "권한이 없습니다."),
+            @ApiResponse(responseCode = "500", description = "서버 오류")
+    })
     @PostMapping("/refreshToken")
     public ResponseEntity<?> reissue(@RequestHeader(value = "refreshToken") String refreshToken) {
         log.info("접근 토큰 재발행");

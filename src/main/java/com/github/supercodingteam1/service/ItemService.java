@@ -67,19 +67,6 @@ public class ItemService {
                 .toList();
 
         return new PageImpl<>(convertedAllItems, PageRequest.of(page, size), totalItems);
-
-//
-//        Page<Item> itemPage = itemRepository.findAll(pageable);
-//
-//        List<GetAllItemDTO> filteredItems = itemPage.getContent().stream()
-//                .filter(item -> (optionSize == null || hasOptionWithSize(item, optionSize)))
-//                .filter(this::isStockMoreThanZero)
-//                .sorted(comparator)
-//                .map(this::convertToGetAllItemDTO)
-//                .toList();
-//
-//        return new PageImpl<>(filteredItems, pageable, itemPage.getTotalElements());
-
     }
 
     private boolean isStockMoreThanZero(Item item) {
@@ -115,11 +102,12 @@ public class ItemService {
         Option option=optionRepository.findById(optionId).orElseThrow(()->new NotFoundException("해당되는 option을 찾을 수 없습니다."));
         Integer itemId=option.getItem().getItemId();
         Item item=itemRepository.findById(itemId).orElseThrow(()->new NotFoundException("해당되는 item을 찾을 수 없습니다."));
-        List<Image> imageList=item.getImageList();
+        List<String> imageList=item.getImageList().stream().map(image -> image.getImageLink()).toList();
 
         return ItemDetailDTO.builder()
                 .item_id(itemId)
-                .item_image(imageList)
+                .item_name(item.getItemName())
+                .item_images(imageList)
                 .price(item.getItemPrice())
                 .description(item.getDescription())
                 .category(CategoryToCategoryDTOMapper.INSTANCE.categoryToCategoryDTO(item.getCategory()))

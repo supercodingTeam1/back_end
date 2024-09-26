@@ -13,7 +13,7 @@ import java.util.List;
 public class ItemDetailDTO {
     private Integer item_id;
     private String item_name;
-    private List<Image> item_image;
+    private List<String> item_images;
     private Integer price;
     private String description;
     private CategoryDTO category;
