@@ -11,6 +11,7 @@ import java.util.List;
 @AllArgsConstructor
 @NoArgsConstructor
 public class CartResponseDTO {
+    private Integer cart_id;
     private Integer option_id;
     private Integer size;
     private String item_image;

@@ -11,7 +11,10 @@ import jakarta.servlet.http.HttpServletRequest;
 import lombok.RequiredArgsConstructor;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageImpl;
 import org.springframework.http.ResponseEntity;
+import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
@@ -37,15 +40,18 @@ public class ItemController {
     public ResponseEntity<?> getAllItems(HttpServletRequest httpServletRequest,
                                          @Schema(description = "정렬 기준, sales로 설정하면 정렬된 목록에서 상위 8개만 출력", allowableValues = {"sales", "price"}) @RequestParam(required = false) String sort,
                                          @Schema(description = "정렬 순서",allowableValues = {"asc", "desc"})@RequestParam(required = false) String order,
-                                         @Schema(description = "사이즈별 필터링")@RequestParam(required = false) Integer size){
+                                         @Schema(description = "사이즈별 필터링")@RequestParam(required = false) Integer optionSize,
+                                         @Schema(description = "페이지 번호", defaultValue = "1")@RequestParam(value = "page", defaultValue = "1") Integer page,
+                                         @Schema(description = "한 페이지에 보여질 아이템 수", defaultValue = "10")@RequestParam(value = "size", defaultValue = "10") Integer size){
         Map<String, Object> responseBody = new HashMap<>();
         log.info("getAllItems 메소드 호출");
-        List<GetAllItemDTO> getAllItemDTOList = itemService.getAllItems(sort, order, size);
+
+        Page<GetAllItemDTO> getAllItemDTOPage = itemService.getAllItemsPage(page, size, sort, order, optionSize);
 
         if(sort != null && sort.equalsIgnoreCase("sales"))
-            responseBody.put("items", getAllItemDTOList.stream().limit(8));
+            responseBody.put("items", getAllItemDTOPage.stream().limit(8));
         else
-            responseBody.put("items", getAllItemDTOList);
+            responseBody.put("items", getAllItemDTOPage);
 
         return ResponseEntity.ok(responseBody);
     }
@@ -57,7 +63,7 @@ public class ItemController {
             @ApiResponse(responseCode = "500", description = "서버 오류")
     })
     @GetMapping("/detail")
-    public ResponseEntity getDetailItem(@RequestParam(required = false) Integer option_id){
+    public ResponseEntity<?> getDetailItem(@RequestParam(required = false) Integer option_id){
         Map<String, Object> responseBody = new HashMap<>();
         log.info("getDetailItem 메소드 호출");
         ItemDetailDTO getItemDetailDTO=itemService.getItemDetail(option_id);

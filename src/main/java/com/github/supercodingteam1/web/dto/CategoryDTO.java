@@ -10,6 +10,6 @@ import lombok.NoArgsConstructor;
 @Data
 @Builder
 public class CategoryDTO {
-    private Integer category_gender;
+    private String category_gender;
     private String category_type;
 }

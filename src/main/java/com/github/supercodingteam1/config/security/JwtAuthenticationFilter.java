@@ -32,6 +32,7 @@ import org.springframework.web.filter.OncePerRequestFilter;
 
 import java.io.IOException;
 import java.io.PrintWriter;
+import java.util.Enumeration;
 
 @Component
 @RequiredArgsConstructor
@@ -46,13 +47,12 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
             "/", "/static/**", "/favicon.ico",
             "/css/**","/js/**","/images/**",
             "/auth/signup","/auth/login" , "/auth/reissue", "/auth/duplicate",
-            "/auth/refreshToken", "/items",
-            "/swagger-ui.html", "/swagger-ui/", "/v3/api-docs/", "/swagger-resources/",
+            "/auth/refreshToken","/items", "/items/**",
+            "/swagger-ui.html", "/swagger-ui/**", "/v3/api-docs/**", "/swagger-resources/",
             "/webjars/"
     };
     private final JwtTokenProvider jwtTokenProvider;
     private final UserRepository userRepository;
-    private final ReturnTypeParser genericReturnTypeParser;
 
     // 필터 제외 페이지 설정
     @Override
@@ -98,6 +98,7 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
         }
 
         String jwtToken = jwtTokenProvider.resolveToken(request);
+
         log.info("=========  doFilterInternal getRequestURI  : {}", request.getRequestURI());
 
         try{
@@ -126,8 +127,6 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
                 }else throw new CustomAuthenticationException("해당하는 유저가 없습니다.", "USER_NOT_FOUND");
 
             }else   throw new CustomAuthenticationException("유효하지 않은 토큰 입니다.","INVALID_TOKEN" );
-
-//            filterChain.doFilter(request, response);
 
         }catch (CustomAuthenticationException e  ){
             log.info("JWT CustomAuthenticationException 에러 처리  ");

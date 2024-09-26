@@ -75,8 +75,6 @@ public class JwtTokenProviderService {
     }
 
 
-
-
     /**
 
      * 2. access token + refresh token 재발급 처리
@@ -102,11 +100,7 @@ public class JwtTokenProviderService {
     }
 
 
-
-
-
-
-    public UserDTO reissue(String refreshToken ) throws  Exception{
+    public UserDTO reissue(String refreshToken) throws  Exception{
 
         //1.refreshToken 유효성 체크
         String userId = validateAndGetUserId(refreshToken);
@@ -127,8 +121,6 @@ public class JwtTokenProviderService {
         }
         throw new RuntimeException("유효하지 않은 토큰 입니다.");
     }
-
-
 
 
     /**

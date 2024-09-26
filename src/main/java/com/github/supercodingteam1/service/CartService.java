@@ -70,6 +70,7 @@ public class CartService {
             String mainImageUrl= ImageUtils.getMainImageUrl(item);
 
             CartResponseDTO cartResponseDTO = CartResponseDTO.builder()
+                    .cart_id(existingCart.getCart().getCartId())
                     .option_id(existingCart.getOption().getOptionId())
                     .size(existingCart.getOption().getSize())
                     .item_image(mainImageUrl)
@@ -171,7 +172,6 @@ public class CartService {
             //현재 인증된 user 정보 가져오기
             String email = customUserDetails.getEmail();
             User user = userRepository.findByEmail(email).orElse(null);
-            System.out.println(user);
 
             String orderNum = generateOrderId(); //주문번호 생성
 
