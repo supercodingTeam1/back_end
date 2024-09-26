@@ -37,12 +37,12 @@ public class MyPageController {
 
         try {
             // 1. Authorization 헤더에서 JWT 토큰 추출
-            String authorizationHeader = request.getHeader("Authorization");
-            if (authorizationHeader == null || !authorizationHeader.startsWith("Bearer ")) {
+            String token = request.getHeader("X-AUTH-TOKEN");
+            if (token == null) {
                 return ResponseEntity.status(401).body("토큰이 존재하지 않습니다.");
             }
 
-            String token = authorizationHeader.substring(7); // "Bearer " 이후의 토큰 부분만 추출
+//            String token = authorizationHeader.substring(7); // "Bearer " 이후의 토큰 부분만 추출
 
             // 2. 토큰을 이용해 사용자 ID 추출 후 사용자 ID로 사용자 정보 조회
             UserDTO userDTO = userService.findByTokenUserInfo(token);

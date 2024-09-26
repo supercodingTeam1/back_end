@@ -2,6 +2,8 @@ package com.github.supercodingteam1.service;
 
 import com.github.supercodingteam1.config.auth.dto.TokenDTO;
 import com.github.supercodingteam1.config.auth.jwt.JwtTokenProviderService;
+import com.github.supercodingteam1.repository.UserDetails.CustomUserDetails;
+import com.github.supercodingteam1.repository.entity.user.RefreshToken;
 import com.github.supercodingteam1.repository.entity.user.RefreshTokenRepository;
 import com.github.supercodingteam1.repository.entity.user.User;
 import com.github.supercodingteam1.repository.entity.user.UserRepository;
@@ -60,13 +62,14 @@ public class UserService {
    * 회원 탈퇴 처리
    * @param withdrawDTO
    */
-  public void withdraw(WithdrawDTO withdrawDTO) {
-    User user = userRepository.findByEmail(withdrawDTO.getUser_email()).orElseThrow(null);
+  @Transactional
+  public void withdraw(WithdrawDTO withdrawDTO, CustomUserDetails customUserDetails) {
     //1.토큰 삭제
-    refreshTokenRepository.deleteByUserUserId(user.getUserId());
+
+    refreshTokenRepository.deleteByUserUserId(customUserDetails.getUserId());
     
     //2.유저 삭제
-    userRepository.deleteById(user.getUserId());
+    userRepository.deleteById(customUserDetails.getUserId());
   }
 
 
@@ -91,7 +94,4 @@ public class UserService {
       throw new IllegalStateException("유저 정보가 없습니다.");
     }
   }
-
-
-
 }
