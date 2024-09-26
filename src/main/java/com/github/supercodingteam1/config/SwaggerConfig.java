@@ -22,16 +22,14 @@ public class SwaggerConfig {
                 .description("신발 쇼핑몰 API에 대한 문서입니다.");
 
         SecurityScheme apiKey = new SecurityScheme()
-                .type(SecurityScheme.Type.HTTP)
+                .type(SecurityScheme.Type.APIKEY)
                 .in(SecurityScheme.In.HEADER)
-                .name("X-AUTH-TOKEN")
-                .scheme("bearer")
-                .bearerFormat("JWT");
+                .name("X-AUTH-TOKEN");
         SecurityRequirement securityRequirement = new SecurityRequirement()
-                .addList("Bearer Token");
+                .addList("X-AUTH-TOKEN");
 
         return new OpenAPI()
-                .components(new Components().addSecuritySchemes("Bearer Token", apiKey))
+                .components(new Components().addSecuritySchemes("X-AUTH-TOKEN", apiKey))
                 .addSecurityItem(securityRequirement)
                 .info(info);
     }

@@ -9,9 +9,6 @@ import lombok.*;
 @AllArgsConstructor
 @Builder
 public class WithdrawDTO {
-
   private String user_email;
   private String token;
-
-
 }

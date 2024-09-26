@@ -2,13 +2,17 @@ package com.github.supercodingteam1.web.controller;
 
 import com.github.supercodingteam1.config.auth.dto.TokenDTO;
 import com.github.supercodingteam1.config.auth.jwt.JwtTokenProviderService;
+import com.github.supercodingteam1.repository.UserDetails.CustomUserDetails;
 import com.github.supercodingteam1.repository.entity.user.User;
 import com.github.supercodingteam1.repository.entity.user.UserRole;
 import com.github.supercodingteam1.service.AuthService;
 import com.github.supercodingteam1.service.UserRoleService;
 import com.github.supercodingteam1.service.UserService;
 import com.github.supercodingteam1.web.dto.*;
+import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
+import io.swagger.v3.oas.annotations.responses.ApiResponse;
+import io.swagger.v3.oas.annotations.responses.ApiResponses;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
@@ -16,11 +20,13 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.util.StringUtils;
 import org.springframework.validation.BindingResult;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 
+import java.util.Enumeration;
 import java.util.List;
 import java.util.Objects;
 import java.util.stream.Collectors;
@@ -50,6 +56,12 @@ public class AuthController {
     "roles" :["BUYER", "SELLER"]
     }
      */
+    @Operation(summary = "회원가입")
+    @ApiResponses({
+            @ApiResponse(responseCode = "200", description = "성공적으로 가입했습니다."),
+            @ApiResponse(responseCode = "403", description = "권한이 없습니다."),
+            @ApiResponse(responseCode = "500", description = "서버 오류")
+    })
     @PostMapping(value = "/signup", consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
     public ResponseDTO signUp(
             @Parameter(description = "사용자 프로필 이미지") @RequestPart(value = "profileImage", required = false) MultipartFile profileImage,
@@ -64,10 +76,7 @@ public class AuthController {
                     .build();
         } catch (Exception e) {
             log.error("회원가입 처리 중 오류 발생: ", e);
-            ResponseDTO responseDTO = ResponseDTO.builder()
-                    .status(400)
-                    .message(e.getMessage())
-                    .build();
+
             return ResponseDTO.builder()
                     .status(HttpStatus.BAD_REQUEST.value())
                     .message(e.getMessage())
@@ -80,6 +89,12 @@ public class AuthController {
      * @param checkDuplicateDTO
      * @return
      */
+    @Operation(summary = "중복확인")
+    @ApiResponses({
+            @ApiResponse(responseCode = "200", description = "사용가능한 이메일입니다."),
+            @ApiResponse(responseCode = "400", description = "이미 존재하는 이메일입니다."),
+            @ApiResponse(responseCode = "500", description = "서버 오류")
+    })
     @PostMapping("/duplicate")
     public ResponseDTO duplicate(@RequestBody CheckDuplicateDTO checkDuplicateDTO){
 
@@ -169,11 +184,10 @@ public class AuthController {
 
     // auth/withdraw
     @DeleteMapping("/withdraw")
-    public ResponseEntity<?> withdraw(HttpServletRequest httpServletRequest, @RequestBody WithdrawDTO withdrawDTO){
+    public ResponseEntity<?> withdraw(@AuthenticationPrincipal CustomUserDetails customUserDetails, @RequestBody WithdrawDTO withdrawDTO){
         try{
-            //TODO : httpServletRequest 헤더에서 토큰 가져와서 파싱 후 user 판단
             //DB 에서 토큰 삭제
-            userService.withdraw(withdrawDTO);
+            userService.withdraw(withdrawDTO, customUserDetails);
             return ResponseEntity.ok().body(ResponseDTO.builder().status(200).message("success").build());
         }catch (Exception e){
             return ResponseEntity.ok().body(ResponseDTO.builder().status(400).message(e.getMessage()).build());
@@ -186,7 +200,14 @@ public class AuthController {
      * @return
      */
     @PostMapping("/refreshToken")
-    public ResponseEntity<?> reissue(@RequestHeader(value = "refreshToken") String refreshToken) {
+    public ResponseEntity<?> reissue(@RequestHeader(value = "refreshToken") String refreshToken, HttpServletRequest request) {
+
+        Enumeration<String> requestHeaders = request.getHeaderNames();
+        while (requestHeaders.hasMoreElements()) {
+            String header = requestHeaders.nextElement();
+            System.out.println(header + ": " + request.getHeader(header));
+        }
+
         log.info("접근 토큰 재발행");
         try {
             UserDTO reissue = jwtTokenProviderService.reissue(refreshToken);

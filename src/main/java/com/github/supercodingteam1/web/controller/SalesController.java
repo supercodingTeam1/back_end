@@ -10,6 +10,7 @@ import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.responses.ApiResponses;
+import jakarta.servlet.http.HttpServletRequest;
 import lombok.RequiredArgsConstructor;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -35,16 +36,17 @@ public class SalesController {
             @ApiResponse(responseCode = "403", description = "권한이 없습니다."),
             @ApiResponse(responseCode = "500", description = "서버 오류")
     })
-    @GetMapping(consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
-    public ResponseDTO GetAllSellItem(@AuthenticationPrincipal CustomUserDetails userDetails){
+//    @GetMapping(consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
+    @GetMapping
+    public List<GetAllSalesItemDTO> GetAllSellItem(@AuthenticationPrincipal CustomUserDetails userDetails){
 
-//        log.info("GetAllSellItem 메소드 호출 {}", GetAllSalesItemDTO);
-        sellService.getAllSellItem(userDetails);
-
-        return ResponseDTO.builder()
-                .status(200)
-                .message("판매물품을 성공적으로 조회하였습니다").
-                build();
+        log.info("GetAllSellItem 메소드 호출");
+        return sellService.getAllSellItem(userDetails);
+//
+//        return ResponseDTO.builder()
+//                .status(200)
+//                .message("판매물품을 성공적으로 조회하였습니다").
+//                build();
     }
 
 
