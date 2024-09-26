@@ -15,7 +15,7 @@ public class AddSellItemDTO {
     private Integer price;
     private String category_type;
     private String category_gender;
-    private List<OptionContentDTO> options;
+    private List<OptionDTO> options;
 
     @Override
     public String toString() {
@@ -25,8 +25,8 @@ public class AddSellItemDTO {
                 ", price=" + price +
                 ", category_type='" + category_type + '\'' +
                 ", category_gender='" + category_gender + '\'' +
-                ", options size =" + options.stream().map(OptionContentDTO::getSize).toList() +
-                ", options stock = " + options.stream().map(OptionContentDTO::getStock).toList() +
+                ", options size =" + options.stream().map(OptionDTO::getSize).toList() +
+                ", options stock = " + options.stream().map(OptionDTO::getStock).toList() +
                 '}';
     }
 }

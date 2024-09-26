@@ -9,7 +9,8 @@ import lombok.Setter;
 @Getter
 @NoArgsConstructor
 @AllArgsConstructor
-public class OptionContentDTO {
+public class MyBuyItemOptionDetailDTO {
+    private Integer option_id;
     private Integer size;
-    private Integer stock;
+    private Integer quantity;
 }

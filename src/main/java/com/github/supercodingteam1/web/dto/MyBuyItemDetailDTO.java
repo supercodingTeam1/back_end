@@ -11,10 +11,10 @@ import java.util.List;
 @Getter
 @NoArgsConstructor
 @AllArgsConstructor
-public class MyBuyDetailInfoDTO {
+public class MyBuyItemDetailDTO {
     private Integer order_id;
     private String item_image;
     private String item_name;
-    private Double price;
-    private List<OptionDTO> option;  // 옵션 리스트
+    private Integer price;
+    private List<MyBuyItemOptionDetailDTO> myBuyItemOptionDetailDTOList;
 }

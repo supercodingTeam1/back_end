@@ -1,13 +1,15 @@
 package com.github.supercodingteam1.service;
 
-import com.github.supercodingteam1.config.auth.dto.TokenDTO;
+
 import com.github.supercodingteam1.config.auth.jwt.JwtTokenProviderService;
 import com.github.supercodingteam1.repository.UserDetails.CustomUserDetails;
-import com.github.supercodingteam1.repository.entity.user.RefreshToken;
+import com.github.supercodingteam1.repository.entity.order.Order;
+import com.github.supercodingteam1.repository.entity.order.OrderRepository;
 import com.github.supercodingteam1.repository.entity.user.RefreshTokenRepository;
 import com.github.supercodingteam1.repository.entity.user.User;
 import com.github.supercodingteam1.repository.entity.user.UserRepository;
 import com.github.supercodingteam1.web.dto.LoginDTO;
+import com.github.supercodingteam1.web.dto.MyPageDTO;
 import com.github.supercodingteam1.web.dto.UserDTO;
 import com.github.supercodingteam1.web.dto.WithdrawDTO;
 import lombok.RequiredArgsConstructor;
@@ -18,11 +20,13 @@ import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
 
+
 @Log4j2
 @Service
 @Transactional
 @RequiredArgsConstructor
 public class UserService {
+  private final OrderRepository orderRepository;
 
   private final UserRepository userRepository;
   private final RefreshTokenRepository refreshTokenRepository;
@@ -96,4 +100,17 @@ public class UserService {
   }
 
 
+  public MyPageDTO<?> getMyBuyInfo(CustomUserDetails userDetails) {
+    //TODO: userDetails token으로 사용자 인증 + user_id 구하기
+    int userId = userDetails.getUserId();
+
+    //TODO: user_id를 이용해 List<order> order을 구하기-order_id, order_num, order_at
+    List<Order> myOrderList=orderRepository.findAllByUserId(userId);
+    //TODO: order_id를 통해 List<option> option을 구하기-option_id, size, quantity(MyBuyItemOptionDetailDTO)
+    //TODO: option_id를 통해 Item item 구하기-item_id, item_name, price
+    //TODO: item_id를 통해 대표 image 구하기-MyBuyItemDetailDTO, MyBuyInfoDTO
+    //TODO: for-builder로 MyPageDTO<T>=List<MyBuyInfoDTO>(>MyBuyItemDetailDTO>MyBuyItemOptionDetailDTO) 구하기
+
+    return null;
+  }
 }

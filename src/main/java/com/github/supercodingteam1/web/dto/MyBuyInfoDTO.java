@@ -13,8 +13,8 @@ import java.util.List;
 @NoArgsConstructor
 @AllArgsConstructor
 public class MyBuyInfoDTO {
-    private Integer order_num;             // 주문 번호
-    private LocalDateTime order_at;        // 주문 일시
-    private List<MyBuyDetailInfoDTO> myBuyDetailInfoDTOList; // 주문 상품 리스트
+    private Integer order_num;
+    private LocalDateTime order_at;
+    private List<MyBuyItemDetailDTO> myBuyItemDetailDTOList; // 주문 상품 리스트
 
 }
