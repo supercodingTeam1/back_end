@@ -60,7 +60,7 @@ public class SecurityConfiguration {
         configuration.setAllowedOrigins(List.of("*"));
 
         configuration.setAllowCredentials(true); // token 주고 받을때 필요
-        configuration.addExposedHeader("Authorization"); //token
+        configuration.addExposedHeader("X-AUTH-TOKEN"); //token
 
         configuration.addAllowedHeader("*");
         configuration.setAllowedMethods(Arrays.asList("GET", "POST", "PUT", "PATCH", "DELETE", "OPTIONS"));
