@@ -169,6 +169,7 @@ public class AuthController {
                     .message("로그인 실패")
                     .build();
             return ResponseEntity.badRequest().body(loginResponseDTO);
+
         }
     }
 

@@ -20,17 +20,12 @@ public class UserDTO {
     private Integer userId;
     private String userName;
 
-    @JsonIgnore
     private String email;
     @JsonIgnore
     private TokenDTO token;
-    @JsonIgnore
     private String phoneNum;
-    @JsonIgnore
     private String userAddress;
-    @JsonIgnore
     private String userGender;
-    @JsonIgnore
     private String userImg;
 
 
@@ -39,7 +34,7 @@ public class UserDTO {
 
 
     public static UserDTO of(User user){
-        List<String> collect = user.getUser_role().stream().map(userRole -> userRole.getRoleName().toString()).collect(Collectors.toList());
+        List<String> collect = user.getUser_role().stream().map(userRole -> userRole.getRoleName().getRole()).collect(Collectors.toList());
 
         return  UserDTO.builder().
                 userId(user.getUserId())
