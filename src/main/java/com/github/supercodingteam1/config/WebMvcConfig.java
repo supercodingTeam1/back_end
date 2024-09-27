@@ -64,20 +64,20 @@ public class WebMvcConfig implements WebMvcConfigurer {
                 .allowCredentials(true)  // 'Access-Control-Allow-Credentials' header 는 요청 시 자격 증명이 필요함
                 .maxAge(CORS_MAX_AGE_SECS)
                 .allowedOrigins(
-                        "http://localhost:3000/"
+                        "http://localhost:5173/"
         ).exposedHeaders("authorization");
 
         
-        //cors 오류가 날경우 다음과 같이 개별 설정
-        registry.addMapping("/auth/**")
-                .allowedMethods("GET", "POST", "PUT", "PATCH", "DELETE", "OPTIONS")
-                .allowedHeaders("*")
-                .allowCredentials(true)  // 'Access-Control-Allow-Credentials' header 는 요청 시 자격 증명이 필요함
-                .maxAge(CORS_MAX_AGE_SECS)
-                .allowedOrigins(
-                        "http://localhost:3000/"
-                ).exposedHeaders("authorization");  //authorization 헤더를 넘기 위해 exposedHeaders 조건을 추가
-
+//        //cors 오류가 날경우 다음과 같이 개별 설정
+//        registry.addMapping("/auth/**")
+//                .allowedMethods("GET", "POST", "PUT", "PATCH", "DELETE", "OPTIONS")
+//                .allowedHeaders("*")
+//                .allowCredentials(true)  // 'Access-Control-Allow-Credentials' header 는 요청 시 자격 증명이 필요함
+//                .maxAge(CORS_MAX_AGE_SECS)
+//                .allowedOrigins(
+//                        "http://localhost:3000/"
+//                ).exposedHeaders("authorization");  //authorization 헤더를 넘기 위해 exposedHeaders 조건을 추가
+//
 
     }
 
