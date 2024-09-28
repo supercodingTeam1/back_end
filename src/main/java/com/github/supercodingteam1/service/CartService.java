@@ -3,7 +3,6 @@ package com.github.supercodingteam1.service;
 import com.github.supercodingteam1.repository.UserDetails.CustomUserDetails;
 import com.github.supercodingteam1.repository.entity.cart.Cart;
 import com.github.supercodingteam1.repository.entity.cart.CartRepository;
-import com.github.supercodingteam1.repository.entity.image.Image;
 import com.github.supercodingteam1.repository.entity.item.Item;
 import com.github.supercodingteam1.repository.entity.item.ItemRepository;
 import com.github.supercodingteam1.repository.entity.option.Option;
@@ -50,7 +49,6 @@ public class CartService {
         Integer userId = userDetails.getUserId();
         User user = userRepository.findByUserId(userId);
 
-//        List<OptionCart> userOptionCartList = optionCartRepository.findAllByUserId(userId);
         List<OptionCart> userOptionCartList = optionCartRepository.findAllByCart_User(user);
         if (userOptionCartList.isEmpty()) {
             throw new NotFoundException("장바구니가 비었습니다.");
@@ -59,12 +57,6 @@ public class CartService {
         List<CartResponseDTO> cartResponseList = new ArrayList<>();
 
         for (OptionCart existingCart : userOptionCartList) {
-//            String mainImageUrl = existingCart.getOption().getItem().getImageList()
-//                    .stream()
-//                    .filter(Image::getImageFirst)
-//                    .map(Image::getImageLink)
-//                    .findFirst()
-//                    .orElse(null);
 
             Item item= existingCart.getOption().getItem();
             String mainImageUrl= ImageUtils.getMainImageUrl(item);
@@ -178,18 +170,18 @@ public class CartService {
             Boolean isFromCart = orderDTO.getIsFromCart();
 
             // 1. 주문한 물품 정보 가져오기
-            List<OrderItemDTO> orderItemDTOList = orderDTO.getItems(); //주문 아이템 정보 가져와서
+            List<MyOrderItemDTO> myOrderItemDTOList = orderDTO.getItems(); //주문 아이템 정보 가져와서
             List<OrderDetail> orderDetailList = new ArrayList<>();
 
             Integer totalPrice = 0;
 
-            for(OrderItemDTO orderItemDTO : orderItemDTOList) { //OrderDetail 객체를 만들기 위함
+            for(MyOrderItemDTO myOrderItemDTO : myOrderItemDTOList) { //OrderDetail 객체를 만들기 위함
                 OrderDetail orderDetail = OrderDetail.builder()
-                        .options(optionRepository.findById(orderItemDTO.getOption_id()).orElse(null))
-                        .quantity(orderItemDTO.getQuantity())
+                        .options(optionRepository.findById(myOrderItemDTO.getOption_id()).orElse(null))
+                        .quantity(myOrderItemDTO.getQuantity())
                         .build();
-                Item item = optionRepository.findById(orderItemDTO.getOption_id()).get().getItem();
-                totalPrice += item.getItemPrice() * orderItemDTO.getQuantity();
+                Item item = optionRepository.findById(myOrderItemDTO.getOption_id()).get().getItem();
+                totalPrice += item.getItemPrice() * myOrderItemDTO.getQuantity();
                 orderDetailList.add(orderDetail);
             }
 
