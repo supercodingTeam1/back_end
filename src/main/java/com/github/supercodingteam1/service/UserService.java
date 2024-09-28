@@ -115,36 +115,32 @@ public class UserService {
 
     int userId = userDetails.getUserId();
 
-    // 결과로 반환할 MyPageDTO
     MyPageDTO<MyBuyInfoDTO> myPageDTO = new MyPageDTO<>();
     List<MyBuyInfoDTO> myBuyInfoDTOList = new ArrayList<>();
 
-    // 1. user_id를 이용해 List<Order> orders를 가져옴
     List<Order> myOrderList = orderRepository.findAllByUserId(userId);
 
-    // 2. 각 주문에 대해 처리
     for (Order order : myOrderList) {
       List<MyBuyItemDetailDTO> myBuyItemDetailDTOList = new ArrayList<>();
 
-      // 3. 해당 주문의 상세(OrderDetail) 목록을 조회
+      // 3. 해당 주문의 OrderDetail 을 조회
       List<OrderDetail> orderDetailList = orderDetailRepository.findAllByOrderId(order.getOrder_id());
 
-      // 4. 각 주문 상세(OrderDetail)에 대해 처리
       for (OrderDetail orderDetail : orderDetailList) {
         Option option = orderDetail.getOptions();  // 주문한 옵션
-        Item item = option.getItem();  // 옵션에 속한 상품
+        Item item = option.getItem();
 
-        // 5. 상품의 대표 이미지 가져오기 (imageFirst가 true인 경우)
+        // 상품의 대표 이미지 가져오기
         String mainImageUrl = ImageUtils.getMainImageUrl(item);
 
-        // 6. MyBuyItemOptionDetailDTO 생성 (옵션 정보 포함)
+        // MyBuyItemOptionDetailDTO 생성 (옵션 정보 포함)
         MyBuyItemOptionDetailDTO myBuyItemOptionDetailDTO = MyBuyItemOptionDetailDTO.builder()
                 .option_id(option.getOptionId())
                 .size(option.getSize())
                 .quantity(orderDetail.getQuantity())
                 .build();
 
-        // 7. MyBuyItemDetailDTO 생성 (상품 정보 및 대표 이미지 포함)
+        // MyBuyItemDetailDTO 생성 (상품 정보 및 대표 이미지 포함)
         MyBuyItemDetailDTO myBuyItemDetailDTO = MyBuyItemDetailDTO.builder()
                 .order_id(orderDetail.getOrder().getOrder_id())
                 .item_image(mainImageUrl)
@@ -153,22 +149,20 @@ public class UserService {
                 .myBuyItemOptionDetailDTOList(Collections.singletonList(myBuyItemOptionDetailDTO))
                 .build();
 
-        // 8. MyBuyItemDetailDTO를 목록에 추가
+        // MyBuyItemDetailDTO를 목록에 추가
         myBuyItemDetailDTOList.add(myBuyItemDetailDTO);
       }
 
-      // 9. MyBuyInfoDTO 생성 (주문 정보 포함)
+      // MyBuyInfoDTO 생성 (주문 정보 포함)
       MyBuyInfoDTO myBuyInfoDTO = MyBuyInfoDTO.builder()
               .order_num(order.getOrderNum())
               .order_at(order.getOrderAt())
               .myBuyItemDetailDTOList(myBuyItemDetailDTOList)
               .build();
 
-      // 10. MyBuyInfoDTO를 목록에 추가
       myBuyInfoDTOList.add(myBuyInfoDTO);
     }
 
-    // 11. MyPageDTO에 최종 목록을 설정하여 반환
     myPageDTO.setData(myBuyInfoDTOList);
 
     return myPageDTO;
