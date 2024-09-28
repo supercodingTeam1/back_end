@@ -67,9 +67,10 @@ public class AuthController {
             @Parameter(description = "사용자 프로필 이미지") @RequestPart(value = "profileImage", required = false) MultipartFile profileImage,
             @Parameter(description = "회원가입정보", required = true) @RequestPart(value = "request") @Valid SignUpDTO signUpDTO
             , BindingResult bindingResult) {
-        log.info("회원 가입 처리 요청 수신");
+        log.info("회원 가입 요청 수신");
         try {
             authService.signUp(profileImage, signUpDTO, bindingResult);
+            log.info("회원 가입 요청 완료");
             return ResponseDTO.builder()
                     .status(200)
                     .message("성공적으로 회원가입하였습니다.")

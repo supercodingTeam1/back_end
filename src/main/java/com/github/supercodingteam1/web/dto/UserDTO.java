@@ -42,7 +42,6 @@ public class UserDTO {
                 .email(user.getEmail())
                 .phoneNum(user.getPhoneNum())
                 .userAddress(user.getUserAddress())
-                .userGender(user.getUserGender())
                 .user_role(collect)
                 .userImg(user.getUserImg())
                 .build();
