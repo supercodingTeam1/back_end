@@ -14,13 +14,11 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageImpl;
+import org.springframework.data.web.PagedModel;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.ui.Model;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestParam;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 
 
 import java.util.*;
@@ -61,20 +59,21 @@ public class ItemController {
     @Operation(summary = "상세 아이템 조회")
     @ApiResponses({
             @ApiResponse(responseCode = "200", description = "성공적으로 조회했습니다."),
-            @ApiResponse(responseCode = "403", description = "권한이 없습니다."),
             @ApiResponse(responseCode = "404", description = "해당 아이템을 찾을 수 없습니다."),
             @ApiResponse(responseCode = "500", description = "서버 오류")
     })
     @GetMapping("/detail")
     public ResponseEntity<?> getDetailItem(@RequestParam(required = false) Integer option_id){
+        Map<String, Object> responseBody = new HashMap<>();
         try {
-            Map<String, Object> responseBody = new HashMap<>();
             log.info("getDetailItem 메소드 호출");
             ItemDetailDTO getItemDetailDTO=itemService.getItemDetail(option_id);
             responseBody.put("item_detail",getItemDetailDTO);
             return ResponseEntity.ok(responseBody);
         }catch (NotFoundException nfe){
-            return ResponseEntity.status(HttpStatus.NOT_FOUND).body(nfe.getMessage());
+            responseBody.put("status", HttpStatus.NOT_FOUND);
+            responseBody.put("message", nfe.getMessage());
+            return ResponseEntity.notFound().build();
         }
     }
 

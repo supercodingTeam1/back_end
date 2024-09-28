@@ -32,6 +32,7 @@ import org.springframework.web.filter.OncePerRequestFilter;
 
 import java.io.IOException;
 import java.io.PrintWriter;
+import java.util.Collections;
 import java.util.Enumeration;
 
 @Component
@@ -99,6 +100,12 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
 
         String jwtToken = jwtTokenProvider.resolveToken(request);
 
+        //테스트
+        System.out.println("Request Headers:");
+        Collections.list(request.getHeaderNames()).forEach(headerName ->
+                System.out.println(headerName + ": " + request.getHeader(headerName))
+        );
+
         log.info("=========  doFilterInternal getRequestURI  : {}", request.getRequestURI());
 
         try{
@@ -124,12 +131,18 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
                     authSetConfirm( request,  customUserDetails);
                     filterChain.doFilter(request, response);
 
+                    //테스트
+                    System.out.println("Response Headers:");
+                    response.getHeaderNames().forEach(headerName ->
+                            System.out.println(headerName + ": " + response.getHeader(headerName))
+                    );
+
                 }else throw new CustomAuthenticationException("해당하는 유저가 없습니다.", "USER_NOT_FOUND");
 
             }else   throw new CustomAuthenticationException("유효하지 않은 토큰 입니다.","INVALID_TOKEN" );
 
         }catch (CustomAuthenticationException e  ){
-            log.info("JWT CustomAuthenticationException 에러 처리  ");
+            log.info("JWT CustomAuthenticationException 에러 처리 : "+e.getMessage());
             //1.에러처리 방법 :커스텀 에러 메시지는 다음과 같이 printWriter 전송 처리 한다.
             response.setStatus(HttpServletResponse.SC_BAD_REQUEST);
             response.setCharacterEncoding("utf-8");
