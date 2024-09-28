@@ -106,7 +106,6 @@ public class AuthService {
                     .password(passwordEncoder.encode(signUpDTO.getUser_password()))
                     .userAddress(signUpDTO.getUser_address())
                     .phoneNum(signUpDTO.getUser_phone())
-                    .userGender(signUpDTO.getUser_gender())
                     .userImg(profileImage != null? setProfileImage(profileImage) : null)
                     .user_role(userRoleList)
                     .build();
