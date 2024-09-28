@@ -1,19 +1,21 @@
 package com.github.supercodingteam1.web.dto;
 
-import lombok.AllArgsConstructor;
-import lombok.Builder;
-import lombok.Data;
-import lombok.NoArgsConstructor;
+import lombok.*;
 
 import java.util.List;
 
 @AllArgsConstructor
 @NoArgsConstructor
 @Data
+@Setter
 @Builder
 public class MyPageDTO<T> {
 
     private Integer status;
     private String message;
     private T data;
+
+    public void setData(List<MyBuyInfoDTO> myBuyInfoDTOList) {
+        this.data = (T) myBuyInfoDTOList;
+    }
 }
