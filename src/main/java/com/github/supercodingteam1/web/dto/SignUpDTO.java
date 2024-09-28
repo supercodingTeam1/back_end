@@ -23,31 +23,29 @@ import java.util.stream.Collectors;
 @Builder
 public class SignUpDTO {
 
-  @NotEmpty(message = "유저 이름은 필수입니다.")
-  @Size(min = 2, max = 20, message = "유저 이름은 2자에서 20자 사이여야 합니다.")
-  private String user_name;
+    @NotEmpty(message = "유저 이름은 필수입니다.")
+    @Size(min = 2, max = 20, message = "유저 이름은 2자에서 20자 사이여야 합니다.")
+    private String user_name;
 
-  @NotEmpty(message = "이메일은 필수입니다.")
-  @Email(message = "유효한 이메일 주소를 입력해 주세요.")
-  private String user_email;
+    @NotEmpty(message = "이메일은 필수입니다.")
+    @Email(message = "유효한 이메일 주소를 입력해 주세요.")
+    private String user_email;
 
-  @NotEmpty(message = "패스워드는 필수입니다.")
-  @Size(min = 4, max = 15, message = "패스워드는 4자에서 15자 사이여야 합니다.")
-  private String user_password;
+    @NotEmpty(message = "패스워드는 필수입니다.")
+    @Size(min = 4, max = 15, message = "패스워드는 4자에서 15자 사이여야 합니다.")
+    private String user_password;
 
-  @NotEmpty(message = "전화번호는 필수입니다.")
-  @Schema(example = "010-0000-0000")
-  @Size(min = 10, max = 15, message = "전화번호는 10자에서 15자 사이여야 합니다.")
-  private String user_phone;
+    @NotEmpty(message = "전화번호는 필수입니다.")
+    @Schema(example = "010-0000-0000")
+    @Size(min = 10, max = 15, message = "전화번호는 10자에서 15자 사이여야 합니다.")
+    private String user_phone;
 
-  @NotEmpty(message = "주소는 필수입니다.")
-  private String user_address;
+    @NotEmpty(message = "주소는 필수입니다.")
+    private String user_address;
 
-  @Schema(description = "사용자 성별", example = "남성, 여성")
-  private String user_gender;
 
-@Schema(description = "사용자 권한", example = "[\"ROLE_BUYER\", \"ROLE_SELLER\", \"ROLE_ADMIN\"]")
-private List<Role> roles;
+    @Schema(description = "사용자 권한", example = "[\"ROLE_BUYER\", \"ROLE_SELLER\", \"ROLE_ADMIN\"]")
+    private List<Role> roles;
 
 
   /**

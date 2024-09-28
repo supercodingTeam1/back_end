@@ -3,11 +3,8 @@ package com.github.supercodingteam1.service;
 
 import com.github.supercodingteam1.config.auth.jwt.JwtTokenProviderService;
 import com.github.supercodingteam1.repository.UserDetails.CustomUserDetails;
-import com.github.supercodingteam1.repository.entity.image.Image;
 import com.github.supercodingteam1.repository.entity.item.Item;
-import com.github.supercodingteam1.repository.entity.item.ItemRepository;
 import com.github.supercodingteam1.repository.entity.option.Option;
-import com.github.supercodingteam1.repository.entity.option.OptionRepository;
 import com.github.supercodingteam1.repository.entity.order.Order;
 import com.github.supercodingteam1.repository.entity.order.OrderRepository;
 import com.github.supercodingteam1.repository.entity.orderDetail.OrderDetail;
@@ -118,13 +115,13 @@ public class UserService {
     MyPageDTO<MyBuyInfoDTO> myPageDTO = new MyPageDTO<>();
     List<MyBuyInfoDTO> myBuyInfoDTOList = new ArrayList<>();
 
-    List<Order> myOrderList = orderRepository.findAllByUserId(userId);
+    List<Order> myOrderList = orderRepository.findAllByUser_UserId(userId);
 
     for (Order order : myOrderList) {
       List<MyBuyItemDetailDTO> myBuyItemDetailDTOList = new ArrayList<>();
 
       // 3. 해당 주문의 OrderDetail 을 조회
-      List<OrderDetail> orderDetailList = orderDetailRepository.findAllByOrderId(order.getOrder_id());
+      List<OrderDetail> orderDetailList = orderDetailRepository.findByOrder(order);
 
       for (OrderDetail orderDetail : orderDetailList) {
         Option option = orderDetail.getOptions();  // 주문한 옵션

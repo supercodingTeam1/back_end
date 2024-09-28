@@ -12,7 +12,7 @@ import java.util.List;
 @NoArgsConstructor
 @AllArgsConstructor
 public class OrderDTO {
-    private List<MyOrderItemDTO> items;
+    private List<OrderItemDTO> items;
     private String name;
     private String payment;
     private String address;

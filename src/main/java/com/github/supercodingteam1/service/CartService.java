@@ -170,12 +170,12 @@ public class CartService {
             Boolean isFromCart = orderDTO.getIsFromCart();
 
             // 1. 주문한 물품 정보 가져오기
-            List<MyOrderItemDTO> myOrderItemDTOList = orderDTO.getItems(); //주문 아이템 정보 가져와서
+            List<OrderItemDTO> myOrderItemDTOList = orderDTO.getItems(); //주문 아이템 정보 가져와서
             List<OrderDetail> orderDetailList = new ArrayList<>();
 
             Integer totalPrice = 0;
 
-            for(MyOrderItemDTO myOrderItemDTO : myOrderItemDTOList) { //OrderDetail 객체를 만들기 위함
+            for(OrderItemDTO myOrderItemDTO : myOrderItemDTOList) { //OrderDetail 객체를 만들기 위함
                 OrderDetail orderDetail = OrderDetail.builder()
                         .options(optionRepository.findById(myOrderItemDTO.getOption_id()).orElse(null))
                         .quantity(myOrderItemDTO.getQuantity())
