@@ -3,9 +3,15 @@ package com.github.supercodingteam1.web.controller;
 import com.github.supercodingteam1.config.auth.jwt.JwtTokenProviderService;
 import com.github.supercodingteam1.repository.UserDetails.CustomUserDetails;
 import com.github.supercodingteam1.service.UserService;
+import com.github.supercodingteam1.web.dto.ItemDetailDTO;
 import com.github.supercodingteam1.web.dto.MyPageDTO;
+import com.github.supercodingteam1.web.dto.ResponseDTO;
 import com.github.supercodingteam1.web.dto.UserDTO;
 
+import com.github.supercodingteam1.web.exceptions.NotFoundException;
+import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.responses.ApiResponse;
+import io.swagger.v3.oas.annotations.responses.ApiResponses;
 import jakarta.servlet.http.HttpServletRequest;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.log4j.Log4j2;
@@ -68,15 +74,33 @@ public class MyPageController {
         }
     }
 
+    @Operation(summary = "마이페이지 주문내역 조회")
+    @ApiResponses({
+            @ApiResponse(responseCode = "200", description = "성공적으로 조회했습니다."),
+            @ApiResponse(responseCode = "404", description = "주문 내역을 찾을 수 없습니다."),
+            @ApiResponse(responseCode = "500", description = "서버 오류")
+    })
     @GetMapping("/order")
-    public ResponseEntity<?> MyBuyInfo(@AuthenticationPrincipal CustomUserDetails userDetails){
+    public ResponseEntity<?> MyBuyInfo(@AuthenticationPrincipal CustomUserDetails userDetails) {
         log.info("my buy info 요청");
 
         if (userDetails == null) {
             return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body("인증된 사용자가 아닙니다.");
         }
-        MyPageDTO<?> myInfo=userService.getMyBuyInfo(userDetails);
-        return null;
+
+        Map<String, Object> responseBody = new HashMap<>();
+
+        try {
+            log.info("getDetailItem 메소드 호출");
+            MyPageDTO myPageDTO = userService.getMyBuyInfo(userDetails);
+            responseBody.put("myPageBuyInfo", myPageDTO);
+            return ResponseEntity.ok(responseBody);
+        } catch (NotFoundException nfe) {
+            responseBody.put("status", HttpStatus.NOT_FOUND);
+            responseBody.put("message", nfe.getMessage());
+            return ResponseEntity.notFound().build();
+        }
+
     }
 
 }

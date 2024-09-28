@@ -58,8 +58,8 @@ public class SalesController {
             @ApiResponse(responseCode = "500", description = "서버 오류")
     })
     @PostMapping(consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
-    public ResponseEntity<?> AddSellItem(@Parameter(description = "상품 이미지 파일 목록", required = true) @RequestPart(value = "item_image") List<MultipartFile> item_image,
-                                      @Parameter(description = "상품 상세 정보", required = true) @RequestPart(value = "request") AddSellItemDTO addSellItemDTO,
+    public ResponseEntity<?> AddSellItem(@Parameter(description = "상품 이미지 파일 목록", required = true) @RequestPart(required = false, value = "item_image") List<MultipartFile> item_image,
+                                      @Parameter(description = "상품 상세 정보", required = true) @RequestPart(required = false, value = "request") AddSellItemDTO addSellItemDTO,
                                       @AuthenticationPrincipal CustomUserDetails customUserDetails){
 
         System.out.println(item_image);

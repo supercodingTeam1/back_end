@@ -95,7 +95,6 @@ public class SignUpDTO {
         .password(signUpDTO.getUser_password())
         .phoneNum(signUpDTO.getUser_phone())
         .userAddress(signUpDTO.getUser_address())
-        .userGender("")
         .user_role(userRoles)
         .build();
   }
