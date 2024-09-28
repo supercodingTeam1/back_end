@@ -84,28 +84,40 @@ public class UserService {
   }
 
 
-  /**
-   * 유저 정보 조회
-   *
-   * @param token
-   * @return
-   */
-  public UserDTO findByTokenUserInfo(String token) {
+//  /**
+//   * 유저 정보 조회
+//   *
+//   * @param token
+//   * @return
+//   */
+//  public UserDTO findByTokenUserInfo(String token) {
+//
+//    try {
+//      // 1. 토큰을 이용해 사용자 ID 추출
+//      //log.info("1. 토큰을 이용해 사용");
+//      String userId = jwtTokenProviderService.validateAndGetUserId(token);
+//      //log.info("1. 토큰을 이용해 사용자 ID 추출  :   {}" , userId);
+//
+//      User user = userRepository.findByUserId(Integer.valueOf(userId));
+//
+//      // 2. 유저 정보를 반환
+//      return UserDTO.of(user);
+//    } catch (Exception e) {
+//      throw new IllegalStateException("유저 정보가 없습니다.");
+//    }
+//  }
 
-    try {
-      // 1. 토큰을 이용해 사용자 ID 추출
-      //log.info("1. 토큰을 이용해 사용");
-      String userId = jwtTokenProviderService.validateAndGetUserId(token);
-      //log.info("1. 토큰을 이용해 사용자 ID 추출  :   {}" , userId);
+  public MyPageDTO getMyUserInfo(CustomUserDetails userDetails) {
+    int userId = userDetails.getUserId();
 
-      User user = userRepository.findByUserId(Integer.valueOf(userId));
+    MyPageDTO<MyBuyInfoDTO> myPageDTO = new MyPageDTO<>();
+    List<MyBuyInfoDTO> myBuyInfoDTOList = new ArrayList<>();
 
-      // 2. 유저 정보를 반환
-      return UserDTO.of(user);
-    } catch (Exception e) {
-      throw new IllegalStateException("유저 정보가 없습니다.");
-    }
+    getMyBuyInfo(userDetails);
+
+    return myPageDTO;
   }
+
 
 
   public MyPageDTO getMyBuyInfo(CustomUserDetails userDetails) {

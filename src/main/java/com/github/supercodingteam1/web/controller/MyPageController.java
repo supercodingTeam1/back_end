@@ -32,45 +32,75 @@ import java.util.Map;
 public class MyPageController {
 
     private final UserService userService;
-    private final JwtTokenProviderService jwtTokenProviderService;
 
 
-    /**
-     *  http://localhost:8080/mypage
-     * @param request
-     * @return
-     */
-    @GetMapping
-    public ResponseEntity<?> myInfo(HttpServletRequest request) {
-        log.info("myInfo 요청");
+//    private final JwtTokenProviderService jwtTokenProviderService;
+//
+//
+//    /**
+//     *  http://localhost:8080/mypage
+//     * @param request
+//     * @return
+//     */
+//    @GetMapping
+//    public ResponseEntity<?> myInfo(HttpServletRequest request) {
+//        log.info("myInfo 요청");
+//
+//        try {
+//            // 1. Authorization 헤더에서 JWT 토큰 추출
+//            String token = request.getHeader("X-AUTH-TOKEN");
+//            if (token == null) {
+//                return ResponseEntity.status(401).body("토큰이 존재하지 않습니다.");
+//            }
+//
+////            String token = authorizationHeader.substring(7); // "Bearer " 이후의 토큰 부분만 추출
+//
+//            // 2. 토큰을 이용해 사용자 ID 추출 후 사용자 ID로 사용자 정보 조회
+//            UserDTO userDTO = userService.findByTokenUserInfo(token);
+//
+//            // 3. 사용자 정보를 "user_info"로 감싸서 반환
+//            Map<String, Object> userInfoMap = new HashMap<>();
+//            userInfoMap.put("user_info", userDTO);
+//
+//            MyPageDTO<Map<String, Object>> myPageDTO = MyPageDTO.<Map<String, Object>>builder()
+//                    .status(200)
+//                    .message("success")
+//                    .data(userInfoMap)
+//                    .build();
+//
+//            return ResponseEntity.ok().body(myPageDTO);
+//
+//        } catch (Exception e) {
+//            log.error("사용자 정보를 가져오는 중 오류 발생: ", e);
+//            return ResponseEntity.status(500).body("사용자 정보를 가져오는 중 오류가 발생했습니다.");
+//        }
+//    }
+
+    @Operation(summary = "마이페이지 사용자 정보 조회")
+    @ApiResponses({
+            @ApiResponse(responseCode = "200", description = "성공적으로 조회했습니다."),
+            @ApiResponse(responseCode = "404", description = "사용자 정보를 찾을 수 없습니다."),
+            @ApiResponse(responseCode = "500", description = "서버 오류")
+    })
+    @GetMapping("")
+    public ResponseEntity<?> MyUserInfo(@AuthenticationPrincipal CustomUserDetails userDetails) {
+        log.info("my user info 요청");
+
+        if (userDetails == null) {
+            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body("인증된 사용자가 아닙니다.");
+        }
+
+        Map<String, Object> responseBody = new HashMap<>();
 
         try {
-            // 1. Authorization 헤더에서 JWT 토큰 추출
-            String token = request.getHeader("X-AUTH-TOKEN");
-            if (token == null) {
-                return ResponseEntity.status(401).body("토큰이 존재하지 않습니다.");
-            }
-
-//            String token = authorizationHeader.substring(7); // "Bearer " 이후의 토큰 부분만 추출
-
-            // 2. 토큰을 이용해 사용자 ID 추출 후 사용자 ID로 사용자 정보 조회
-            UserDTO userDTO = userService.findByTokenUserInfo(token);
-
-            // 3. 사용자 정보를 "user_info"로 감싸서 반환
-            Map<String, Object> userInfoMap = new HashMap<>();
-            userInfoMap.put("user_info", userDTO);
-
-            MyPageDTO<Map<String, Object>> myPageDTO = MyPageDTO.<Map<String, Object>>builder()
-                    .status(200)
-                    .message("success")
-                    .data(userInfoMap)
-                    .build();
-
-            return ResponseEntity.ok().body(myPageDTO);
-
-        } catch (Exception e) {
-            log.error("사용자 정보를 가져오는 중 오류 발생: ", e);
-            return ResponseEntity.status(500).body("사용자 정보를 가져오는 중 오류가 발생했습니다.");
+            log.info("getMyUserInfo 메소드 호출");
+            MyPageDTO myPageDTO = userService.getMyUserInfo(userDetails);
+            responseBody.put("MyUserInfo", myPageDTO);
+            return ResponseEntity.ok(responseBody);
+        } catch (NotFoundException nfe) {
+            responseBody.put("status", HttpStatus.NOT_FOUND);
+            responseBody.put("message", nfe.getMessage());
+            return ResponseEntity.notFound().build();
         }
     }
 
