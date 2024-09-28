@@ -4,17 +4,15 @@ import lombok.*;
 
 import java.util.List;
 
-@Getter
 @Setter
+@Getter
+@Builder
 @NoArgsConstructor
 @AllArgsConstructor
-@Builder
-public class GetAllSalesItemDTO {
-    private Integer item_id;
+public class MyBuyItemDetailDTO {
+    private Integer order_id;
     private String item_image;
     private String item_name;
     private Integer price;
-    private CategoryDTO category;
-    private List<OptionDTO> options;
-
+    private List<MyBuyItemOptionDetailDTO> myBuyItemOptionDetailDTOList;
 }

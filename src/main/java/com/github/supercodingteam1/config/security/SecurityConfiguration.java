@@ -66,7 +66,7 @@ public class SecurityConfiguration {
     public CorsConfigurationSource corsConfigurationSource() {
         CorsConfiguration configuration = new CorsConfiguration();
 
-        configuration.setAllowedOrigins(List.of("http://127.0.0.1:5173"));
+        configuration.setAllowedOrigins(List.of("http://127.0.0.1:5173", "localhost:5173"));
         configuration.setAllowedHeaders(Arrays.asList("X-AUTH-TOKEN", "Content-Type", "time-zone"));
         configuration.setAllowCredentials(true); // token 주고 받을때 필요
         configuration.setAllowedMethods(Arrays.asList("GET", "POST", "PUT", "PATCH", "DELETE", "OPTIONS"));
