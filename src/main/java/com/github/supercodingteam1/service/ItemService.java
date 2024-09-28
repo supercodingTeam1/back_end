@@ -32,19 +32,21 @@ public class ItemService {
 
     public Page<GetAllItemDTO> getAllItemsPage(Integer page, Integer size, String sort, String order, Integer optionSize) {
         page -= 1;
-        Comparator<Item> comparator;
+        Comparator<Item> comparator = null;
 
-        if ("sales".equalsIgnoreCase(sort)) {
-            comparator = Comparator.comparing(Item::getTotalSales);
-            comparator = comparator.reversed();
-        }else if("price".equalsIgnoreCase(sort)){
-            comparator = Comparator.comparing(Item::getItemPrice);
-        }else{ //sort 없으면 등록순
-            comparator = Comparator.comparing(Item::getItemId);
-        }
+        if(sort != null && !sort.isEmpty()) {
+            if ("sales".equalsIgnoreCase(sort)) {
+                comparator = Comparator.comparing(Item::getTotalSales);
+                comparator = comparator.reversed();
+            }else if("price".equalsIgnoreCase(sort)){
+                comparator = Comparator.comparing(Item::getItemPrice);
+            }else{ //sort 없으면 등록순
+                comparator = Comparator.comparing(Item::getItemId);
+            }
 
-        if("desc".equalsIgnoreCase(order)){
-            comparator = comparator.reversed();
+            if(order != null && "desc".equalsIgnoreCase(order)){
+                comparator = comparator.reversed();
+            }
         }
 
         //option 중 모든 option에 대한 stock이 0이면 아이템 전체를 안보여주고
@@ -53,10 +55,12 @@ public class ItemService {
         List<Item> filteredItems = itemRepository.findAll().stream()
                 .filter(item -> (optionSize == null || hasOptionWithSize(item, optionSize)))
                 .filter(this::isStockMoreThanZero)
-                .sorted(comparator)
                 .toList();
+        if(comparator != null){
+            filteredItems = filteredItems.stream().sorted(comparator).toList();
+        }
 
-        if(sort.equalsIgnoreCase("sales")){
+        if(sort != null && sort.equalsIgnoreCase("sales")){
             filteredItems = filteredItems.stream().limit(8).toList();
         }
 
