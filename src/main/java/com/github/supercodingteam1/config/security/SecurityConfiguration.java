@@ -65,9 +65,10 @@ public class SecurityConfiguration {
     public CorsConfigurationSource corsConfigurationSource() {
         CorsConfiguration configuration = new CorsConfiguration();
 
-        configuration.setAllowedOrigins(List.of("http://127.0.0.1:5173", "http://localhost:5173"));
+//        configuration.setAllowedOrigins(List.of("http://127.0.0.1:5173", "http://localhost:5173"));
+        configuration.setAllowedOriginPatterns(List.of("*"));
         configuration.setAllowedHeaders(Arrays.asList("X-AUTH-TOKEN", "Content-Type", "time-zone", "*"));
-        configuration.setAllowCredentials(true); // token 주고 받을때 필요
+//        configuration.setAllowCredentials(true); // token 주고 받을때 필요
         configuration.setAllowedMethods(Arrays.asList("GET", "POST", "PUT", "PATCH", "DELETE", "OPTIONS"));
         configuration.setMaxAge(3600L); //만료 시간
 
