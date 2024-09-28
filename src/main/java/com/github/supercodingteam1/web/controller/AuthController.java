@@ -185,7 +185,8 @@ public class AuthController {
             @ApiResponse(responseCode = "500", description = "서버 오류")
     })
     @PostMapping("/logout")
-    public ResponseEntity<?> logout(@RequestBody LoginDTO loginDTO){
+    public ResponseEntity<?> logout(@RequestBody LoginDTO loginDTO, @RequestHeader(name = "X-AUTH-TOKEN") String token){
+        log.info(String.format(token+"헤더에 담긴 토큰"));
         try{
             //DB 에서 토큰 삭제
             userService.logout(loginDTO);
