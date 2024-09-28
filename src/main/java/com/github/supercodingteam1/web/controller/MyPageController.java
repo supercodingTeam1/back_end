@@ -1,6 +1,7 @@
 package com.github.supercodingteam1.web.controller;
 
 import com.github.supercodingteam1.config.auth.jwt.JwtTokenProviderService;
+import com.github.supercodingteam1.repository.UserDetails.CustomUserDetails;
 import com.github.supercodingteam1.service.UserService;
 import com.github.supercodingteam1.web.dto.MyPageDTO;
 import com.github.supercodingteam1.web.dto.UserDTO;
@@ -8,7 +9,9 @@ import com.github.supercodingteam1.web.dto.UserDTO;
 import jakarta.servlet.http.HttpServletRequest;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.log4j.Log4j2;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
@@ -65,5 +68,15 @@ public class MyPageController {
         }
     }
 
+    @GetMapping("/order")
+    public ResponseEntity<?> MyBuyInfo(@AuthenticationPrincipal CustomUserDetails userDetails){
+        log.info("my buy info 요청");
+
+        if (userDetails == null) {
+            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body("인증된 사용자가 아닙니다.");
+        }
+        MyPageDTO<?> myInfo=userService.getMyBuyInfo(userDetails);
+        return null;
+    }
 
 }

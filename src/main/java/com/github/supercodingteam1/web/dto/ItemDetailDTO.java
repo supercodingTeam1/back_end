@@ -1,6 +1,5 @@
 package com.github.supercodingteam1.web.dto;
 
-import com.github.supercodingteam1.repository.entity.image.Image;
 import lombok.*;
 
 import java.util.List;
