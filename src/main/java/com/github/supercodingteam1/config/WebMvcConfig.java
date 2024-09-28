@@ -47,38 +47,37 @@ public class WebMvcConfig implements WebMvcConfigurer {
     }
 
 
-    @Override
-    public void addCorsMappings(CorsRegistry registry) {
-
-        /**
-         *     restapi 가 아닌 경로까지 적용되면  restapi 아닌 페이지는  발생한다.
-         /모든 경로에 대해 cors 허용 ex)
-         registry.addMapping("/**")
-         *      registry.addMapping("/cart/**"),
-         *      registry.addMapping("/members/**")
-         */
-
-        registry.addMapping("/**")
-                .allowedMethods("GET", "POST", "PUT", "PATCH", "DELETE", "OPTIONS")
-                .allowedHeaders("X-AUTH-TOKEN","Content-Type","*")
-                .maxAge(CORS_MAX_AGE_SECS)
-                .allowedOrigins("http://127.0.0.1:5173")
-                .allowCredentials(true)  // 'Access-Control-Allow-Credentials' header 는 요청 시 자격 증명이 필요함
-                .exposedHeaders("X-AUTH-TOKEN","Content-Type");
-
-
-//        //cors 오류가 날경우 다음과 같이 개별 설정
-//        registry.addMapping("/auth/**")
-//                .allowedMethods("GET", "POST", "PUT", "PATCH", "DELETE", "OPTIONS")
-//                .allowedHeaders("*")
-//                .allowCredentials(true)  // 'Access-Control-Allow-Credentials' header 는 요청 시 자격 증명이 필요함
-//                .maxAge(CORS_MAX_AGE_SECS)
-//                .allowedOrigins(
-//                        "http://localhost:3000/"
-//                ).exposedHeaders("authorization");  //authorization 헤더를 넘기 위해 exposedHeaders 조건을 추가
+//    @Override
+//    public void addCorsMappings(CorsRegistry registry) {
 //
-
-    }
-
+//        /**
+//         *     restapi 가 아닌 경로까지 적용되면  restapi 아닌 페이지는  발생한다.
+//         /모든 경로에 대해 cors 허용 ex)
+//         registry.addMapping("/**")
+//         *      registry.addMapping("/cart/**"),
+//         *      registry.addMapping("/members/**")
+//         */
+//
+//        registry.addMapping("/**")
+//                .allowedMethods("GET", "POST", "PUT", "PATCH", "DELETE", "OPTIONS")
+//                .allowedHeaders("X-AUTH-TOKEN","Content-Type","*")
+//                .maxAge(CORS_MAX_AGE_SECS)
+//                .allowedOrigins("http://127.0.0.1:5173")
+//                .allowCredentials(true)  // 'Access-Control-Allow-Credentials' header 는 요청 시 자격 증명이 필요함
+//                .exposedHeaders("X-AUTH-TOKEN","Content-Type");
+//
+//
+////        //cors 오류가 날경우 다음과 같이 개별 설정
+////        registry.addMapping("/auth/**")
+////                .allowedMethods("GET", "POST", "PUT", "PATCH", "DELETE", "OPTIONS")
+////                .allowedHeaders("*")
+////                .allowCredentials(true)  // 'Access-Control-Allow-Credentials' header 는 요청 시 자격 증명이 필요함
+////                .maxAge(CORS_MAX_AGE_SECS)
+////                .allowedOrigins(
+////                        "http://localhost:3000/"
+////                ).exposedHeaders("authorization");  //authorization 헤더를 넘기 위해 exposedHeaders 조건을 추가
+////
+//
+//    }
 
 }
