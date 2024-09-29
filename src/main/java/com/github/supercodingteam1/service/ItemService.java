@@ -105,11 +105,9 @@ public class ItemService {
                 .build();
     }
 
-    public ItemDetailDTO getItemDetail(Integer optionId) {
-        Option option=optionRepository.findById(optionId).orElseThrow(()->new NotFoundException("해당되는 option을 찾을 수 없습니다."));
-        Integer itemId=option.getItem().getItemId();
+    public ItemDetailDTO getItemDetail(Integer itemId) {
         Item item=itemRepository.findById(itemId).orElseThrow(()->new NotFoundException("해당되는 item을 찾을 수 없습니다."));
-        List<String> imageList=item.getImageList().stream().map(image -> image.getImageLink()).toList();
+        List<String> imageList=item.getImageList().stream().map(Image::getImageLink).toList();
 
         return ItemDetailDTO.builder()
                 .item_id(itemId)
