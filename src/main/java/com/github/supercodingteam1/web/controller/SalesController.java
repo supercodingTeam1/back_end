@@ -6,6 +6,7 @@ import com.github.supercodingteam1.web.dto.AddSellItemDTO;
 import com.github.supercodingteam1.web.dto.GetAllSalesItemDTO;
 import com.github.supercodingteam1.web.dto.ModifySalesItemOptionDTO;
 import com.github.supercodingteam1.web.dto.ResponseDTO;
+import com.github.supercodingteam1.web.exceptions.NotFoundException;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
@@ -21,7 +22,9 @@ import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 @RestController
 @RequestMapping("/sell")
@@ -38,15 +41,21 @@ public class SalesController {
     })
 //    @GetMapping(consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
     @GetMapping
-    public List<GetAllSalesItemDTO> GetAllSellItem(@AuthenticationPrincipal CustomUserDetails userDetails){
-
+    public ResponseEntity<?> GetAllSellItem(@AuthenticationPrincipal CustomUserDetails userDetails){
+        Map<String, Object> result = new HashMap<>();
         log.info("GetAllSellItem 메소드 호출");
-        return sellService.getAllSellItem(userDetails);
-//
-//        return ResponseDTO.builder()
-//                .status(200)
-//                .message("판매물품을 성공적으로 조회하였습니다").
-//                build();
+        try {
+            List<GetAllSalesItemDTO> allSalesItemDTOList =  sellService.getAllSellItem(userDetails);
+            result.put("status", HttpStatus.OK.value());
+            result.put("message", "성공적으로 조회했습니다");
+            result.put("allSalesItemDTOList", allSalesItemDTOList);
+
+            return ResponseEntity.status(HttpStatus.OK).body(result);
+        }catch (NotFoundException nfe){
+            result.put("status", HttpStatus.NOT_FOUND.value());
+            result.put("message", nfe.getMessage());
+            return ResponseEntity.status(HttpStatus.NOT_FOUND).body(result);
+        }
     }
 
 

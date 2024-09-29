@@ -46,6 +46,9 @@ public class SellService {
     public List<GetAllSalesItemDTO> getAllSellItem(CustomUserDetails userDetails) {
         int userId=userDetails.getUserId();
         List<Item> userSellItems=itemRepository.findAllByUser_UserId(userId);
+        if(userSellItems==null || userSellItems.isEmpty()){
+            throw new NotFoundException("판매중인 물품이 없습니다.");
+        }
         List<GetAllSalesItemDTO> getAllSalesItemDTOList=new ArrayList<>();
         for(Item sellItems: userSellItems){
             GetAllSalesItemDTO getAllSalesItemDTO=GetAllSalesItemDTO.builder()

@@ -13,6 +13,7 @@ import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.responses.ApiResponses;
+import io.swagger.v3.oas.annotations.security.SecurityRequirement;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
@@ -63,6 +64,7 @@ public class AuthController {
             @ApiResponse(responseCode = "403", description = "권한이 없습니다."),
             @ApiResponse(responseCode = "500", description = "서버 오류")
     })
+    @SecurityRequirement(name = "") //swagger에서 인증 제외
     @PostMapping(value = "/signup", consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
     public ResponseDTO signUp(
             @Parameter(description = "사용자 프로필 이미지") @RequestPart(value = "profileImage", required = false) MultipartFile profileImage,
@@ -97,6 +99,7 @@ public class AuthController {
             @ApiResponse(responseCode = "400", description = "이미 존재하는 이메일입니다."),
             @ApiResponse(responseCode = "500", description = "서버 오류")
     })
+    @SecurityRequirement(name = "") //swagger에서 인증 제외
     @PostMapping(value = "/duplicate")
     public ResponseDTO duplicate(@RequestBody CheckDuplicateDTO checkDuplicateDTO){
 
@@ -131,6 +134,7 @@ public class AuthController {
             @ApiResponse(responseCode = "403", description = "권한이 없습니다."),
             @ApiResponse(responseCode = "500", description = "서버 오류")
     })
+    @SecurityRequirement(name = "") //swagger에서 인증 제외
     @PostMapping("/login")
     public ResponseEntity<?> login(@Valid @RequestBody LoginDTO loginDTO, BindingResult bindingResult){
 
@@ -190,8 +194,7 @@ public class AuthController {
             @ApiResponse(responseCode = "500", description = "서버 오류")
     })
     @PostMapping("/logout")
-    public ResponseEntity<?> logout(@RequestBody LoginDTO loginDTO, @RequestHeader(name = "X-AUTH-TOKEN") String token){
-        log.info(String.format(token+"헤더에 담긴 토큰"));
+    public ResponseEntity<?> logout(@RequestBody LoginDTO loginDTO){
         try{
             //DB 에서 토큰 삭제
             userService.logout(loginDTO);
