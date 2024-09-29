@@ -36,7 +36,8 @@ public class MyPageController {
 
 
     /**
-     *  http://localhost:8080/mypage
+     * http://localhost:8080/mypage
+     *
      * @param request
      * @return
      */
@@ -87,6 +88,7 @@ public class MyPageController {
         if (userDetails == null) {
             return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body("인증된 사용자가 아닙니다.");
         }
-        MyPageDTO<?> myInfo=userService.getMyBuyInfo(userDetails);
+        MyPageDTO<?> myInfo = userService.getMyBuyInfo(userDetails);
         return ResponseEntity.ok().body(myInfo);
+    }
 }
