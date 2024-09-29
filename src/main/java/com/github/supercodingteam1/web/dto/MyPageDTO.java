@@ -15,7 +15,7 @@ public class MyPageDTO<T> {
     private String message;
     private T data;
 
-    public void setData(List<MyBuyInfoDTO> myBuyInfoDTOList) {
-        this.data = (T) myBuyInfoDTOList;
+    public void setData(T data) {
+        this.data = (T) data;
     }
 }

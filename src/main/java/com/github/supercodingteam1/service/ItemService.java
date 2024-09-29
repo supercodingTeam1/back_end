@@ -119,18 +119,26 @@ public class ItemService {
     }
 
     public ItemDetailDTO getItemDetail(Integer itemId) {
-        Item item=itemRepository.findById(itemId).orElseThrow(()->new NotFoundException("해당되는 item을 찾을 수 없습니다."));
-        List<String> imageList=item.getImageList().stream().map(Image::getImageLink).toList();
+        if(itemId == null) {
+            throw new IllegalArgumentException("item id를 확인해주세요.");
+        }
+        try {
+            Item item=itemRepository.findById(itemId).orElseThrow(()->new NotFoundException("해당되는 item을 찾을 수 없습니다."));
+            List<String> imageList=item.getImageList().stream().map(Image::getImageLink).toList();
 
-        return ItemDetailDTO.builder()
-                .item_id(itemId)
-                .item_name(item.getItemName())
-                .item_images(imageList)
-                .price(item.getItemPrice())
-                .description(item.getDescription())
-                .category(CategoryToCategoryDTOMapper.INSTANCE.categoryToCategoryDTO(item.getCategory()))
-                .option(OptionListToOptionDTOListMapper.INSTANCE.OptionListToOptionDTOList(item.getOptionList()))
-                .build();
+            return ItemDetailDTO.builder()
+                    .item_id(itemId)
+                    .item_name(item.getItemName())
+                    .item_images(imageList)
+                    .price(item.getItemPrice())
+                    .description(item.getDescription())
+                    .category(CategoryToCategoryDTOMapper.INSTANCE.categoryToCategoryDTO(item.getCategory()))
+                    .option(OptionListToOptionDTOListMapper.INSTANCE.OptionListToOptionDTOList(item.getOptionList()))
+                    .build();
+        }catch (NotFoundException nfe){
+            throw
+                    new NotFoundException(nfe.getMessage());
+        }
 
     }
 
