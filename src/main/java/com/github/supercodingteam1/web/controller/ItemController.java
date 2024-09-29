@@ -79,6 +79,8 @@ public class ItemController {
             log.info("getDetailItem 메소드 호출");
             ItemDetailDTO getItemDetailDTO = itemService.getItemDetail(item_id);
             responseBody.put("item_detail",getItemDetailDTO);
+            responseBody.put("status", HttpStatus.OK.value());
+            responseBody.put("message", "성공적으로 조회했습니다.");
             return ResponseEntity.ok(responseBody);
         }catch (NotFoundException nfe){
             responseBody.put("status", HttpStatus.NOT_FOUND);
