@@ -25,6 +25,7 @@ import org.springframework.util.StringUtils;
 import org.springframework.validation.BindingResult;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
+import org.springframework.web.server.ResponseStatusException;
 
 import java.util.Enumeration;
 import java.util.List;
@@ -96,10 +97,10 @@ public class AuthController {
             @ApiResponse(responseCode = "400", description = "이미 존재하는 이메일입니다."),
             @ApiResponse(responseCode = "500", description = "서버 오류")
     })
-    @PostMapping("/duplicate")
+    @PostMapping(value = "/duplicate")
     public ResponseDTO duplicate(@RequestBody CheckDuplicateDTO checkDuplicateDTO){
 
-        log.info("회원가입시 중복확인 -duplicate :checkDuplicateDTO  :{} ", checkDuplicateDTO);
+        log.info("회원가입시 중복확인 -duplicate :checkDuplicateDTO  :{} ", checkDuplicateDTO.getUser_email());
 
         if(StringUtils.hasText(checkDuplicateDTO.getUser_email())){
             boolean isDuplicate = userService.isDuplicateEmail(checkDuplicateDTO.getUser_email());
@@ -133,38 +134,40 @@ public class AuthController {
     @PostMapping("/login")
     public ResponseEntity<?> login(@Valid @RequestBody LoginDTO loginDTO, BindingResult bindingResult){
 
-        // 1. 유효성 체크 메서드 호출
-        if (bindingResult.hasErrors()) {
-            String errorMessage = Objects.requireNonNull(bindingResult.getFieldError()).getDefaultMessage();
-            LoginResponseDTO<Object> loginResponseDTO =  LoginResponseDTO.builder()
-                    .status(400)
-                    .message(errorMessage)
-                    .build();
-            return ResponseEntity.badRequest().body(loginResponseDTO);
-        }
+        try {
+            // 1. 유효성 체크 메서드 호출
+            if (bindingResult.hasErrors()) {
+                String errorMessage = Objects.requireNonNull(bindingResult.getFieldError()).getDefaultMessage();
+                LoginResponseDTO<Object> loginResponseDTO =  LoginResponseDTO.builder()
+                        .status(400)
+                        .message(errorMessage)
+                        .build();
+                return ResponseEntity.badRequest().body(loginResponseDTO);
+            }
 
-        User user = userService.getByCredentials(loginDTO.getUser_name(), loginDTO.getUser_password());
+            User user = userService.getByCredentials(loginDTO.getUser_email(), loginDTO.getUser_password());
 
-        if(user!=null){
-            //토큰 생성
-            TokenDTO tokenDTO = jwtTokenProviderService.create(user);
+            if(user!=null){
+                //토큰 생성
+                TokenDTO tokenDTO = jwtTokenProviderService.create(user);
 
-            //.collect(Collectors.joining(","))  // 여러 역할을 ','로 구분하여 하나의 문자열로 합침
-            //.collect(Collectors.toList())  // 리스트로 수집하여 배열 형식으로 반환
-            LoginResponseDTO<?> loginResponseDTO = LoginResponseDTO.builder()
-                    .status(200)
-                    .message("success")
-                    .data(new ResTokenDTO(
-                            tokenDTO.getAccessToken(),
-                            tokenDTO.getRefreshToken(),
-                            user.getUser_role().stream()
-                                    .map(userRole -> userRole.getRoleName().getRole())  // Role 열거형을 문자열로 변환 -> 반환형 ROLE_BUYER, ROLE_SELLER, ROLE_ADMIN 이렇게 출력되도록 수정하였음.
-                                    .collect(Collectors.joining(","))  // 여러 역할을 ','로 구분하여 하나의 문자열로 합침
-                    ))
-                    .build();
+                //.collect(Collectors.joining(","))  // 여러 역할을 ','로 구분하여 하나의 문자열로 합침
+                //.collect(Collectors.toList())  // 리스트로 수집하여 배열 형식으로 반환
+                LoginResponseDTO<?> loginResponseDTO = LoginResponseDTO.builder()
+                        .status(200)
+                        .message("success")
+                        .data(new ResTokenDTO(
+                                tokenDTO.getAccessToken(),
+                                tokenDTO.getRefreshToken(),
+                                user.getUser_role().stream()
+                                        .map(userRole -> userRole.getRoleName().getRole())  // Role 열거형을 문자열로 변환 -> 반환형 ROLE_BUYER, ROLE_SELLER, ROLE_ADMIN 이렇게 출력되도록 수정하였음.
+                                        .collect(Collectors.joining(","))  // 여러 역할을 ','로 구분하여 하나의 문자열로 합침
+                        ))
+                        .build();
 
-            return ResponseEntity.ok().body(loginResponseDTO);
-        }else{
+                return ResponseEntity.ok().body(loginResponseDTO);
+            }
+        }catch (Exception e){
             LoginResponseDTO<Object> loginResponseDTO =  LoginResponseDTO.builder()
                     .status(400)
                     .message("로그인 실패")
@@ -172,6 +175,7 @@ public class AuthController {
             return ResponseEntity.badRequest().body(loginResponseDTO);
 
         }
+        return null;
     }
 
     /**   auth/logout
