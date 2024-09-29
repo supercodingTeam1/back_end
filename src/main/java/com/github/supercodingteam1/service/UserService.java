@@ -116,7 +116,7 @@ public class UserService {
   }
 
 
-  public MyPageDTO<?> getMyBuyInfo(CustomUserDetails userDetails) {
+  public MyPageDTO getMyBuyInfo(CustomUserDetails userDetails) {
 
     int userId = userDetails.getUserId();
 
@@ -162,6 +162,8 @@ public class UserService {
       MyBuyInfoDTO myBuyInfoDTO = MyBuyInfoDTO.builder()
               .order_num(order.getOrderNum())
               .order_at(order.getOrderAt())
+              .address(order.getOrderAddress())
+              .phone_num(order.getPhoneNum())
               .myBuyItemDetailDTOList(myBuyItemDetailDTOList)
               .build();
 
