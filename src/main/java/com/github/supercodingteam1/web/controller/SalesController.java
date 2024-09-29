@@ -11,7 +11,6 @@ import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.responses.ApiResponses;
-import jakarta.servlet.http.HttpServletRequest;
 import lombok.RequiredArgsConstructor;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -45,10 +44,10 @@ public class SalesController {
         Map<String, Object> result = new HashMap<>();
         log.info("GetAllSellItem 메소드 호출");
         try {
-            List<GetAllSalesItemDTO> allSalesItemDTOList =  sellService.getAllSellItem(userDetails);
+            List<GetAllSalesItemDTO> getAllSalesItemDTOList = sellService.getAllSellItem(userDetails);
             result.put("status", HttpStatus.OK.value());
             result.put("message", "성공적으로 조회했습니다");
-            result.put("allSalesItemDTOList", allSalesItemDTOList);
+            result.put("allSalesItemDTOList", getAllSalesItemDTOList);
 
             return ResponseEntity.status(HttpStatus.OK).body(result);
         }catch (NotFoundException nfe){
