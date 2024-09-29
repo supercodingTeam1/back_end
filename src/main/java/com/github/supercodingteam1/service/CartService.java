@@ -78,7 +78,7 @@ public class CartService {
     }
 
     @Transactional
-    public void addItemToCart(AddToCartDTO addToCartDTO, CustomUserDetails customUserDetails) {
+    public Cart addItemToCart(AddToCartDTO addToCartDTO, CustomUserDetails customUserDetails) {
         //TODO : 카트 담을 때 같은 아이템의 같은 옵션을 또 장바구니에 담으면 quantity 만큼만 수량 증가하고 메소드 종료
         //TODO : httpServletRequest에서 헤더 가져와서 token 파싱하여 user 가져와야함.
         String email = customUserDetails.getEmail();
@@ -122,6 +122,7 @@ public class CartService {
             optionCart.getCart().setCartQuantity(optionCart.getCart().getCartQuantity() + quantity);
             optionCartRepository.save(optionCart);
         }
+        return cart;
     }
 
     @Transactional
