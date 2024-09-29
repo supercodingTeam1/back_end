@@ -47,14 +47,21 @@ public class ItemController {
                                          @Schema(description = "한 페이지에 보여질 아이템 수", defaultValue = "10")@RequestParam(value = "size", defaultValue = "10") Integer size){
         Map<String, Object> responseBody = new HashMap<>();
         log.info("getAllItems 메소드 호출");
+        try {
+            Page<GetAllItemDTO> getAllItemDTOPage = itemService.getAllItemsPage(page, size, sort, order, optionSize);
 
-        Page<GetAllItemDTO> getAllItemDTOPage = itemService.getAllItemsPage(page, size, sort, order, optionSize);
+            if(sort != null && sort.equalsIgnoreCase("sales"))
+                responseBody.put("items", getAllItemDTOPage.stream().limit(8));
+            else
+                responseBody.put("items", getAllItemDTOPage);
 
-        if(sort != null && sort.equalsIgnoreCase("sales"))
-            responseBody.put("items", getAllItemDTOPage.stream().limit(8));
-        else
-            responseBody.put("items", getAllItemDTOPage);
+            responseBody.put("status", HttpStatus.OK.value());
+            responseBody.put("message", "성공적으로 조회했습니다.");
+            return ResponseEntity.ok(responseBody);
 
+        }catch (Exception e) {
+            responseBody.put("error", e.getMessage());
+        }
         return ResponseEntity.ok(responseBody);
     }
 
@@ -66,12 +73,14 @@ public class ItemController {
     })
     @SecurityRequirement(name = "") //swagger에서 인증 제외
     @GetMapping("/detail")
-    public ResponseEntity<?> getDetailItem(@RequestParam(required = false) Integer option_id){
+    public ResponseEntity<?> getDetailItem(@RequestParam(required = false) Integer item_id){
         Map<String, Object> responseBody = new HashMap<>();
         try {
             log.info("getDetailItem 메소드 호출");
-            ItemDetailDTO getItemDetailDTO=itemService.getItemDetail(option_id);
+            ItemDetailDTO getItemDetailDTO = itemService.getItemDetail(item_id);
             responseBody.put("item_detail",getItemDetailDTO);
+            responseBody.put("status", HttpStatus.OK.value());
+            responseBody.put("message", "성공적으로 조회했습니다.");
             return ResponseEntity.ok(responseBody);
         }catch (NotFoundException nfe){
             responseBody.put("status", HttpStatus.NOT_FOUND);
