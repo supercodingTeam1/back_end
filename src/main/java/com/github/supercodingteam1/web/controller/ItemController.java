@@ -8,6 +8,7 @@ import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.media.Schema;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.responses.ApiResponses;
+import io.swagger.v3.oas.annotations.security.SecurityRequirement;
 import jakarta.servlet.http.HttpServletRequest;
 import lombok.RequiredArgsConstructor;
 import org.slf4j.Logger;
@@ -36,6 +37,7 @@ public class ItemController {
             @ApiResponse(responseCode = "403", description = "권한이 없습니다."),
             @ApiResponse(responseCode = "500", description = "서버 오류")
     })
+    @SecurityRequirement(name = "") //swagger에서 인증 제외
     @GetMapping //물품전체조회
     public ResponseEntity<?> getAllItems(HttpServletRequest httpServletRequest,
                                          @Schema(description = "정렬 기준, sales로 설정하면 정렬된 목록에서 상위 8개만 출력", allowableValues = {"sales", "price"}) @RequestParam(required = false) String sort,
@@ -62,6 +64,7 @@ public class ItemController {
             @ApiResponse(responseCode = "404", description = "해당 아이템을 찾을 수 없습니다."),
             @ApiResponse(responseCode = "500", description = "서버 오류")
     })
+    @SecurityRequirement(name = "") //swagger에서 인증 제외
     @GetMapping("/detail")
     public ResponseEntity<?> getDetailItem(@RequestParam(required = false) Integer option_id){
         Map<String, Object> responseBody = new HashMap<>();
