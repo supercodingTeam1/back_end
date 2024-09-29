@@ -35,9 +35,6 @@ public class User {
     @Column(name = "user_address", nullable = false, length = 200)
     private String userAddress;
 
-    @Column(name = "user_gender", nullable = false, length = 2)
-    private String userGender;
-
     @ManyToMany(fetch = FetchType.EAGER)
     @JoinTable(
             name = "user_role_mapping",

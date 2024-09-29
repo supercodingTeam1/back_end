@@ -31,6 +31,7 @@ dependencies {
     implementation 'org.springframework.boot:spring-boot-starter-jdbc'
     implementation 'org.springframework.boot:spring-boot-starter-web'
     implementation 'org.springframework.boot:spring-boot-starter-security'
+    implementation 'org.springframework.boot:spring-boot-starter-hateoas'
 
     compileOnly 'org.projectlombok:lombok'
     implementation 'org.mariadb.jdbc:mariadb-java-client'
@@ -59,7 +60,6 @@ dependencies {
 
     //spring swagger
     implementation 'org.springdoc:springdoc-openapi-starter-webmvc-ui:2.6.0'
-
 
 }
 

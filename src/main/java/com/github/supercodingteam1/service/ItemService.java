@@ -15,7 +15,11 @@ import com.github.supercodingteam1.web.exceptions.NotFoundException;
 import lombok.RequiredArgsConstructor;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.*;
+import org.springframework.data.web.PagedResourcesAssembler;
+import org.springframework.hateoas.EntityModel;
+import org.springframework.hateoas.PagedModel;
 import org.springframework.stereotype.Service;
 
 import java.util.Comparator;
@@ -29,51 +33,60 @@ public class ItemService {
     private final OptionRepository optionRepository;
     private final CategoryRepository categoryRepository;
 
+    @Autowired
+    private final PagedResourcesAssembler<GetAllItemDTO> pagedResourcesAssembler;
 
-    public Page<GetAllItemDTO> getAllItemsPage(Integer page, Integer size, String sort, String order, Integer optionSize) {
-        page -= 1;
-        Comparator<Item> comparator = null;
+    public PagedModel<EntityModel<GetAllItemDTO>> getAllItemsPage(Integer page, Integer size, String sort, String order, Integer optionSize) throws Exception {
+        try {
+            page -= 1;
+            Comparator<Item> comparator = null;
 
-        if(sort != null && !sort.isEmpty()) {
-            if ("sales".equalsIgnoreCase(sort)) {
-                comparator = Comparator.comparing(Item::getTotalSales);
-                comparator = comparator.reversed();
-            }else if("price".equalsIgnoreCase(sort)){
-                comparator = Comparator.comparing(Item::getItemPrice);
-            }else{ //sort 없으면 등록순
-                comparator = Comparator.comparing(Item::getItemId);
+            if(sort != null && !sort.isEmpty()) {
+                if ("sales".equalsIgnoreCase(sort)) {
+                    comparator = Comparator.comparing(Item::getTotalSales);
+                    comparator = comparator.reversed();
+                }else if("price".equalsIgnoreCase(sort)){
+                    comparator = Comparator.comparing(Item::getItemPrice);
+                }else{ //sort 없으면 등록순
+                    comparator = Comparator.comparing(Item::getItemId);
+                }
+
+                if(order != null && "desc".equalsIgnoreCase(order)){
+                    comparator = comparator.reversed();
+                }
             }
 
-            if(order != null && "desc".equalsIgnoreCase(order)){
-                comparator = comparator.reversed();
+            //option 중 모든 option에 대한 stock이 0이면 아이템 전체를 안보여주고
+            //option 중 일부 option에 대한 stock이 0이면 해당 option만 안보여주게 filtering 구현
+
+            List<Item> filteredItems = itemRepository.findAll().stream()
+                    .filter(item -> (optionSize == null || hasOptionWithSize(item, optionSize)))
+                    .filter(this::isStockMoreThanZero)
+                    .toList();
+            if(comparator != null){
+                filteredItems = filteredItems.stream().sorted(comparator).toList();
             }
+
+            if(sort != null && sort.equalsIgnoreCase("sales")){
+                filteredItems = filteredItems.stream().limit(8).toList();
+            }
+
+            Integer totalItems = filteredItems.size();
+            Integer start = Math.toIntExact(Math.min(page*size, totalItems));
+            Integer end = Math.min(start + size, totalItems);
+
+            List<GetAllItemDTO> convertedAllItems = filteredItems.subList(start, end)
+                    .stream()
+                    .map(this::convertToGetAllItemDTO)
+                    .toList();
+            Page<GetAllItemDTO> getAllItemDTOPage = new PageImpl<>(convertedAllItems, PageRequest.of(page, size), totalItems);
+
+            PagedModel<EntityModel<GetAllItemDTO>> getAllItemDTOPagedModel = pagedResourcesAssembler.toModel(getAllItemDTOPage);
+            return getAllItemDTOPagedModel;
+        }catch (Exception e){
+            throw new Exception(e.getMessage());
         }
 
-        //option 중 모든 option에 대한 stock이 0이면 아이템 전체를 안보여주고
-        //option 중 일부 option에 대한 stock이 0이면 해당 option만 안보여주게 filtering 구현
-
-        List<Item> filteredItems = itemRepository.findAll().stream()
-                .filter(item -> (optionSize == null || hasOptionWithSize(item, optionSize)))
-                .filter(this::isStockMoreThanZero)
-                .toList();
-        if(comparator != null){
-            filteredItems = filteredItems.stream().sorted(comparator).toList();
-        }
-
-        if(sort != null && sort.equalsIgnoreCase("sales")){
-            filteredItems = filteredItems.stream().limit(8).toList();
-        }
-
-        Integer totalItems = filteredItems.size();
-        Integer start = Math.toIntExact(Math.min(page*size, totalItems));
-        Integer end = Math.min(start + size, totalItems);
-
-        List<GetAllItemDTO> convertedAllItems = filteredItems.subList(start, end)
-                .stream()
-                .map(this::convertToGetAllItemDTO)
-                .toList();
-
-        return new PageImpl<>(convertedAllItems, PageRequest.of(page, size), totalItems);
     }
 
     private boolean isStockMoreThanZero(Item item) {
@@ -105,11 +118,9 @@ public class ItemService {
                 .build();
     }
 
-    public ItemDetailDTO getItemDetail(Integer optionId) {
-        Option option=optionRepository.findById(optionId).orElseThrow(()->new NotFoundException("해당되는 option을 찾을 수 없습니다."));
-        Integer itemId=option.getItem().getItemId();
+    public ItemDetailDTO getItemDetail(Integer itemId) {
         Item item=itemRepository.findById(itemId).orElseThrow(()->new NotFoundException("해당되는 item을 찾을 수 없습니다."));
-        List<String> imageList=item.getImageList().stream().map(image -> image.getImageLink()).toList();
+        List<String> imageList=item.getImageList().stream().map(Image::getImageLink).toList();
 
         return ItemDetailDTO.builder()
                 .item_id(itemId)

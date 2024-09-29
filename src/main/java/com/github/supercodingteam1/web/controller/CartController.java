@@ -6,6 +6,7 @@ import com.github.supercodingteam1.service.ItemService;
 import com.github.supercodingteam1.web.dto.*;
 import com.github.supercodingteam1.repository.entity.user.User;
 import com.github.supercodingteam1.repository.entity.user.UserRepository;
+import com.github.supercodingteam1.web.exceptions.NotFoundException;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.responses.ApiResponses;
@@ -45,13 +46,31 @@ public class CartController {
     public ResponseEntity<?> getAllCartItem(@AuthenticationPrincipal CustomUserDetails userDetails) { //장바구니 조회
         log.info("getAllCartItem 메소드 호출");
 
-        if (userDetails == null) {
-            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body("인증된 사용자가 아닙니다.");
+        try {
+            if (userDetails == null) {
+                return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body("인증된 사용자가 아닙니다.");
+            }
+
+            List<CartResponseDTO> cartResponseDTOList = cartService.getAllCartItem(userDetails);
+
+            if (cartResponseDTOList.isEmpty() || cartResponseDTOList == null) {
+                return ResponseEntity.badRequest().body(
+                        ResponseDTO.builder().status(HttpStatus.NOT_FOUND.value())
+                                .message("장바구니가 비었습니다.")
+                                .build()
+                );
+            }
+
+            return ResponseEntity.ok().body(cartResponseDTOList);
+        }catch (NotFoundException nfe) {
+            return ResponseEntity.status(HttpStatus.NOT_FOUND.value()).body(
+                    ResponseDTO.builder()
+                            .status(HttpStatus.NOT_FOUND.value())
+                            .message(nfe.getMessage())
+                            .build()
+            );
         }
 
-        List<CartResponseDTO> cartResponseDTOList = cartService.getAllCartItem(userDetails);
-
-        return ResponseEntity.ok().body(cartResponseDTOList);
 //
 //        return ResponseEntity.ok(ResponseDTO.builder()
 //                .status(200)
@@ -75,10 +94,18 @@ public class CartController {
                     .status(200)
                     .message("장바구니에 담았습니다.")
                     .build());
-        }catch (Exception e){
+        }catch (NotFoundException nfe){
             return ResponseEntity.badRequest().body(
                     ResponseDTO.builder()
-                            .status(400)
+                            .status(404)
+                            .message(nfe.getMessage())
+                            .build()
+            );
+        }
+        catch (Exception e){
+            return ResponseEntity.badRequest().body(
+                    ResponseDTO.builder()
+                            .status(500)
                             .message(e.getMessage())
                             .build()
             );

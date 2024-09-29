@@ -13,6 +13,7 @@ import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.responses.ApiResponses;
+import io.swagger.v3.oas.annotations.security.SecurityRequirement;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
@@ -25,6 +26,7 @@ import org.springframework.util.StringUtils;
 import org.springframework.validation.BindingResult;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
+import org.springframework.web.server.ResponseStatusException;
 
 import java.util.Enumeration;
 import java.util.List;
@@ -62,14 +64,16 @@ public class AuthController {
             @ApiResponse(responseCode = "403", description = "권한이 없습니다."),
             @ApiResponse(responseCode = "500", description = "서버 오류")
     })
+    @SecurityRequirement(name = "") //swagger에서 인증 제외
     @PostMapping(value = "/signup", consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
     public ResponseDTO signUp(
             @Parameter(description = "사용자 프로필 이미지") @RequestPart(value = "profileImage", required = false) MultipartFile profileImage,
             @Parameter(description = "회원가입정보", required = true) @RequestPart(value = "request") @Valid SignUpDTO signUpDTO
             , BindingResult bindingResult) {
-        log.info("회원 가입 처리 요청 수신");
+        log.info("회원 가입 요청 수신");
         try {
             authService.signUp(profileImage, signUpDTO, bindingResult);
+            log.info("회원 가입 요청 완료");
             return ResponseDTO.builder()
                     .status(200)
                     .message("성공적으로 회원가입하였습니다.")
@@ -95,10 +99,11 @@ public class AuthController {
             @ApiResponse(responseCode = "400", description = "이미 존재하는 이메일입니다."),
             @ApiResponse(responseCode = "500", description = "서버 오류")
     })
-    @PostMapping("/duplicate")
+    @SecurityRequirement(name = "") //swagger에서 인증 제외
+    @PostMapping(value = "/duplicate")
     public ResponseDTO duplicate(@RequestBody CheckDuplicateDTO checkDuplicateDTO){
 
-        log.info("회원가입시 중복확인 -duplicate :checkDuplicateDTO  :{} ", checkDuplicateDTO);
+        log.info("회원가입시 중복확인 -duplicate :checkDuplicateDTO  :{} ", checkDuplicateDTO.getUser_email());
 
         if(StringUtils.hasText(checkDuplicateDTO.getUser_email())){
             boolean isDuplicate = userService.isDuplicateEmail(checkDuplicateDTO.getUser_email());
@@ -129,41 +134,44 @@ public class AuthController {
             @ApiResponse(responseCode = "403", description = "권한이 없습니다."),
             @ApiResponse(responseCode = "500", description = "서버 오류")
     })
+    @SecurityRequirement(name = "") //swagger에서 인증 제외
     @PostMapping("/login")
     public ResponseEntity<?> login(@Valid @RequestBody LoginDTO loginDTO, BindingResult bindingResult){
 
-        // 1. 유효성 체크 메서드 호출
-        if (bindingResult.hasErrors()) {
-            String errorMessage = Objects.requireNonNull(bindingResult.getFieldError()).getDefaultMessage();
-            LoginResponseDTO<Object> loginResponseDTO =  LoginResponseDTO.builder()
-                    .status(400)
-                    .message(errorMessage)
-                    .build();
-            return ResponseEntity.badRequest().body(loginResponseDTO);
-        }
+        try {
+            // 1. 유효성 체크 메서드 호출
+            if (bindingResult.hasErrors()) {
+                String errorMessage = Objects.requireNonNull(bindingResult.getFieldError()).getDefaultMessage();
+                LoginResponseDTO<Object> loginResponseDTO =  LoginResponseDTO.builder()
+                        .status(400)
+                        .message(errorMessage)
+                        .build();
+                return ResponseEntity.badRequest().body(loginResponseDTO);
+            }
 
-        User user = userService.getByCredentials(loginDTO.getUser_name(), loginDTO.getUser_password());
+            User user = userService.getByCredentials(loginDTO.getUser_email(), loginDTO.getUser_password());
 
-        if(user!=null){
-            //토큰 생성
-            TokenDTO tokenDTO = jwtTokenProviderService.create(user);
+            if(user!=null){
+                //토큰 생성
+                TokenDTO tokenDTO = jwtTokenProviderService.create(user);
 
-            //.collect(Collectors.joining(","))  // 여러 역할을 ','로 구분하여 하나의 문자열로 합침
-            //.collect(Collectors.toList())  // 리스트로 수집하여 배열 형식으로 반환
-            LoginResponseDTO<?> loginResponseDTO = LoginResponseDTO.builder()
-                    .status(200)
-                    .message("success")
-                    .data(new ResTokenDTO(
-                            tokenDTO.getAccessToken(),
-                            tokenDTO.getRefreshToken(),
-                            user.getUser_role().stream()
-                                    .map(userRole -> userRole.getRoleName().getRole())  // Role 열거형을 문자열로 변환 -> 반환형 ROLE_BUYER, ROLE_SELLER, ROLE_ADMIN 이렇게 출력되도록 수정하였음.
-                                    .collect(Collectors.joining(","))  // 여러 역할을 ','로 구분하여 하나의 문자열로 합침
-                    ))
-                    .build();
+                //.collect(Collectors.joining(","))  // 여러 역할을 ','로 구분하여 하나의 문자열로 합침
+                //.collect(Collectors.toList())  // 리스트로 수집하여 배열 형식으로 반환
+                LoginResponseDTO<?> loginResponseDTO = LoginResponseDTO.builder()
+                        .status(200)
+                        .message("success")
+                        .data(new ResTokenDTO(
+                                tokenDTO.getAccessToken(),
+                                tokenDTO.getRefreshToken(),
+                                user.getUser_role().stream()
+                                        .map(userRole -> userRole.getRoleName().getRole())  // Role 열거형을 문자열로 변환 -> 반환형 ROLE_BUYER, ROLE_SELLER, ROLE_ADMIN 이렇게 출력되도록 수정하였음.
+                                        .collect(Collectors.joining(","))  // 여러 역할을 ','로 구분하여 하나의 문자열로 합침
+                        ))
+                        .build();
 
-            return ResponseEntity.ok().body(loginResponseDTO);
-        }else{
+                return ResponseEntity.ok().body(loginResponseDTO);
+            }
+        }catch (Exception e){
             LoginResponseDTO<Object> loginResponseDTO =  LoginResponseDTO.builder()
                     .status(400)
                     .message("로그인 실패")
@@ -171,6 +179,7 @@ public class AuthController {
             return ResponseEntity.badRequest().body(loginResponseDTO);
 
         }
+        return null;
     }
 
     /**   auth/logout
@@ -185,8 +194,7 @@ public class AuthController {
             @ApiResponse(responseCode = "500", description = "서버 오류")
     })
     @PostMapping("/logout")
-    public ResponseEntity<?> logout(@RequestBody LoginDTO loginDTO, @RequestHeader(name = "X-AUTH-TOKEN") String token){
-        log.info(String.format(token+"헤더에 담긴 토큰"));
+    public ResponseEntity<?> logout(@RequestBody LoginDTO loginDTO){
         try{
             //DB 에서 토큰 삭제
             userService.logout(loginDTO);

@@ -43,7 +43,7 @@ public class AuthService {
     private final S3Uploader s3Uploader;
 
     public Map<String, String> login(LoginDTO loginRequestDto) {
-        String email = loginRequestDto.getUser_name();
+        String email = loginRequestDto.getUser_email();
         String password = loginRequestDto.getUser_password();
 
         try {

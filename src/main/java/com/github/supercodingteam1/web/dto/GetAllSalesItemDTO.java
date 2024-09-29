@@ -1,5 +1,6 @@
 package com.github.supercodingteam1.web.dto;
 
+import com.github.supercodingteam1.repository.entity.option.Option;
 import lombok.*;
 
 import java.util.List;
