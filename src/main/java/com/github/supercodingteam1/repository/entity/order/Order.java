@@ -45,4 +45,7 @@ public class Order {
 
     @Column(name = "total_price", nullable = false)
     private Integer totalPrice;
+
+    @OneToMany(mappedBy = "order", cascade = CascadeType.ALL, orphanRemoval = true)
+    private List<OrderDetail> orderDetails;
 }
