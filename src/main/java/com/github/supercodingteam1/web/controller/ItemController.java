@@ -66,11 +66,11 @@ public class ItemController {
     })
     @SecurityRequirement(name = "") //swagger에서 인증 제외
     @GetMapping("/detail")
-    public ResponseEntity<?> getDetailItem(@RequestParam(required = false) Integer option_id){
+    public ResponseEntity<?> getDetailItem(@RequestParam(required = false) Integer item_id){
         Map<String, Object> responseBody = new HashMap<>();
         try {
             log.info("getDetailItem 메소드 호출");
-            ItemDetailDTO getItemDetailDTO=itemService.getItemDetail(option_id);
+            ItemDetailDTO getItemDetailDTO = itemService.getItemDetail(item_id);
             responseBody.put("item_detail",getItemDetailDTO);
             return ResponseEntity.ok(responseBody);
         }catch (NotFoundException nfe){
