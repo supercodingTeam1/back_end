@@ -34,10 +34,11 @@ public class CustomUserDetails implements UserDetails {
         this.userId = user.getUserId();
         this.email = user.getEmail();
         this.password = user.getPassword();
-        this.authorities = getAuthorities();
+        this.authorities = user.getUser_role().stream()
+                .map(role -> new SimpleGrantedAuthority(role.getRoleName().toString()))
+                .collect(Collectors.toList());
         this.user = user;
     }
-
     @Override
     public Collection<? extends GrantedAuthority> getAuthorities() {
         return authorities.stream()

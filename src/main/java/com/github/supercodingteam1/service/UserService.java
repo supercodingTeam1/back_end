@@ -13,10 +13,12 @@ import com.github.supercodingteam1.repository.entity.user.RefreshTokenRepository
 import com.github.supercodingteam1.repository.entity.user.User;
 import com.github.supercodingteam1.repository.entity.user.UserRepository;
 import com.github.supercodingteam1.service.Utils.ImageUtils;
+import com.github.supercodingteam1.service.Utils.MyBuyInfoDTOUtils;
 import com.github.supercodingteam1.web.dto.*;
 import com.github.supercodingteam1.web.exceptions.NotFoundException;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.log4j.Log4j2;
+import org.springframework.security.core.GrantedAuthority;
 import org.apache.coyote.BadRequestException;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
@@ -24,8 +26,9 @@ import org.springframework.transaction.annotation.Transactional;
 
 import java.util.ArrayList;
 import java.util.Collections;
-import java.util.List;
+import java.util.stream.Collectors;
 import java.util.Objects;
+import java.util.List;
 
 
 @Log4j2
@@ -92,86 +95,87 @@ public class UserService {
   }
 
 
-  /**
-   * 유저 정보 조회
-   *
-   * @param token
-   * @return
-   */
-  public UserDTO findByTokenUserInfo(String token) {
+//  /**
+//   * 유저 정보 조회
+//   *
+//   * @param token
+//   * @return
+//   */
+//  public UserDTO findByTokenUserInfo(String token) {
+//
+//    try {
+//      // 1. 토큰을 이용해 사용자 ID 추출
+//      //log.info("1. 토큰을 이용해 사용");
+//      String userId = jwtTokenProviderService.validateAndGetUserId(token);
+//      //log.info("1. 토큰을 이용해 사용자 ID 추출  :   {}" , userId);
+//
+//      User user = userRepository.findByUserId(Integer.valueOf(userId));
+//
+//      // 2. 유저 정보를 반환
+//      return UserDTO.of(user);
+//    } catch (Exception e) {
+//      throw new IllegalStateException("유저 정보가 없습니다.");
+//    }
+//  }
 
-    try {
-      // 1. 토큰을 이용해 사용자 ID 추출
-      //log.info("1. 토큰을 이용해 사용");
-      String userId = jwtTokenProviderService.validateAndGetUserId(token);
-      //log.info("1. 토큰을 이용해 사용자 ID 추출  :   {}" , userId);
+  public MyPageDTO<UserInfoAndOrderDTO> getMyUserInfo(CustomUserDetails userDetails) {
 
-      User user = userRepository.findByUserId(Integer.valueOf(userId));
+    int userId = userDetails.getUserId();
 
-      // 2. 유저 정보를 반환
-      return UserDTO.of(user);
-    } catch (Exception e) {
-      throw new IllegalStateException("유저 정보가 없습니다.");
+    MyPageDTO<UserInfoAndOrderDTO> myPageDTO = new MyPageDTO<>();
+
+    // User 정보 구성
+    UserInfoDTO userInfoDTO = UserInfoDTO.builder()
+            .user_id(userDetails.getUserId())
+            .name(userDetails.getUsername())
+            .roles(userDetails.getAuthorities().stream()
+                    .map(GrantedAuthority::getAuthority)
+                    .collect(Collectors.toList()))
+            .build();
+
+    // 최신 3개의 주문 정보 가져오기
+    List<Order> recentOrders = orderRepository.findTop3ByUser_UserIdOrderByOrderAtDesc(userId);
+    List<MyBuyInfoDTO> userOrderDTOList = new ArrayList<>();
+
+    for (Order order : recentOrders) {
+      List<MyBuyItemDetailDTO> myBuyItemDetailDTOList = new ArrayList<>();
+      List<OrderDetail> orderDetailList = orderDetailRepository.findByOrder(order);
+
+      // MyBuyInfoDTOUtils 사용하여 주문 내역 구성
+      MyBuyInfoDTO userOrderDTO = MyBuyInfoDTOUtils.getUserOrderDTO(order, orderDetailList, myBuyItemDetailDTOList);
+      userOrderDTOList.add(userOrderDTO);
     }
+
+    UserInfoAndOrderDTO userInfoAndOrderDTO = UserInfoAndOrderDTO.builder()
+            .user_info(userInfoDTO)
+            .user_order(userOrderDTOList)
+            .build();
+
+    myPageDTO.setData(userInfoAndOrderDTO);
+
+    return myPageDTO;
   }
 
 
   public MyPageDTO getMyBuyInfo(CustomUserDetails userDetails) {
-
     int userId = userDetails.getUserId();
 
     MyPageDTO<MyBuyInfoDTO> myPageDTO = new MyPageDTO<>();
     List<MyBuyInfoDTO> myBuyInfoDTOList = new ArrayList<>();
 
-    List<Order> myOrderList = orderRepository.findAllByUser_UserId(userId);
+    List<Order> myOrderList = orderRepository.findAllByUser_UserIdFetchDetails(userId);
 
+    // 각 Order에 대해 MyBuyInfoDTO 생성
     for (Order order : myOrderList) {
       List<MyBuyItemDetailDTO> myBuyItemDetailDTOList = new ArrayList<>();
-
-      // 3. 해당 주문의 OrderDetail 을 조회
-      List<OrderDetail> orderDetailList = orderDetailRepository.findByOrder(order);
-
-      for (OrderDetail orderDetail : orderDetailList) {
-        Option option = orderDetail.getOptions();  // 주문한 옵션
-        Item item = option.getItem();
-
-        // 상품의 대표 이미지 가져오기
-        String mainImageUrl = ImageUtils.getMainImageUrl(item);
-
-        // MyBuyItemOptionDetailDTO 생성 (옵션 정보 포함)
-        MyBuyItemOptionDetailDTO myBuyItemOptionDetailDTO = MyBuyItemOptionDetailDTO.builder()
-                .option_id(option.getOptionId())
-                .size(option.getSize())
-                .quantity(orderDetail.getQuantity())
-                .build();
-
-        // MyBuyItemDetailDTO 생성 (상품 정보 및 대표 이미지 포함)
-        MyBuyItemDetailDTO myBuyItemDetailDTO = MyBuyItemDetailDTO.builder()
-                .order_id(orderDetail.getOrder().getOrder_id())
-                .item_image(mainImageUrl)
-                .item_name(item.getItemName())
-                .price(item.getItemPrice())
-                .myBuyItemOptionDetailDTOList(Collections.singletonList(myBuyItemOptionDetailDTO))
-                .build();
-
-        // MyBuyItemDetailDTO를 목록에 추가
-        myBuyItemDetailDTOList.add(myBuyItemDetailDTO);
-      }
-
-      // MyBuyInfoDTO 생성 (주문 정보 포함)
-      MyBuyInfoDTO myBuyInfoDTO = MyBuyInfoDTO.builder()
-              .order_num(order.getOrderNum())
-              .order_at(order.getOrderAt())
-              .address(order.getOrderAddress())
-              .phone_num(order.getPhoneNum())
-              .myBuyItemDetailDTOList(myBuyItemDetailDTOList)
-              .build();
+      List<OrderDetail> orderDetailList = order.getOrderDetails(); // 페치된 OrderDetail 사용
+      MyBuyInfoDTO myBuyInfoDTO = MyBuyInfoDTOUtils.getBuyInfoDTO(order, orderDetailList, myBuyItemDetailDTOList);
 
       myBuyInfoDTOList.add(myBuyInfoDTO);
     }
 
-    myPageDTO.setData(myBuyInfoDTOList);
-
+    myPageDTO.setData((MyBuyInfoDTO) myBuyInfoDTOList);
     return myPageDTO;
   }
+
 }
