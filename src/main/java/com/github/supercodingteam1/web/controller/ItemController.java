@@ -15,7 +15,8 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageImpl;
-import org.springframework.data.web.PagedModel;
+import org.springframework.hateoas.EntityModel;
+import org.springframework.hateoas.PagedModel;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.ui.Model;
@@ -48,12 +49,9 @@ public class ItemController {
         Map<String, Object> responseBody = new HashMap<>();
         log.info("getAllItems 메소드 호출");
         try {
-            Page<GetAllItemDTO> getAllItemDTOPage = itemService.getAllItemsPage(page, size, sort, order, optionSize);
+            PagedModel<EntityModel<GetAllItemDTO>> getAllItemDTOPage = itemService.getAllItemsPage(page, size, sort, order, optionSize);
 
-            if(sort != null && sort.equalsIgnoreCase("sales"))
-                responseBody.put("items", getAllItemDTOPage.stream().limit(8));
-            else
-                responseBody.put("items", getAllItemDTOPage);
+            responseBody.put("items", getAllItemDTOPage);
 
             responseBody.put("status", HttpStatus.OK.value());
             responseBody.put("message", "성공적으로 조회했습니다.");
@@ -82,6 +80,7 @@ public class ItemController {
             responseBody.put("status", HttpStatus.OK.value());
             responseBody.put("message", "성공적으로 조회했습니다.");
             return ResponseEntity.ok(responseBody);
+
         }catch (NotFoundException nfe){
             responseBody.put("status", HttpStatus.NOT_FOUND);
             responseBody.put("message", nfe.getMessage());

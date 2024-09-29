@@ -15,7 +15,11 @@ import com.github.supercodingteam1.web.exceptions.NotFoundException;
 import lombok.RequiredArgsConstructor;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.*;
+import org.springframework.data.web.PagedResourcesAssembler;
+import org.springframework.hateoas.EntityModel;
+import org.springframework.hateoas.PagedModel;
 import org.springframework.stereotype.Service;
 
 import java.util.Comparator;
@@ -29,8 +33,10 @@ public class ItemService {
     private final OptionRepository optionRepository;
     private final CategoryRepository categoryRepository;
 
+    @Autowired
+    private final PagedResourcesAssembler<GetAllItemDTO> pagedResourcesAssembler;
 
-    public Page<GetAllItemDTO> getAllItemsPage(Integer page, Integer size, String sort, String order, Integer optionSize) throws Exception {
+    public PagedModel<EntityModel<GetAllItemDTO>> getAllItemsPage(Integer page, Integer size, String sort, String order, Integer optionSize) throws Exception {
         try {
             page -= 1;
             Comparator<Item> comparator = null;
@@ -73,8 +79,10 @@ public class ItemService {
                     .stream()
                     .map(this::convertToGetAllItemDTO)
                     .toList();
+            Page<GetAllItemDTO> getAllItemDTOPage = new PageImpl<>(convertedAllItems, PageRequest.of(page, size), totalItems);
 
-            return new PageImpl<>(convertedAllItems, PageRequest.of(page, size), totalItems);
+            PagedModel<EntityModel<GetAllItemDTO>> getAllItemDTOPagedModel = pagedResourcesAssembler.toModel(getAllItemDTOPage);
+            return getAllItemDTOPagedModel;
         }catch (Exception e){
             throw new Exception(e.getMessage());
         }
