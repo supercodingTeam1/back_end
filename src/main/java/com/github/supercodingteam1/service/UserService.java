@@ -14,8 +14,10 @@ import com.github.supercodingteam1.repository.entity.user.User;
 import com.github.supercodingteam1.repository.entity.user.UserRepository;
 import com.github.supercodingteam1.service.Utils.ImageUtils;
 import com.github.supercodingteam1.web.dto.*;
+import com.github.supercodingteam1.web.exceptions.NotFoundException;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.log4j.Log4j2;
+import org.apache.coyote.BadRequestException;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -23,6 +25,7 @@ import org.springframework.transaction.annotation.Transactional;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
+import java.util.Objects;
 
 
 @Log4j2
@@ -48,12 +51,17 @@ public class UserService {
     return userRepository.existsByEmail(userEmail);
   }
 
-  public User getByCredentials(String userName, String password) {
-    User user = userRepository.findByEmail(userName).orElse(null);
-    if (passwordEncoder.matches(password, user.getPassword())) {
-      return user;
+  public User getByCredentials(String userEmail, String password) {
+    try {
+      User user = userRepository.findByEmail(userEmail).orElse(null);
+      if (passwordEncoder.matches(password, Objects.requireNonNull(user).getPassword())) {
+        return user;
+      }else throw new BadRequestException("Invalid password");
+    }catch (BadRequestException badRequestException) {
+      return null;
     }
-    return null;
+
+
   }
 
 
@@ -63,7 +71,7 @@ public class UserService {
    * @param loginDTO
    */
   public void logout(LoginDTO loginDTO) {
-    User user = userRepository.findByUserName(loginDTO.getUser_name());
+    User user = userRepository.findByUserName(loginDTO.getUser_email());
     refreshTokenRepository.deleteByUserUserId(user.getUserId());
   }
 

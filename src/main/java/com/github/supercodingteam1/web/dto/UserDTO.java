@@ -25,7 +25,6 @@ public class UserDTO {
     private TokenDTO token;
     private String phoneNum;
     private String userAddress;
-    private String userGender;
     private String userImg;
 
 

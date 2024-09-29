@@ -76,7 +76,7 @@ public class MyPageController {
             return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body("인증된 사용자가 아닙니다.");
         }
         MyPageDTO<?> myInfo=userService.getMyBuyInfo(userDetails);
-        return null;
+        return ResponseEntity.ok().body(myInfo);
     }
 
 }
