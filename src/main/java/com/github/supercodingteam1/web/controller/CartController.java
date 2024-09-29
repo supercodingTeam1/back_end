@@ -1,6 +1,7 @@
 package com.github.supercodingteam1.web.controller;
 
 import com.github.supercodingteam1.repository.UserDetails.CustomUserDetails;
+import com.github.supercodingteam1.repository.entity.cart.Cart;
 import com.github.supercodingteam1.service.CartService;
 import com.github.supercodingteam1.service.ItemService;
 import com.github.supercodingteam1.web.dto.*;
@@ -24,7 +25,9 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.bind.annotation.*;
 
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 
 @RestController
@@ -45,6 +48,7 @@ public class CartController {
     @GetMapping
     public ResponseEntity<?> getAllCartItem(@AuthenticationPrincipal CustomUserDetails userDetails) { //장바구니 조회
         log.info("getAllCartItem 메소드 호출");
+        Map<String, Object> responseBody = new HashMap<>();
 
         try {
             if (userDetails == null) {
@@ -61,7 +65,11 @@ public class CartController {
                 );
             }
 
-            return ResponseEntity.ok().body(cartResponseDTOList);
+            return ResponseEntity.ok().body(ResponseDTO.builder()
+                    .status(HttpStatus.OK.value())
+                    .message("장바구니 조회에 성공했습니다.")
+                    .data(cartResponseDTOList)
+                    .build());
         }catch (NotFoundException nfe) {
             return ResponseEntity.status(HttpStatus.NOT_FOUND.value()).body(
                     ResponseDTO.builder()
@@ -70,12 +78,6 @@ public class CartController {
                             .build()
             );
         }
-
-//
-//        return ResponseEntity.ok(ResponseDTO.builder()
-//                .status(200)
-//                .message("장바구니 조회에 성공했습니다.")
-//                .build());
     }
     @Operation(summary = "장바구니에 물품 추가")
     @ApiResponses({
@@ -88,11 +90,12 @@ public class CartController {
         //TODO : httpServletRequest에서 토큰 가져와서 user 객체 생성 해야함
         log.info("addItemCart 메소드 호출, {},{}", addToCartDTO.getOption_id(), addToCartDTO.getQuantity());
         try {
-            cartService.addItemToCart(addToCartDTO, customUserDetails);
+            Cart cart = cartService.addItemToCart(addToCartDTO, customUserDetails);
 
             return ResponseEntity.ok(ResponseDTO.builder()
                     .status(200)
                     .message("장바구니에 담았습니다.")
+                    .data(cart.toString())
                     .build());
         }catch (NotFoundException nfe){
             return ResponseEntity.badRequest().body(
