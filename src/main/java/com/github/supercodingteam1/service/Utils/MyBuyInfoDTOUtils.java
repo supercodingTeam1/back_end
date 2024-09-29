@@ -7,7 +7,6 @@ import com.github.supercodingteam1.repository.entity.orderDetail.OrderDetail;
 import com.github.supercodingteam1.web.dto.MyBuyInfoDTO;
 import com.github.supercodingteam1.web.dto.MyBuyItemDetailDTO;
 import com.github.supercodingteam1.web.dto.MyBuyItemOptionDetailDTO;
-import com.github.supercodingteam1.web.dto.UserOrderDTO;
 
 import java.util.Collections;
 import java.util.List;
@@ -16,7 +15,7 @@ public class MyBuyInfoDTOUtils {
     public static MyBuyInfoDTO getBuyInfoDTO(Order order, List<OrderDetail> orderDetailList, List<MyBuyItemDetailDTO> myBuyItemDetailDTOList) {
 
         for (OrderDetail orderDetail : orderDetailList) {
-            Option option = orderDetail.getOptions();  // 주문한 옵션
+            Option option = orderDetail.getOptions();
             Item item = option.getItem();
 
             // 상품의 대표 이미지 가져오기
@@ -54,7 +53,7 @@ public class MyBuyInfoDTOUtils {
         return myBuyInfoDTO;
     }
 
-    public static UserOrderDTO getUserOrderDTO(Order order, List<OrderDetail> orderDetailList, List<MyBuyItemDetailDTO> myBuyItemDetailDTOList) {
+    public static MyBuyInfoDTO getUserOrderDTO(Order order, List<OrderDetail> orderDetailList, List<MyBuyItemDetailDTO> myBuyItemDetailDTOList) {
 
         for (OrderDetail orderDetail : orderDetailList) {
             Option option = orderDetail.getOptions();
@@ -79,12 +78,12 @@ public class MyBuyInfoDTOUtils {
             myBuyItemDetailDTOList.add(myBuyItemDetailDTO);
         }
 
-        return UserOrderDTO.builder()
+        return MyBuyInfoDTO.builder()
                 .order_num(order.getOrderNum())
                 .order_at(order.getOrderAt())
                 .address(order.getOrderAddress())
                 .phone_num(order.getPhoneNum())
-                .order_item(myBuyItemDetailDTOList)
+                .myBuyItemDetailDTOList(myBuyItemDetailDTOList)
                 .build();
     }
 }
