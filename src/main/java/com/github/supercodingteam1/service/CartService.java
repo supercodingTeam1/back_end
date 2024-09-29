@@ -86,6 +86,9 @@ public class CartService {
         User user = userRepository.findByEmail(email).orElse(null);
 
         Option option = optionRepository.findById(addToCartDTO.getOption_id()).orElse(null);
+        if(option == null) {
+            throw new NotFoundException("존재하지 않는 아이템입니다.");
+        }
         Integer quantity = addToCartDTO.getQuantity();
 
         List<Cart> userCartList = cartRepository.findAllByUser(user); //user의 cart 목록 전부 가져오기

@@ -99,6 +99,7 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
         }
 
         String jwtToken = jwtTokenProvider.resolveToken(request);
+        System.out.println(request.getHeader("origin"));
 
         //테스트
         System.out.println("Request Headers:");

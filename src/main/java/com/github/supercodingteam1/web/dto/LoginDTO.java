@@ -10,8 +10,8 @@ import lombok.*;
 @Builder
 public class LoginDTO {
 
-    @NotEmpty(message = "유저 이름은 필수입니다.")
-    private String user_name;
+    @NotEmpty(message = "이메일은 필수입니다.")
+    private String user_email;
 
     @NotEmpty(message = "패스워드는 필수입니다.")
     private String user_password;
@@ -19,7 +19,7 @@ public class LoginDTO {
 
     public static User toLoginUser(LoginDTO loginDTO) {
         return User.builder()
-                .userName(loginDTO.getUser_name())
+                .email(loginDTO.getUser_email())
                 .password(loginDTO.getUser_password())
                 .build();
     }
