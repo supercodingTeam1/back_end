@@ -82,9 +82,17 @@ public class ItemController {
             return ResponseEntity.ok(responseBody);
 
         }catch (NotFoundException nfe){
-            responseBody.put("status", HttpStatus.NOT_FOUND);
+            responseBody.put("status", HttpStatus.NOT_FOUND.value());
             responseBody.put("message", nfe.getMessage());
             return ResponseEntity.notFound().build();
+        }catch (IllegalArgumentException iae){
+            responseBody.put("status", HttpStatus.BAD_REQUEST.value());
+            responseBody.put("message", iae.getMessage());
+            return ResponseEntity.badRequest().body(responseBody);
+        }catch (Exception e) {
+            responseBody.put("status", HttpStatus.INTERNAL_SERVER_ERROR.value());
+            responseBody.put("message", e.getMessage());
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(responseBody);
         }
     }
 

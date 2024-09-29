@@ -163,7 +163,7 @@ public class UserService {
     MyPageDTO<MyBuyInfoDTO> myPageDTO = new MyPageDTO<>();
     List<MyBuyInfoDTO> myBuyInfoDTOList = new ArrayList<>();
 
-    List<Order> myOrderList = orderRepository.findAllByUser_UserIdFetchDetails(userId);
+    List<Order> myOrderList = orderRepository.findAllByUser_UserId(userId);
 
     // 각 Order에 대해 MyBuyInfoDTO 생성
     for (Order order : myOrderList) {
