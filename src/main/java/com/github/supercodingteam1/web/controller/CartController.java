@@ -2,6 +2,7 @@ package com.github.supercodingteam1.web.controller;
 
 import com.github.supercodingteam1.repository.UserDetails.CustomUserDetails;
 import com.github.supercodingteam1.repository.entity.cart.Cart;
+import com.github.supercodingteam1.repository.entity.order.Order;
 import com.github.supercodingteam1.service.CartService;
 import com.github.supercodingteam1.service.ItemService;
 import com.github.supercodingteam1.web.dto.*;
@@ -180,11 +181,13 @@ public class CartController {
     public ResponseEntity<?> orderItem(@AuthenticationPrincipal CustomUserDetails customUserDetails, @RequestBody OrderDTO orderDTO){
         log.info("orderItem : {}", orderDTO.getIsFromCart() ? "장바구니 주문":"바로구매");
         try {
-            cartService.orderItem(orderDTO, customUserDetails);
+            Order order = cartService.orderItem(orderDTO, customUserDetails);
+            System.out.println(order.getOrderDetails());
 
             return ResponseEntity.ok(ResponseDTO.builder()
                     .status(200)
                     .message("성공적으로 주문되었습니다.")
+                    .data(order.toString())
                     .build());
         }catch (IllegalArgumentException e){
             return ResponseEntity.badRequest().body(

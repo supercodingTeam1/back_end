@@ -6,6 +6,7 @@ import jakarta.persistence.*;
 import lombok.*;
 
 import java.time.LocalDateTime;
+import java.util.ArrayList;
 import java.util.List;
 
 @Getter
@@ -46,6 +47,21 @@ public class Order {
     @Column(name = "total_price", nullable = false)
     private Integer totalPrice;
 
-    @OneToMany(mappedBy = "order", cascade = CascadeType.ALL, orphanRemoval = true)
-    private List<OrderDetail> orderDetails;
+    @OneToMany(mappedBy = "order", cascade = CascadeType.ALL, orphanRemoval = true, fetch = FetchType.EAGER)
+    @Builder.Default
+    private List<OrderDetail> orderDetails = new ArrayList<>();
+
+    @Override
+    public String toString() {
+        return "Order{" +
+                "orderNum='" + orderNum + '\'' +
+                ", orderAt=" + orderAt +
+                ", orderAddress='" + orderAddress + '\'' +
+                ", name='" + name + '\'' +
+                ", payment='" + payment + '\'' +
+                ", phoneNum='" + phoneNum + '\'' +
+                ", totalPrice=" + totalPrice +
+                ", orderDetails=" + orderDetails +
+                '}';
+    }
 }
