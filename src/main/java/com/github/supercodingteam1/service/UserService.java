@@ -112,14 +112,17 @@ public class UserService {
 
   public MyPageDTO<UserInfoAndOrderDTO> getMyUserInfo(CustomUserDetails userDetails) {
 
-    int userId = userDetails.getUserId();
-
+    User user=userDetails.getUser();
     MyPageDTO<UserInfoAndOrderDTO> myPageDTO = new MyPageDTO<>();
 
     // User 정보 구성
     UserInfoDTO userInfoDTO = UserInfoDTO.builder()
-            .user_id(userDetails.getUserId())
-            .name(userDetails.getUsername())
+            .user_id(user.getUserId())
+            .email(user.getEmail())
+            .name(user.getUserName())
+            .user_address(user.getUserAddress())
+            .profile(user.getUserImg())
+            .phone_num(user.getPhoneNum())
             .roles(userDetails.getAuthorities().stream()
                     .map(GrantedAuthority::getAuthority)
                     .collect(Collectors.toList()))
