@@ -137,7 +137,7 @@ public class UserService {
             .build();
 
     // 최신 3개의 주문 정보 가져오기
-    List<Order> recentOrders = orderRepository.findTop3ByUser_UserIdOrderByOrderAtDesc(userId);
+    List<Order> recentOrders = orderRepository.findTop3ByUser_UserIdOrderByOrderAtDesc(user.getUserId());
     List<MyBuyInfoDTO> userOrderDTOList = new ArrayList<>();
 
     for (Order order : recentOrders) {
