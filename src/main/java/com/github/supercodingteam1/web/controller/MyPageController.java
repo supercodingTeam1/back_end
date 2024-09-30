@@ -112,10 +112,16 @@ public class MyPageController {
     public ResponseEntity<?> MyBuyInfo(@AuthenticationPrincipal CustomUserDetails userDetails) {
         log.info("my buy info 요청");
 
-        if (userDetails == null) {
-            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body("인증된 사용자가 아닙니다.");
+        try {
+            if (userDetails == null) {
+                return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body("인증된 사용자가 아닙니다.");
+            }
+            MyPageDTO<?> myInfo = userService.getMyBuyInfo(userDetails);
+            myInfo.setStatus(200);
+            myInfo.setMessage("성공적으로 불러왔습니다.");
+            return ResponseEntity.ok().body(myInfo);
+        }catch (Exception e) {
+            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(e.getMessage());
         }
-        MyPageDTO<?> myInfo = userService.getMyBuyInfo(userDetails);
-        return ResponseEntity.ok().body(myInfo);
     }
 }
