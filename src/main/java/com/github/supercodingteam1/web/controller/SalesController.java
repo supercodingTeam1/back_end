@@ -7,10 +7,12 @@ import com.github.supercodingteam1.web.dto.GetAllSalesItemDTO;
 import com.github.supercodingteam1.web.dto.ModifySalesItemOptionDTO;
 import com.github.supercodingteam1.web.dto.ResponseDTO;
 import com.github.supercodingteam1.web.exceptions.NotFoundException;
+import com.github.supercodingteam1.web.exceptions.UnauthorizedAccessException;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.responses.ApiResponses;
+import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -95,14 +97,31 @@ public class SalesController {
             @ApiResponse(responseCode = "500", description = "서버 오류")
     })
     @PutMapping
-    public ResponseDTO updateSellItem(@Parameter(description = "옵션 재고 수정", required = true) @RequestBody List<ModifySalesItemOptionDTO> modifySalesItemOptionDTO){
+    public ResponseEntity<?> updateSellItem(
+            @Valid @RequestBody List<ModifySalesItemOptionDTO> modifySalesItemOptionDTOList,
+            @AuthenticationPrincipal CustomUserDetails customUserDetails) {
 
-        log.info("updateSellItem 메소드 호출 {}", modifySalesItemOptionDTO);
-        sellService.updateSellItem(modifySalesItemOptionDTO);
-
-        return ResponseDTO.builder()
-                .status(200)
-                .message("상품 옵션의 재고를 성공적으로 수정하였습니다").
-                build();
+        try {
+            sellService.updateSellItem(modifySalesItemOptionDTOList, customUserDetails);
+            return ResponseEntity.ok().body(ResponseDTO.builder()
+                    .status(200)
+                    .message("상품 옵션의 재고를 성공적으로 수정하였습니다.")
+                    .build());
+        } catch (UnauthorizedAccessException e) {
+            return ResponseEntity.status(HttpStatus.FORBIDDEN).body(ResponseDTO.builder()
+                    .status(403)
+                    .message(e.getMessage())
+                    .build());
+        } catch (NotFoundException e) {
+            return ResponseEntity.status(HttpStatus.NOT_FOUND).body(ResponseDTO.builder()
+                    .status(404)
+                    .message(e.getMessage())
+                    .build());
+        } catch (Exception e) {
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(ResponseDTO.builder()
+                    .status(500)
+                    .message("서버 오류가 발생했습니다.")
+                    .build());
+        }
     }
 }

@@ -120,21 +120,24 @@ public class UserService {
 
   public MyPageDTO<UserInfoAndOrderDTO> getMyUserInfo(CustomUserDetails userDetails) {
 
-    int userId = userDetails.getUserId();
-
+    User user=userDetails.getUser();
     MyPageDTO<UserInfoAndOrderDTO> myPageDTO = new MyPageDTO<>();
 
     // User 정보 구성
     UserInfoDTO userInfoDTO = UserInfoDTO.builder()
-            .user_id(userDetails.getUserId())
-            .name(userDetails.getUsername())
+            .user_id(user.getUserId())
+            .email(user.getEmail())
+            .name(user.getUserName())
+            .user_address(user.getUserAddress())
+            .profile(user.getUserImg())
+            .phone_num(user.getPhoneNum())
             .roles(userDetails.getAuthorities().stream()
                     .map(GrantedAuthority::getAuthority)
                     .collect(Collectors.toList()))
             .build();
 
     // 최신 3개의 주문 정보 가져오기
-    List<Order> recentOrders = orderRepository.findTop3ByUser_UserIdOrderByOrderAtDesc(userId);
+    List<Order> recentOrders = orderRepository.findTop3ByUser_UserIdOrderByOrderAtDesc(user.getUserId());
     List<MyBuyInfoDTO> userOrderDTOList = new ArrayList<>();
 
     for (Order order : recentOrders) {
