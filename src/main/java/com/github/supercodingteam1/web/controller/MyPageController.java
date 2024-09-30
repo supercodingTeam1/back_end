@@ -32,8 +32,6 @@ import java.util.Map;
 public class MyPageController {
 
     private final UserService userService;
-
-
 //    private final JwtTokenProviderService jwtTokenProviderService;
 //
 //
@@ -114,23 +112,16 @@ public class MyPageController {
     public ResponseEntity<?> MyBuyInfo(@AuthenticationPrincipal CustomUserDetails userDetails) {
         log.info("my buy info 요청");
 
-        if (userDetails == null) {
-            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body("인증된 사용자가 아닙니다.");
-        }
-
-        Map<String, Object> responseBody = new HashMap<>();
-
         try {
-            log.info("getDetailItem 메소드 호출");
-            MyPageDTO myPageDTO = userService.getMyBuyInfo(userDetails);
-            responseBody.put("myPageBuyInfo", myPageDTO);
-            return ResponseEntity.ok(responseBody);
-        } catch (NotFoundException nfe) {
-            responseBody.put("status", HttpStatus.NOT_FOUND);
-            responseBody.put("message", nfe.getMessage());
-            return ResponseEntity.notFound().build();
+            if (userDetails == null) {
+                return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body("인증된 사용자가 아닙니다.");
+            }
+            MyPageDTO<?> myInfo = userService.getMyBuyInfo(userDetails);
+            myInfo.setStatus(200);
+            myInfo.setMessage("성공적으로 불러왔습니다.");
+            return ResponseEntity.ok().body(myInfo);
+        }catch (Exception e) {
+            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(e.getMessage());
         }
-
     }
-
 }

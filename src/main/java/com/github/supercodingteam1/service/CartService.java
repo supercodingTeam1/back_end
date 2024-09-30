@@ -78,7 +78,7 @@ public class CartService {
     }
 
     @Transactional
-    public void addItemToCart(AddToCartDTO addToCartDTO, CustomUserDetails customUserDetails) {
+    public Cart addItemToCart(AddToCartDTO addToCartDTO, CustomUserDetails customUserDetails) {
         //TODO : 카트 담을 때 같은 아이템의 같은 옵션을 또 장바구니에 담으면 quantity 만큼만 수량 증가하고 메소드 종료
         //TODO : httpServletRequest에서 헤더 가져와서 token 파싱하여 user 가져와야함.
         String email = customUserDetails.getEmail();
@@ -86,6 +86,9 @@ public class CartService {
         User user = userRepository.findByEmail(email).orElse(null);
 
         Option option = optionRepository.findById(addToCartDTO.getOption_id()).orElse(null);
+        if(option == null) {
+            throw new NotFoundException("존재하지 않는 아이템입니다.");
+        }
         Integer quantity = addToCartDTO.getQuantity();
 
         List<Cart> userCartList = cartRepository.findAllByUser(user); //user의 cart 목록 전부 가져오기
@@ -119,6 +122,7 @@ public class CartService {
             optionCart.getCart().setCartQuantity(optionCart.getCart().getCartQuantity() + quantity);
             optionCartRepository.save(optionCart);
         }
+        return cart;
     }
 
     @Transactional
@@ -157,7 +161,7 @@ public class CartService {
     }
 
     @Transactional
-    public void orderItem(OrderDTO orderDTO, CustomUserDetails customUserDetails) throws Exception {
+    public Order orderItem(OrderDTO orderDTO, CustomUserDetails customUserDetails) throws Exception {
         //TODO : 물품 주문 시 option에 stock 조정, order 테이블에 주문기록 저장
 
         try {
@@ -215,6 +219,7 @@ public class CartService {
                 item.setTotalSales(item.getTotalSales() + orderDetail.getQuantity());
 
                 orderDetail.setOrder(order);
+                order.getOrderDetails().add(orderDetail);
 
                 itemRepository.save(item);
                 optionRepository.save(option);
@@ -227,12 +232,12 @@ public class CartService {
                 List<OptionCart> optionCartList = optionCartRepository.findAllByCart_User(user);
                 List<Cart> cartList = optionCartList.stream().map(OptionCart::getCart).toList();
                 cartRepository.deleteAll(cartList);
-            }else{ //바로구매 누른것이면 cart가 없으니까 새로 만들어야함.
-                System.out.println("바로구매 + " + orderDTO);
             }
+
+            return order;
         }catch (IllegalArgumentException e){
-            log.error("재고보다 주문한 수량이 많습니다.");
-            throw new IllegalArgumentException("재고보다 주문한 수량이 많습니다.");
+            log.error(e.getMessage());
+            throw new IllegalArgumentException(e.getMessage());
         }catch (Exception e){
             log.error(e.getMessage());
             throw new Exception(e.getMessage());

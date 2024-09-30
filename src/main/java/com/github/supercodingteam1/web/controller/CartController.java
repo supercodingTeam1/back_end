@@ -1,11 +1,14 @@
 package com.github.supercodingteam1.web.controller;
 
 import com.github.supercodingteam1.repository.UserDetails.CustomUserDetails;
+import com.github.supercodingteam1.repository.entity.cart.Cart;
+import com.github.supercodingteam1.repository.entity.order.Order;
 import com.github.supercodingteam1.service.CartService;
 import com.github.supercodingteam1.service.ItemService;
 import com.github.supercodingteam1.web.dto.*;
 import com.github.supercodingteam1.repository.entity.user.User;
 import com.github.supercodingteam1.repository.entity.user.UserRepository;
+import com.github.supercodingteam1.web.exceptions.NotFoundException;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.responses.ApiResponses;
@@ -23,7 +26,9 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.bind.annotation.*;
 
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 
 @RestController
@@ -44,19 +49,36 @@ public class CartController {
     @GetMapping
     public ResponseEntity<?> getAllCartItem(@AuthenticationPrincipal CustomUserDetails userDetails) { //장바구니 조회
         log.info("getAllCartItem 메소드 호출");
+        Map<String, Object> responseBody = new HashMap<>();
 
-        if (userDetails == null) {
-            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body("인증된 사용자가 아닙니다.");
+        try {
+            if (userDetails == null) {
+                return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body("인증된 사용자가 아닙니다.");
+            }
+
+            List<CartResponseDTO> cartResponseDTOList = cartService.getAllCartItem(userDetails);
+
+            if (cartResponseDTOList.isEmpty() || cartResponseDTOList == null) {
+                return ResponseEntity.badRequest().body(
+                        ResponseDTO.builder().status(HttpStatus.NOT_FOUND.value())
+                                .message("장바구니가 비었습니다.")
+                                .build()
+                );
+            }
+
+            return ResponseEntity.ok().body(ResponseDTO.builder()
+                    .status(HttpStatus.OK.value())
+                    .message("장바구니 조회에 성공했습니다.")
+                    .data(cartResponseDTOList)
+                    .build());
+        }catch (NotFoundException nfe) {
+            return ResponseEntity.status(HttpStatus.NOT_FOUND.value()).body(
+                    ResponseDTO.builder()
+                            .status(HttpStatus.NOT_FOUND.value())
+                            .message(nfe.getMessage())
+                            .build()
+            );
         }
-
-        List<CartResponseDTO> cartResponseDTOList = cartService.getAllCartItem(userDetails);
-
-        return ResponseEntity.ok().body(cartResponseDTOList);
-//
-//        return ResponseEntity.ok(ResponseDTO.builder()
-//                .status(200)
-//                .message("장바구니 조회에 성공했습니다.")
-//                .build());
     }
     @Operation(summary = "장바구니에 물품 추가")
     @ApiResponses({
@@ -69,16 +91,25 @@ public class CartController {
         //TODO : httpServletRequest에서 토큰 가져와서 user 객체 생성 해야함
         log.info("addItemCart 메소드 호출, {},{}", addToCartDTO.getOption_id(), addToCartDTO.getQuantity());
         try {
-            cartService.addItemToCart(addToCartDTO, customUserDetails);
+            Cart cart = cartService.addItemToCart(addToCartDTO, customUserDetails);
 
             return ResponseEntity.ok(ResponseDTO.builder()
                     .status(200)
                     .message("장바구니에 담았습니다.")
+                    .data(cart.toString())
                     .build());
-        }catch (Exception e){
+        }catch (NotFoundException nfe){
             return ResponseEntity.badRequest().body(
                     ResponseDTO.builder()
-                            .status(400)
+                            .status(404)
+                            .message(nfe.getMessage())
+                            .build()
+            );
+        }
+        catch (Exception e){
+            return ResponseEntity.badRequest().body(
+                    ResponseDTO.builder()
+                            .status(500)
                             .message(e.getMessage())
                             .build()
             );
@@ -150,11 +181,13 @@ public class CartController {
     public ResponseEntity<?> orderItem(@AuthenticationPrincipal CustomUserDetails customUserDetails, @RequestBody OrderDTO orderDTO){
         log.info("orderItem : {}", orderDTO.getIsFromCart() ? "장바구니 주문":"바로구매");
         try {
-            cartService.orderItem(orderDTO, customUserDetails);
+            Order order = cartService.orderItem(orderDTO, customUserDetails);
+            System.out.println(order.getOrderDetails());
 
             return ResponseEntity.ok(ResponseDTO.builder()
                     .status(200)
                     .message("성공적으로 주문되었습니다.")
+                    .data(order.toString())
                     .build());
         }catch (IllegalArgumentException e){
             return ResponseEntity.badRequest().body(

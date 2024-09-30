@@ -12,5 +12,5 @@ public interface OrderRepository extends JpaRepository<Order,Integer> {
 
     List<Order> findTop3ByUser_UserIdOrderByOrderAtDesc(int userId);
 
-    List<Order> findAllByUser_UserIdFetchDetails(int userId);
+
 }

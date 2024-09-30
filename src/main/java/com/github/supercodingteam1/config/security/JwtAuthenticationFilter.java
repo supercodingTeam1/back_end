@@ -88,6 +88,7 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
                                     FilterChain filterChain) throws ServletException, IOException {
 
         String jwtToken = jwtTokenProvider.resolveToken(request);
+        System.out.println(request.getHeader("origin"));
 
         //테스트
         System.out.println("Request Headers:");
