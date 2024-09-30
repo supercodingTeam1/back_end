@@ -18,7 +18,11 @@ import com.github.supercodingteam1.web.dto.AddSellItemDTO;
 import com.github.supercodingteam1.web.dto.GetAllSalesItemDTO;
 import com.github.supercodingteam1.web.dto.ModifySalesItemOptionDTO;
 import com.github.supercodingteam1.web.dto.OptionDTO;
+import com.github.supercodingteam1.web.exceptions.InvalidStockException;
 import com.github.supercodingteam1.web.exceptions.NotFoundException;
+import com.github.supercodingteam1.web.exceptions.OptionNotFoundException;
+import com.github.supercodingteam1.web.exceptions.UnauthorizedAccessException;
+import jakarta.persistence.LockModeType;
 import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -66,24 +70,36 @@ public class SellService {
     }
 
 
-//    @Transactional
-    public void updateSellItem(List<ModifySalesItemOptionDTO> modifySalesItemOptionDTOList) {
-        // 각 옵션에 대해 업데이트
+    @Transactional
+    public void updateSellItem(List<ModifySalesItemOptionDTO> modifySalesItemOptionDTOList, CustomUserDetails customUserDetails) {
+        List<Option> optionsToUpdate = new ArrayList<>();
+
         for (ModifySalesItemOptionDTO dto : modifySalesItemOptionDTOList) {
-            // 옵션 ID에 해당하는 옵션을 조회
-            Option option = optionRepository.findById(dto.getOptionId())
-                    .orElseThrow(() -> new NotFoundException("Option not found with id: " + dto.getOptionId()));
 
-            // 재고(stock)를 업데이트
+            // 옵션 조회
+            Option option = optionRepository.findByOptionId(dto.getOptionId())
+                    .orElseThrow(() -> new OptionNotFoundException("Option not found with id: " + dto.getOptionId()));
+
+            // 현재 사용자가 해당 옵션의 아이템 소유자인지 확인
+            Item item = option.getItem();
+            if (!item.getUser().getUserId().equals(customUserDetails.getUserId())) {
+                throw new UnauthorizedAccessException("You do not have permission to modify this option.");
+            }
+
+            // 재고 업데이트 로직
+            if (dto.getNewStock() < 0) {
+                throw new InvalidStockException("Stock cannot be negative for option ID: " + dto.getOptionId());
+            }
+
             option.setStock(dto.getNewStock());
-
-            // 변경된 값을 저장
-            optionRepository.save(option);
-
-            log.info("Option {}의 재고가 {}로 업데이트되었습니다.", dto.getOptionId(), dto.getNewStock());
+            optionsToUpdate.add(option);
         }
-    }
 
+        // 한 번에 저장 (대량 업데이트)
+        optionRepository.saveAll(optionsToUpdate);
+
+        log.info("{}개의 옵션 재고가 업데이트되었습니다.", optionsToUpdate.size());
+    }
 
     @Transactional
     public void addSellItem(List<MultipartFile> item_image, AddSellItemDTO addSellItemDTO, CustomUserDetails customUserDetails) throws Exception {
