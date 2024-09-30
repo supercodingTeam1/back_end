@@ -95,14 +95,20 @@ public class SalesController {
             @ApiResponse(responseCode = "500", description = "서버 오류")
     })
     @PutMapping
-    public ResponseDTO updateSellItem(@Parameter(description = "옵션 재고 수정", required = true) @RequestBody List<ModifySalesItemOptionDTO> modifySalesItemOptionDTO){
+    public ResponseEntity<?> updateSellItem(@Parameter(description = "옵션 재고 수정", required = true) @RequestBody List<ModifySalesItemOptionDTO> modifySalesItemOptionDTO, @AuthenticationPrincipal CustomUserDetails customUserDetails){
 
         log.info("updateSellItem 메소드 호출 {}", modifySalesItemOptionDTO);
-        sellService.updateSellItem(modifySalesItemOptionDTO);
 
-        return ResponseDTO.builder()
-                .status(200)
-                .message("상품 옵션의 재고를 성공적으로 수정하였습니다").
-                build();
+        try {
+            sellService.updateSellItem(modifySalesItemOptionDTO,customUserDetails);
+            return ResponseEntity.ok().body(ResponseDTO.builder()
+                    .status(200)
+                    .message("상품 옵션의 재고를 성공적으로 수정하였습니다").
+                    build());
+        }catch (Exception e){
+            return ResponseEntity.status(HttpStatus.NOT_FOUND).body(ResponseDTO.builder()
+                    .status(404).message(e.getMessage()).build());
+        }
+
     }
 }
