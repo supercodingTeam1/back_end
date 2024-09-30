@@ -161,7 +161,7 @@ public class CartService {
     }
 
     @Transactional
-    public void orderItem(OrderDTO orderDTO, CustomUserDetails customUserDetails) throws Exception {
+    public Order orderItem(OrderDTO orderDTO, CustomUserDetails customUserDetails) throws Exception {
         //TODO : 물품 주문 시 option에 stock 조정, order 테이블에 주문기록 저장
 
         try {
@@ -219,6 +219,7 @@ public class CartService {
                 item.setTotalSales(item.getTotalSales() + orderDetail.getQuantity());
 
                 orderDetail.setOrder(order);
+                order.getOrderDetails().add(orderDetail);
 
                 itemRepository.save(item);
                 optionRepository.save(option);
@@ -231,12 +232,12 @@ public class CartService {
                 List<OptionCart> optionCartList = optionCartRepository.findAllByCart_User(user);
                 List<Cart> cartList = optionCartList.stream().map(OptionCart::getCart).toList();
                 cartRepository.deleteAll(cartList);
-            }else{ //바로구매 누른것이면 cart가 없으니까 새로 만들어야함.
-                System.out.println("바로구매 + " + orderDTO);
             }
+
+            return order;
         }catch (IllegalArgumentException e){
-            log.error("재고보다 주문한 수량이 많습니다.");
-            throw new IllegalArgumentException("재고보다 주문한 수량이 많습니다.");
+            log.error(e.getMessage());
+            throw new IllegalArgumentException(e.getMessage());
         }catch (Exception e){
             log.error(e.getMessage());
             throw new Exception(e.getMessage());

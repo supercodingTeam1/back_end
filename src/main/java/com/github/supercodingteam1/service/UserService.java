@@ -157,10 +157,10 @@ public class UserService {
   }
 
 
-  public MyPageDTO getMyBuyInfo(CustomUserDetails userDetails) {
+  public MyPageDTO<?> getMyBuyInfo(CustomUserDetails userDetails) {
     int userId = userDetails.getUserId();
 
-    MyPageDTO<MyBuyInfoDTO> myPageDTO = new MyPageDTO<>();
+    MyPageDTO<List<MyBuyInfoDTO>> myPageDTO = new MyPageDTO<>();
     List<MyBuyInfoDTO> myBuyInfoDTOList = new ArrayList<>();
 
     List<Order> myOrderList = orderRepository.findAllByUser_UserId(userId);
@@ -174,7 +174,8 @@ public class UserService {
       myBuyInfoDTOList.add(myBuyInfoDTO);
     }
 
-    myPageDTO.setData((MyBuyInfoDTO) myBuyInfoDTOList);
+
+    myPageDTO.setData(myBuyInfoDTOList);
     return myPageDTO;
   }
 

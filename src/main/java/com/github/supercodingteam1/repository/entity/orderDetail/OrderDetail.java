@@ -27,7 +27,15 @@ public class OrderDetail {
     @Column(name = "quantity", nullable = false)
     private Integer quantity;
 
-    @ManyToOne(fetch = FetchType.LAZY)
+    @ManyToOne(fetch = FetchType.EAGER)
     @JoinColumn(name = "order_id", nullable = false)
     private Order order;
+
+    @Override
+    public String toString() {
+        return "OrderDetail{" +
+                "options=" + options +
+                ", quantity=" + quantity +
+                '}';
+    }
 }
