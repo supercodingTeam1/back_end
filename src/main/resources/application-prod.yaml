@@ -1,0 +1,20 @@
+spring:
+  config:
+    activate:
+      on-profile: prod
+
+  logging:
+    config: classpath:logback-spring-prod.xml
+
+  datasource:
+    url: jdbc:mariadb://shoes-project-mariadb.cn6ioosku2ij.ap-northeast-2.rds.amazonaws.com:3306/shoes_project
+    username: ${RDS_USERNAME}
+    password: ${RDS_PASSWORD}
+    driver-class-name: org.mariadb.jdbc.Driver
+
+  jpa:
+    hibernate:
+      ddl-auto: update
+    properties:
+      hibernate:
+        dialect: org.hibernate.dialect.MariaDBDialect

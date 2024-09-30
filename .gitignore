@@ -26,8 +26,7 @@ out/
 !**/src/main/**/out/
 !**/src/test/**/out/
 *.log
-logs/
-*.yaml
+logs/test.log
 ### NetBeans ###
 /nbproject/private/
 /nbbuild/

@@ -1,8 +1,6 @@
 package com.github.supercodingteam1.web.dto;
 
-import com.github.supercodingteam1.repository.category.Category;
-import com.github.supercodingteam1.repository.image.Image;
-import com.github.supercodingteam1.repository.option.Option;
+import com.github.supercodingteam1.repository.entity.category.Category;
 import lombok.*;
 
 import java.util.List;
@@ -19,4 +17,5 @@ public class GetAllItemDTO {
     private Category category;
     private List<GetAllItemOptionDTO> option;
     private String item_image;
+    private Integer seller_id;
 }

@@ -10,7 +10,7 @@ import lombok.Setter;
 @NoArgsConstructor
 @AllArgsConstructor
 public class GetAllItemOptionDTO {
-    private Integer option_id;
+    private Integer optionId;
     private Integer size;
     private Integer stock;
 }
