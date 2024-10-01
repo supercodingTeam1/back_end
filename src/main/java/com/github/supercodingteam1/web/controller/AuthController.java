@@ -1,5 +1,6 @@
 package com.github.supercodingteam1.web.controller;
 
+import ch.qos.logback.core.subst.Token;
 import com.github.supercodingteam1.config.auth.dto.TokenDTO;
 import com.github.supercodingteam1.config.auth.jwt.JwtTokenProviderService;
 import com.github.supercodingteam1.repository.UserDetails.CustomUserDetails;
@@ -9,6 +10,7 @@ import com.github.supercodingteam1.service.AuthService;
 import com.github.supercodingteam1.service.UserRoleService;
 import com.github.supercodingteam1.service.UserService;
 import com.github.supercodingteam1.web.dto.*;
+import com.github.supercodingteam1.web.exceptions.TokenExpiredException;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
@@ -21,7 +23,9 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.core.Authentication;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
+import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.util.StringUtils;
 import org.springframework.validation.BindingResult;
 import org.springframework.web.bind.annotation.*;
@@ -182,11 +186,28 @@ public class AuthController {
         return null;
     }
 
-    /**   auth/logout
-     * 로그 아웃 처리
-     * @param loginDTO
-     * @return
-     */
+//    /**   auth/logout
+//     * 로그 아웃 처리
+//     * @param loginDTO
+//     * @return
+//     */
+//    @Operation(summary = "로그아웃")
+//    @ApiResponses({
+//            @ApiResponse(responseCode = "200", description = "로그아웃 되었습니다."),
+//            @ApiResponse(responseCode = "403", description = "권한이 없습니다."),
+//            @ApiResponse(responseCode = "500", description = "서버 오류")
+//    })
+//    @PostMapping("/logout")
+//    public ResponseEntity<?> logout(@RequestBody LoginDTO loginDTO){
+//        try{
+//            //DB 에서 토큰 삭제
+//            userService.logout(loginDTO);
+//            return ResponseEntity.ok().body(ResponseDTO.builder().status(200).message("Logout successful").build());
+//        }catch (Exception e){
+//            return ResponseEntity.ok().body(ResponseDTO.builder().status(400).message(e.getMessage()).build());
+//        }
+//    }
+
     @Operation(summary = "로그아웃")
     @ApiResponses({
             @ApiResponse(responseCode = "200", description = "로그아웃 되었습니다."),
@@ -194,15 +215,30 @@ public class AuthController {
             @ApiResponse(responseCode = "500", description = "서버 오류")
     })
     @PostMapping("/logout")
-    public ResponseEntity<?> logout(@RequestBody LoginDTO loginDTO){
-        try{
-            //DB 에서 토큰 삭제
-            userService.logout(loginDTO);
+    public ResponseEntity<?> logout(@AuthenticationPrincipal User user, HttpServletRequest request) {
+        String authHeader = request.getHeader("Authorization");
+        String accessToken = null;
+
+        if (authHeader != null && authHeader.startsWith("Bearer ")) {
+            accessToken = authHeader.substring(7); // "Bearer "를 제거하고 토큰 반환
+        }
+
+        if (user == null) {
+            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(ResponseDTO.builder().status(401).message("Unauthorized").build());
+        }
+
+        try {
+            // DB에서 Refresh Token 삭제
+            authService.logout(user, accessToken);
             return ResponseEntity.ok().body(ResponseDTO.builder().status(200).message("Logout successful").build());
-        }catch (Exception e){
-            return ResponseEntity.ok().body(ResponseDTO.builder().status(400).message(e.getMessage()).build());
+        } catch (TokenExpiredException e) {
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(ResponseDTO.builder().status(400).message("Token has expired").build());
+        } catch (Exception e) {
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(ResponseDTO.builder().status(400).message(e.getMessage()).build());
         }
     }
+
+
 
     @Operation(summary = "회원탈퇴")
     @ApiResponses({
