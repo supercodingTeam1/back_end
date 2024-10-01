@@ -33,6 +33,9 @@ public class SecurityConfiguration {
     @Bean
     public SecurityFilterChain filterChain(HttpSecurity http) throws Exception {
         http
+                .requiresChannel(channel->channel
+                        .anyRequest()
+                        .requiresSecure())
                 .csrf(AbstractHttpConfigurer::disable)  // CSRF 보호 비활성화
                 .cors(cors->cors.configurationSource(corsConfigurationSource()))
                 .sessionManagement(session -> session

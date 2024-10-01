@@ -2,6 +2,7 @@ package com.github.supercodingteam1.service;
 
 
 import com.github.supercodingteam1.config.security.JwtTokenProvider;
+import com.github.supercodingteam1.repository.UserDetails.CustomUserDetails;
 import com.github.supercodingteam1.repository.entity.user.*;
 import com.github.supercodingteam1.web.dto.ResponseDTO;
 import com.github.supercodingteam1.web.dto.SignUpDTO;
@@ -75,7 +76,7 @@ public class AuthService {
 //        }
 //    }
     @Transactional
-    public void logout(User user, String accessToken) throws TokenExpiredException {
+    public void logout(CustomUserDetails user, String accessToken) throws TokenExpiredException {
         RefreshToken refreshToken=refreshTokenRepository.findByUserUserId(user.getUserId());
 
         // 사용자 이름을 이용해 비관적 락을 걸고 사용자 정보 조회
