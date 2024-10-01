@@ -215,7 +215,7 @@ public class AuthController {
             @ApiResponse(responseCode = "500", description = "서버 오류")
     })
     @PostMapping("/logout")
-    public ResponseEntity<?> logout(@AuthenticationPrincipal User user, HttpServletRequest request) {
+    public ResponseEntity<?> logout(@AuthenticationPrincipal CustomUserDetails userDetails, HttpServletRequest request) {
         String authHeader = request.getHeader("Authorization");
         String accessToken = null;
 
@@ -223,13 +223,13 @@ public class AuthController {
             accessToken = authHeader.substring(7); // "Bearer "를 제거하고 토큰 반환
         }
 
-        if (user == null) {
+        if (userDetails == null) {
             return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(ResponseDTO.builder().status(401).message("Unauthorized").build());
         }
 
         try {
             // DB에서 Refresh Token 삭제
-            authService.logout(user, accessToken);
+            authService.logout(userDetails, accessToken);
             return ResponseEntity.ok().body(ResponseDTO.builder().status(200).message("Logout successful").build());
         } catch (TokenExpiredException e) {
             return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(ResponseDTO.builder().status(400).message("Token has expired").build());

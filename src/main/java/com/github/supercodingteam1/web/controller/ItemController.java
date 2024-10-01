@@ -32,8 +32,7 @@ public class ItemController {
     private static final Logger log = LoggerFactory.getLogger(ItemController.class);
     private final ItemService itemService;
 
-    @Operation(summary = "모든 아이템 조회", description = "option 중 모든 option에 대한 stock이 0이면 아이템 전체를 안 보여주고,<br>" +
-                                                        ",option 중 일부 option에 대한 stock이 0이면 해당 option만 안 보여주게 filtering 구현")
+    @Operation(summary = "모든 아이템 조회")
     @ApiResponses({
             @ApiResponse(responseCode = "200", description = "성공적으로 조회했습니다."),
             @ApiResponse(responseCode = "403", description = "권한이 없습니다."),
