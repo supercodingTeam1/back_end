@@ -54,7 +54,7 @@ public class WebMvcConfig implements WebMvcConfigurer {
                 .allowedMethods("GET", "POST", "PUT", "PATCH", "DELETE", "OPTIONS")
                 .allowedHeaders("X-AUTH-TOKEN", "Content-Type") // 실제 사용하는 헤더만 포함
                 .maxAge(CORS_MAX_AGE_SECS)
-                .allowedOrigins("http://localhost:5173", "http://127.0.0.1:5173") // localhost와 127.0.0.1 모두 허용
+                .allowedOrigins("http://localhost:5173", "http://127.0.0.1:5173", "https://shooemall.netlify.app") // localhost와 127.0.0.1 모두 허용
                 .allowCredentials(true) // 자격 증명 허용
                 .exposedHeaders("X-AUTH-TOKEN"); // 클라이언트에서 사용할 수 있는 헤더
     }
