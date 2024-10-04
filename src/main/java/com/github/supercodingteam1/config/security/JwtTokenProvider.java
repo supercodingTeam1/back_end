@@ -1,5 +1,6 @@
 package com.github.supercodingteam1.config.security;
 
+import com.github.supercodingteam1.repository.entity.user.RefreshToken;
 import io.jsonwebtoken.Claims;
 import io.jsonwebtoken.Jwts;
 import io.jsonwebtoken.SignatureAlgorithm;
@@ -66,6 +67,18 @@ public class JwtTokenProvider {
             return claims.getExpiration().after(now);
         } catch (Exception e) {
             return false;
+        }
+    }
+    public boolean isRefreshTokenExpired(RefreshToken refreshToken) {
+        try {
+            Claims claims = Jwts.parserBuilder()
+                    .setSigningKey(key)
+                    .build()
+                    .parseClaimsJws(String.valueOf(refreshToken))
+                    .getBody();
+            return claims.getExpiration().before(new Date());
+        } catch (Exception e) {
+            return true; // 만료된 토큰일 경우 true
         }
     }
 

@@ -18,6 +18,10 @@ import java.util.stream.Collectors;
 public class UserInfoDTO {
 
     private Integer user_id;
+    private String profile;
+    private String email;
+    private String user_address;
+    private String phone_num;
     private String name;
     private List<String> roles;
 
