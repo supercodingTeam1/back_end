@@ -98,7 +98,7 @@ public class SalesController {
     })
     @PutMapping
     public ResponseEntity<?> updateSellItem(
-            @Valid @RequestBody List<ModifySalesItemOptionDTO> modifySalesItemOptionDTOList,
+            @RequestBody List<ModifySalesItemOptionDTO> modifySalesItemOptionDTOList,
             @AuthenticationPrincipal CustomUserDetails customUserDetails) {
 
         try {
