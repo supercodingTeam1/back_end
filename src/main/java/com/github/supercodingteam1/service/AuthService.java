@@ -77,12 +77,15 @@ public class AuthService {
 //    }
     @Transactional
     public void logout(CustomUserDetails user, String accessToken) throws TokenExpiredException {
-        RefreshToken refreshToken=refreshTokenRepository.findByUserUserId(user.getUserId());
+        RefreshToken refreshToken=refreshTokenRepository.findTopByUserUserIdOrderByRefreshTokenIdDesc(user.getUserId());
 
-        // 사용자 이름을 이용해 비관적 락을 걸고 사용자 정보 조회
-        if(!userRepository.findExistByUserName(user.getEmail())){
-            throw new UsernameNotFoundException("해당하는 user name 을 찾을 수 없습니다.");
-        }
+        log.info("Access Token: {}", accessToken);
+
+//        // 사용자 이름을 이용해 비관적 락을 걸고 사용자 정보 조회
+//        if(userRepository.findByUserId(user.getUserId())!=null){
+//            throw new UsernameNotFoundException("해당하는 UserId를 찾을 수 없습니다.");
+//        }
+
         // 엑세스 토큰을 블랙리스트에 추가
         redisTemplate.opsForValue().set(accessToken, "blacklisted", 3600, TimeUnit.SECONDS);
 
@@ -95,7 +98,7 @@ public class AuthService {
             throw new TokenExpiredException("이미 만료된 토큰입니다.");
         }
 
-        refreshTokenRepository.deleteByUserUserId(user.getUserId());
+        refreshTokenRepository.deleteAllByUserUserId(user.getUserId());
 
         //로그아웃 기록 조회
         log.info("User {} logged out successfully", user.getUserId());

@@ -6,9 +6,9 @@ public interface RefreshTokenRepository  extends JpaRepository<RefreshToken, Int
 
 
     // user의 id를 기반으로 refresh token을 삭제
-    public void deleteByUserUserId(Integer userId);
+    public void deleteAllByUserUserId(Integer userId);
 
-    RefreshToken findByUserUserId(Integer user);
+    RefreshToken findTopByUserUserIdOrderByRefreshTokenIdDesc(Integer user);
 
     RefreshToken findByRefreshToken(String refreshToken);
 
