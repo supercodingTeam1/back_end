@@ -3,8 +3,6 @@ package com.github.supercodingteam1.service;
 
 import com.github.supercodingteam1.config.auth.jwt.JwtTokenProviderService;
 import com.github.supercodingteam1.repository.UserDetails.CustomUserDetails;
-import com.github.supercodingteam1.repository.entity.item.Item;
-import com.github.supercodingteam1.repository.entity.option.Option;
 import com.github.supercodingteam1.repository.entity.order.Order;
 import com.github.supercodingteam1.repository.entity.order.OrderRepository;
 import com.github.supercodingteam1.repository.entity.orderDetail.OrderDetail;
@@ -12,10 +10,8 @@ import com.github.supercodingteam1.repository.entity.orderDetail.OrderDetailRepo
 import com.github.supercodingteam1.repository.entity.user.RefreshTokenRepository;
 import com.github.supercodingteam1.repository.entity.user.User;
 import com.github.supercodingteam1.repository.entity.user.UserRepository;
-import com.github.supercodingteam1.service.Utils.ImageUtils;
 import com.github.supercodingteam1.service.Utils.MyBuyInfoDTOUtils;
 import com.github.supercodingteam1.web.dto.*;
-import com.github.supercodingteam1.web.exceptions.NotFoundException;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.log4j.Log4j2;
 import org.springframework.security.core.GrantedAuthority;
@@ -25,7 +21,6 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.util.ArrayList;
-import java.util.Collections;
 import java.util.stream.Collectors;
 import java.util.Objects;
 import java.util.List;
@@ -81,11 +76,9 @@ public class UserService {
 
   /**
    * 회원 탈퇴 처리
-   *
-   * @param withdrawDTO
    */
   @Transactional
-  public void withdraw(WithdrawDTO withdrawDTO, CustomUserDetails customUserDetails) {
+  public void withdraw(CustomUserDetails customUserDetails) {
     //1.토큰 삭제
 
     refreshTokenRepository.deleteAllByUserUserId(customUserDetails.getUserId());

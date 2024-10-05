@@ -16,6 +16,7 @@ public interface GetAllItemMapper {
     @Mapping(target = "item_name", source = "itemName")
     @Mapping(target = "item_image", expression = "java(item.getImageList() != null && !item.getImageList().isEmpty() ? item.getImageList().get(0).getImageLink() : null)")
     @Mapping(target = "price", source = "itemPrice")
+    @Mapping(target = "option", source = "optionList") // 매핑 추가
     @Mapping(target = "seller_id", source = "user.userId")
     GetAllItemDTO ItemToGetAllItemDTO(Item item);
 

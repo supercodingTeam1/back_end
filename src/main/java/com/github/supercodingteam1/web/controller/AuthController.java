@@ -247,10 +247,10 @@ public class AuthController {
             @ApiResponse(responseCode = "500", description = "서버 오류")
     })
     @DeleteMapping("/withdraw")
-    public ResponseEntity<?> withdraw(@AuthenticationPrincipal CustomUserDetails customUserDetails, @RequestBody WithdrawDTO withdrawDTO){
+    public ResponseEntity<?> withdraw(@AuthenticationPrincipal CustomUserDetails customUserDetails){
         try{
             //DB 에서 토큰 삭제
-            userService.withdraw(withdrawDTO, customUserDetails);
+            userService.withdraw(customUserDetails);
             return ResponseEntity.ok().body(ResponseDTO.builder().status(200).message("success").build());
         }catch (Exception e){
             return ResponseEntity.ok().body(ResponseDTO.builder().status(400).message(e.getMessage()).build());
