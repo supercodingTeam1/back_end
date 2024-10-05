@@ -138,7 +138,7 @@ public class JwtTokenProviderService {
         String userId=validateAndGetUserId(refreshToken);
 
         //2.DB 에서 삭제 처리
-        refreshTokenRepository.deleteByUserUserId(Integer.valueOf(userId));
+        refreshTokenRepository.deleteAllByUserUserId(Integer.valueOf(userId));
     }
 
 
