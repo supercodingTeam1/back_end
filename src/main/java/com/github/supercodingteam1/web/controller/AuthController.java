@@ -216,11 +216,11 @@ public class AuthController {
     })
     @PostMapping("/logout")
     public ResponseEntity<?> logout(@AuthenticationPrincipal CustomUserDetails userDetails, HttpServletRequest request) {
-        String authHeader = request.getHeader("Authorization");
+        String authHeader = request.getHeader("X-AUTH-TOKEN");
         String accessToken = null;
 
-        if (authHeader != null && authHeader.startsWith("Bearer ")) {
-            accessToken = authHeader.substring(7); // "Bearer "를 제거하고 토큰 반환
+        if (authHeader != null) {
+            accessToken = authHeader.substring(7);
         }
 
         if (userDetails == null) {

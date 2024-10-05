@@ -67,16 +67,16 @@ public class UserService {
 
   }
 
-
-  /**
-   * 로그아웃처리
-   *
-   * @param loginDTO
-   */
-  public void logout(LoginDTO loginDTO) {
-    User user = userRepository.findByUserName(loginDTO.getUser_email());
-    refreshTokenRepository.deleteByUserUserId(user.getUserId());
-  }
+//
+//  /**
+//   * 로그아웃처리
+//   *
+//   * @param loginDTO
+//   */
+//  public void logout(LoginDTO loginDTO) {
+//    User user = userRepository.findByUserName(loginDTO.getUser_email());
+//    refreshTokenRepository.deleteAllByUserUserId(user.getUserId());
+//  }
 
 
   /**
@@ -88,7 +88,7 @@ public class UserService {
   public void withdraw(WithdrawDTO withdrawDTO, CustomUserDetails customUserDetails) {
     //1.토큰 삭제
 
-    refreshTokenRepository.deleteByUserUserId(customUserDetails.getUserId());
+    refreshTokenRepository.deleteAllByUserUserId(customUserDetails.getUserId());
 
     //2.유저 삭제
     userRepository.deleteById(customUserDetails.getUserId());
