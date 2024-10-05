@@ -217,10 +217,10 @@ public class AuthController {
     @PostMapping("/logout")
     public ResponseEntity<?> logout(@AuthenticationPrincipal CustomUserDetails userDetails, HttpServletRequest request) {
         String authHeader = request.getHeader("X-AUTH-TOKEN");
-        String accessToken = null;
+        String accessToken=null;
 
         if (authHeader != null) {
-            accessToken = authHeader.substring(7);
+            accessToken = authHeader;
         }
 
         if (userDetails == null) {
