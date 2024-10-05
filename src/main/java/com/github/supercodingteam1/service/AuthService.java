@@ -89,14 +89,14 @@ public class AuthService {
         // 엑세스 토큰을 블랙리스트에 추가
         redisTemplate.opsForValue().set(accessToken, "blacklisted", 3600, TimeUnit.SECONDS);
 
-        //refreshToken이 이미 삭제되었는데 다시 로그아웃 요청을 보냈을 때
-        if (!refreshTokenRepository.existsByUserUserId(user.getUserId())) {
-            throw new IllegalStateException("이미 로그아웃된 사용자입니다.");
-        }
-        //refreshToken이 이미 만료된 경우
-        if (jwtTokenProvider.isRefreshTokenExpired(refreshToken)) {
-            throw new TokenExpiredException("이미 만료된 토큰입니다.");
-        }
+//        //refreshToken이 이미 삭제되었는데 다시 로그아웃 요청을 보냈을 때
+//        if (!refreshTokenRepository.existsByUserUserId(user.getUserId())) {
+//            throw new IllegalStateException("이미 로그아웃된 사용자입니다.");
+//        }
+//        //refreshToken이 이미 만료된 경우
+//        if (jwtTokenProvider.isRefreshTokenExpired(refreshToken)) {
+//            throw new TokenExpiredException("이미 만료된 토큰입니다.");
+//        }
 
         refreshTokenRepository.deleteAllByUserUserId(user.getUserId());
 
