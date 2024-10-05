@@ -8994,3 +8994,4 @@ org.springframework.security.authentication.BadCredentialsException: Invalid
 2024-10-05 22:55:28.606 [http-nio-8080-exec-3] [34mINFO [0;39m [36mc.g.s.c.s.JwtAuthenticationFilter[0;39m - Filter running ..
 2024-10-05 22:55:29.444 [http-nio-8080-exec-3] [34mINFO [0;39m [36mc.g.s.c.s.JwtAuthenticationFilter[0;39m - 필터 === customUserDetails  [ROLE_ADMIN]
 2024-10-05 22:55:29.607 [http-nio-8080-exec-3] [34mINFO [0;39m [36mc.g.s.service.AuthService[0;39m - Access Token: iOiJIUzUxMiJ9.eyJ1c2VySWQiOjIwLCJzdWIiOiIyMCIsImlzcyI6InN1cGVyY29kaW5nIGFwcCIsImlhdCI6MTcyODEzNjUxOSwiZXhwIjoxNzI4MTQwMTE5fQ.qo7Vv8s9h_He4769ZCIi2kwn6_Mpz1cQCbGdoo7x3oSzpQhmFAuWR0CZj4kRKIu-wqtjYb2sJrPpXZdvUDRedw
+2024-10-05 23:18:39.578 [SpringApplicationShutdownHook] [34mINFO [0;39m [36mo.s.o.j.LocalContainerEntityManagerFactoryBean[0;39m - Closing JPA EntityManagerFactory for persistence unit 'default'
