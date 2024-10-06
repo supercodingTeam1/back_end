@@ -144,12 +144,13 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
 
         }catch (CustomAuthenticationException e  ){
             log.info("JWT CustomAuthenticationException 에러 처리 : "+e.getMessage());
-            //1.에러처리 방법 :커스텀 에러 메시지는 다음과 같이 printWriter 전송 처리 한다.
-            response.setStatus(HttpServletResponse.SC_BAD_REQUEST);
+
+            // 에러처리 방법 : 커스텀 에러 메시지는 다음과 같이 printWriter 전송 처리 한다.
+            response.setStatus(HttpServletResponse.SC_UNAUTHORIZED);  // 401 Unauthorized로 변경
             response.setCharacterEncoding("utf-8");
             response.setContentType("application/json");
-            ResponseDTO  errorRes= ResponseDTO.builder()
-                    .status(400)
+            ResponseDTO errorRes = ResponseDTO.builder()
+                    .status(401)  // 상태 코드도 401로 설정
                     .message(e.getMessage())
                     .build();
 
