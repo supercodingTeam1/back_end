@@ -94,19 +94,36 @@ public class ItemService {
             page -= 1; // 페이지 번호를 0부터 시작하도록 조정
             Comparator<Item> comparator = null;
 
+//            // 정렬 기준 설정
+//            if(sort != null && !sort.isEmpty()) {
+//                if ("sales".equalsIgnoreCase(sort)) {
+//                    comparator = Comparator.comparing(Item::getTotalSales).reversed();
+//                } else if("price".equalsIgnoreCase(sort)){
+//                    comparator = Comparator.comparing(Item::getItemPrice);
+//                } else {
+//                    comparator = Comparator.comparing(Item::getItemId).reversed();
+//                }
+//                if(order != null && "desc".equalsIgnoreCase(order)){
+//                    comparator = comparator.reversed();
+//                }
+//            }
+
             // 정렬 기준 설정
             if(sort != null && !sort.isEmpty()) {
                 if ("sales".equalsIgnoreCase(sort)) {
-                    comparator = Comparator.comparing(Item::getTotalSales).reversed();
+                    comparator = Comparator.comparing(Item::getTotalSales).reversed();  // sales 기준 정렬(판매율높은 순)
                 } else if("price".equalsIgnoreCase(sort)){
-                    comparator = Comparator.comparing(Item::getItemPrice);
+                    comparator = Comparator.comparing(Item::getItemPrice);   // price 기준 정렬(저가순)
                 } else {
-                    comparator = Comparator.comparing(Item::getItemId);
+                    comparator = Comparator.comparing(Item::getItemId).reversed();  // 기본 정렬: itemId 내림차순
                 }
+            } else {
+                // sort가 없을 경우 기본 정렬: itemId 내림차순
+                comparator = Comparator.comparing(Item::getItemId).reversed();
+            }
 
-                if(order != null && "desc".equalsIgnoreCase(order)){
-                    comparator = comparator.reversed();
-                }
+            if(order != null && "asc".equalsIgnoreCase(order)){
+                comparator = comparator.reversed();  // asc 요청이 들어오면 정렬 순서를 바꿈
             }
 
             // 전체 아이템을 필터링
