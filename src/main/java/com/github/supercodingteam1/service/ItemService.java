@@ -89,6 +89,73 @@ public class ItemService {
 
     }
 
+    public PagedModel<EntityModel<GetAllItemDTO>> getAllCategoryItemsPage(String categoryGender, String categoryType, Integer page, Integer size, String sort, String order, Integer optionSize) throws Exception {
+        try {
+            page -= 1; // 페이지 번호를 0부터 시작하도록 조정
+            Comparator<Item> comparator = null;
+
+            // 정렬 기준 설정
+            if(sort != null && !sort.isEmpty()) {
+                if ("sales".equalsIgnoreCase(sort)) {
+                    comparator = Comparator.comparing(Item::getTotalSales).reversed();
+                } else if("price".equalsIgnoreCase(sort)){
+                    comparator = Comparator.comparing(Item::getItemPrice);
+                } else {
+                    comparator = Comparator.comparing(Item::getItemId);
+                }
+
+                if(order != null && "desc".equalsIgnoreCase(order)){
+                    comparator = comparator.reversed();
+                }
+            }
+
+            // 전체 아이템을 필터링
+            List<Item> filteredItems = itemRepository.findAll().stream()
+                    .filter(item -> {
+                        boolean matchesGender = categoryGender == null ||
+                                (item.getCategory().getCategoryGender() != null &&
+                                        item.getCategory().getCategoryGender().equals(categoryGender));
+                        boolean matchesType = categoryType == null ||
+                                (item.getCategory().getCategoryType() != null &&
+                                        item.getCategory().getCategoryType().equals(categoryType));
+                        return matchesGender && matchesType;
+                    })
+                    .filter(item -> (optionSize == null || hasOptionWithSize(item, optionSize)))
+                    .filter(this::isStockMoreThanZero)
+                    .toList();
+
+            // 정렬
+            if(comparator != null){
+                filteredItems = filteredItems.stream().sorted(comparator).toList();
+            }
+
+            // sales 기준으로 상위 8개 아이템만 표시
+            if(sort != null && sort.equalsIgnoreCase("sales")){
+                filteredItems = filteredItems.stream().limit(8).toList();
+            }
+
+            // 페이지 계산
+            Integer totalItems = filteredItems.size();
+            Integer start = Math.max(0, page * size);
+            Integer end = Math.min(start + size, totalItems);
+
+            List<GetAllItemDTO> convertedAllItems = filteredItems.subList(start, end)
+                    .stream()
+                    .map(this::convertToGetAllItemDTO)
+                    .toList();
+
+            Page<GetAllItemDTO> getAllItemDTOPage = new PageImpl<>(convertedAllItems, PageRequest.of(page, size), totalItems);
+            return pagedResourcesAssembler.toModel(getAllItemDTOPage);
+
+        } catch (Exception e) {
+            // 오류 로그 추가
+            log.error("Error retrieving category items: ", e);
+            throw new Exception(e.getMessage());
+        }
+    }
+
+
+
     private boolean isStockMoreThanZero(Item item) {
         return optionRepository.findAllByItem(item).stream()
                 .anyMatch(option -> option.getStock() > 0);
@@ -141,5 +208,6 @@ public class ItemService {
         }
 
     }
+
 
 }
