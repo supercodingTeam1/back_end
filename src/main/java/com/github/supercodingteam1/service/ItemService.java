@@ -122,8 +122,8 @@ public class ItemService {
                 comparator = Comparator.comparing(Item::getItemId).reversed();
             }
 
-            if(order != null && "asc".equalsIgnoreCase(order)){
-                comparator = comparator.reversed();  // asc 요청이 들어오면 정렬 순서를 바꿈
+            if(order != null && "desc".equalsIgnoreCase(order)){
+                comparator = comparator.reversed();
             }
 
             // 전체 아이템을 필터링
