@@ -36,58 +36,58 @@ public class ItemService {
     @Autowired
     private final PagedResourcesAssembler<GetAllItemDTO> pagedResourcesAssembler;
 
-    public PagedModel<EntityModel<GetAllItemDTO>> getAllItemsPage(Integer page, Integer size, String sort, String order, Integer optionSize) throws Exception {
-        try {
-            page -= 1;
-            Comparator<Item> comparator = null;
-
-            if(sort != null && !sort.isEmpty()) {
-                if ("sales".equalsIgnoreCase(sort)) {
-                    comparator = Comparator.comparing(Item::getTotalSales);
-                    comparator = comparator.reversed();
-                }else if("price".equalsIgnoreCase(sort)){
-                    comparator = Comparator.comparing(Item::getItemPrice);
-                }else{ //sort 없으면 등록순
-                    comparator = Comparator.comparing(Item::getItemId);
-                }
-
-                if(order != null && "desc".equalsIgnoreCase(order)){
-                    comparator = comparator.reversed();
-                }
-            }
-
-            //option 중 모든 option에 대한 stock이 0이면 아이템 전체를 안보여주고
-            //option 중 일부 option에 대한 stock이 0이면 해당 option만 안보여주게 filtering 구현
-
-            List<Item> filteredItems = itemRepository.findAll().stream()
-                    .filter(item -> (optionSize == null || hasOptionWithSize(item, optionSize)))
-                    .filter(this::isStockMoreThanZero)
-                    .toList();
-            if(comparator != null){
-                filteredItems = filteredItems.stream().sorted(comparator).toList();
-            }
-
-            if(sort != null && sort.equalsIgnoreCase("sales")){
-                filteredItems = filteredItems.stream().limit(8).toList();
-            }
-
-            Integer totalItems = filteredItems.size();
-            Integer start = Math.toIntExact(Math.min(page*size, totalItems));
-            Integer end = Math.min(start + size, totalItems);
-
-            List<GetAllItemDTO> convertedAllItems = filteredItems.subList(start, end)
-                    .stream()
-                    .map(this::convertToGetAllItemDTO)
-                    .toList();
-            Page<GetAllItemDTO> getAllItemDTOPage = new PageImpl<>(convertedAllItems, PageRequest.of(page, size), totalItems);
-
-            PagedModel<EntityModel<GetAllItemDTO>> getAllItemDTOPagedModel = pagedResourcesAssembler.toModel(getAllItemDTOPage);
-            return getAllItemDTOPagedModel;
-        }catch (Exception e){
-            throw new Exception(e.getMessage());
-        }
-
-    }
+//    public PagedModel<EntityModel<GetAllItemDTO>> getAllItemsPage(Integer page, Integer size, String sort, String order, Integer optionSize) throws Exception {
+//        try {
+//            page -= 1;
+//            Comparator<Item> comparator = null;
+//
+//            if(sort != null && !sort.isEmpty()) {
+//                if ("sales".equalsIgnoreCase(sort)) {
+//                    comparator = Comparator.comparing(Item::getTotalSales);
+//                    comparator = comparator.reversed();
+//                }else if("price".equalsIgnoreCase(sort)){
+//                    comparator = Comparator.comparing(Item::getItemPrice);
+//                }else{ //sort 없으면 등록순
+//                    comparator = Comparator.comparing(Item::getItemId);
+//                }
+//
+//                if(order != null && "desc".equalsIgnoreCase(order)){
+//                    comparator = comparator.reversed();
+//                }
+//            }
+//
+//            //option 중 모든 option에 대한 stock이 0이면 아이템 전체를 안보여주고
+//            //option 중 일부 option에 대한 stock이 0이면 해당 option만 안보여주게 filtering 구현
+//
+//            List<Item> filteredItems = itemRepository.findAll().stream()
+//                    .filter(item -> (optionSize == null || hasOptionWithSize(item, optionSize)))
+//                    .filter(this::isStockMoreThanZero)
+//                    .toList();
+//            if(comparator != null){
+//                filteredItems = filteredItems.stream().sorted(comparator).toList();
+//            }
+//
+//            if(sort != null && sort.equalsIgnoreCase("sales")){
+//                filteredItems = filteredItems.stream().limit(8).toList();
+//            }
+//
+//            Integer totalItems = filteredItems.size();
+//            Integer start = Math.toIntExact(Math.min(page*size, totalItems));
+//            Integer end = Math.min(start + size, totalItems);
+//
+//            List<GetAllItemDTO> convertedAllItems = filteredItems.subList(start, end)
+//                    .stream()
+//                    .map(this::convertToGetAllItemDTO)
+//                    .toList();
+//            Page<GetAllItemDTO> getAllItemDTOPage = new PageImpl<>(convertedAllItems, PageRequest.of(page, size), totalItems);
+//
+//            PagedModel<EntityModel<GetAllItemDTO>> getAllItemDTOPagedModel = pagedResourcesAssembler.toModel(getAllItemDTOPage);
+//            return getAllItemDTOPagedModel;
+//        }catch (Exception e){
+//            throw new Exception(e.getMessage());
+//        }
+//
+//    }
 
     public PagedModel<EntityModel<GetAllItemDTO>> getAllCategoryItemsPage(String categoryGender, String categoryType, Integer page, Integer size, String sort, String order, Integer optionSize) throws Exception {
         try {
