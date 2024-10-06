@@ -32,43 +32,43 @@ public class ItemController {
     private static final Logger log = LoggerFactory.getLogger(ItemController.class);
     private final ItemService itemService;
 
-    @Operation(summary = "모든 아이템 조회")
+//    @Operation(summary = "모든 아이템 조회")
+//    @ApiResponses({
+//            @ApiResponse(responseCode = "200", description = "성공적으로 조회했습니다."),
+//            @ApiResponse(responseCode = "403", description = "권한이 없습니다."),
+//            @ApiResponse(responseCode = "500", description = "서버 오류")
+//    })
+//    @SecurityRequirement(name = "") //swagger에서 인증 제외
+//    @GetMapping //물품전체조회
+//    public ResponseEntity<?> getAllItems(HttpServletRequest httpServletRequest,
+//                                         @Schema(description = "정렬 기준, sales로 설정하면 정렬된 목록에서 상위 8개만 출력", allowableValues = {"sales", "price"}) @RequestParam(required = false) String sort,
+//                                         @Schema(description = "정렬 순서",allowableValues = {"asc", "desc"})@RequestParam(required = false) String order,
+//                                         @Schema(description = "사이즈별 필터링")@RequestParam(required = false) Integer optionSize,
+//                                         @Schema(description = "페이지 번호", defaultValue = "1")@RequestParam(value = "page", defaultValue = "1") Integer page,
+//                                         @Schema(description = "한 페이지에 보여질 아이템 수", defaultValue = "10")@RequestParam(value = "size", defaultValue = "10") Integer size){
+//        Map<String, Object> responseBody = new HashMap<>();
+//        log.info("getAllItems 메소드 호출");
+//        try {
+//            PagedModel<EntityModel<GetAllItemDTO>> getAllItemDTOPage = itemService.getAllItemsPage(page, size, sort, order, optionSize);
+//
+//            responseBody.put("items", getAllItemDTOPage);
+//            responseBody.put("status", HttpStatus.OK.value());
+//            responseBody.put("message", "성공적으로 조회했습니다.");
+//            return ResponseEntity.ok(responseBody);
+//
+//        }catch (Exception e) {
+//            responseBody.put("error", e.getMessage());
+//        }
+//        return ResponseEntity.ok(responseBody);
+//    }
+    @Operation(summary = "모든 아이템 조회 및 카테고리별 아이템 조회")
     @ApiResponses({
             @ApiResponse(responseCode = "200", description = "성공적으로 조회했습니다."),
             @ApiResponse(responseCode = "403", description = "권한이 없습니다."),
             @ApiResponse(responseCode = "500", description = "서버 오류")
     })
     @SecurityRequirement(name = "") //swagger에서 인증 제외
-    @GetMapping //물품전체조회
-    public ResponseEntity<?> getAllItems(HttpServletRequest httpServletRequest,
-                                         @Schema(description = "정렬 기준, sales로 설정하면 정렬된 목록에서 상위 8개만 출력", allowableValues = {"sales", "price"}) @RequestParam(required = false) String sort,
-                                         @Schema(description = "정렬 순서",allowableValues = {"asc", "desc"})@RequestParam(required = false) String order,
-                                         @Schema(description = "사이즈별 필터링")@RequestParam(required = false) Integer optionSize,
-                                         @Schema(description = "페이지 번호", defaultValue = "1")@RequestParam(value = "page", defaultValue = "1") Integer page,
-                                         @Schema(description = "한 페이지에 보여질 아이템 수", defaultValue = "10")@RequestParam(value = "size", defaultValue = "10") Integer size){
-        Map<String, Object> responseBody = new HashMap<>();
-        log.info("getAllItems 메소드 호출");
-        try {
-            PagedModel<EntityModel<GetAllItemDTO>> getAllItemDTOPage = itemService.getAllItemsPage(page, size, sort, order, optionSize);
-
-            responseBody.put("items", getAllItemDTOPage);
-            responseBody.put("status", HttpStatus.OK.value());
-            responseBody.put("message", "성공적으로 조회했습니다.");
-            return ResponseEntity.ok(responseBody);
-
-        }catch (Exception e) {
-            responseBody.put("error", e.getMessage());
-        }
-        return ResponseEntity.ok(responseBody);
-    }
-    @Operation(summary = "카테고리별 아이템 조회")
-    @ApiResponses({
-            @ApiResponse(responseCode = "200", description = "성공적으로 조회했습니다."),
-            @ApiResponse(responseCode = "403", description = "권한이 없습니다."),
-            @ApiResponse(responseCode = "500", description = "서버 오류")
-    })
-    @SecurityRequirement(name = "") //swagger에서 인증 제외
-    @GetMapping("/category")
+    @GetMapping
     public ResponseEntity<?> getAllCategoryItems(HttpServletRequest httpServletRequest,
                                                  @Schema(description = "카테고리(성별) 페이지",allowableValues = {"남성", "여성","아동"}) @RequestParam(required = false) String categoryGender,
                                                  @Schema(description = "카테고리(타입) 페이지",allowableValues = {"스니커즈","런닝","샌들"}) @RequestParam(required = false) String categoryType,
